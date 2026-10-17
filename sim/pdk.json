@@ -1,0 +1,42 @@
+{
+  "_comment": "Pinned SG13G2 PDK revision this sim/ tree's committed evidence records were generated against. Every record under sim/*/records/*.md must trace to this file (or a later commit that bumps it) -- see sim/README.md 'PDK pin' section. Not consumed by tooling; kept as a plain, greppable fact sheet.",
+  "source": "IHP-GmbH/IHP-Open-PDK",
+  "fetch_method": "klayout-tools scripts/fetch-ihp-sg13g2.sh (2AMLogic/klayout-tools), same fetch this repo's design/README.md documents for schematic-entry work",
+  "release_tag": "v0.3.0",
+  "release_url": "https://github.com/IHP-GmbH/IHP-Open-PDK/archive/refs/tags/v0.3.0.tar.gz",
+  "tarball_sha256": "f6afb7a8d2adf3e40acd3fd2c7892fc93510e6f760565409a8df2b5b242254fc",
+  "pdk_root_layout": "PDK_ROOT/ihp-sg13g2 (open_pdks-shaped install, klt pdk find/list convention)",
+  "variant": "ihp-sg13g2",
+  "documented_tool_versions_from_pdk_versions_txt": {
+    "openvaf": "23.5.0",
+    "ngspice": "43",
+    "xschem": "3.4.6",
+    "note": "This PDK release's own versions.txt names openvaf 23.5.0 as the tool used to build its Verilog-A device models to OSDI. That upstream release ships source only (no binary assets), so this repo builds the same models with the PDK-preferred OpenVAF-Reloaded fork instead -- see osdi_toolchain below and sim/README.md 'OSDI device models'."
+  },
+  "osdi_toolchain": {
+    "_comment": "Provenance of the OSDI (Verilog-A compact model) binaries every MOS/resistor-instantiating testbench in this tree loads. sim/tools/build-osdi.sh is the executable source of truth; this block restates its pins as a greppable fact sheet, per this file's convention. Nothing under sim/ commits a .osdi binary: they are platform-specific shared libraries, rebuilt locally from the PDK's own Verilog-A sources.",
+    "approach": "source-compile the PDK's own Verilog-A models with a checksum-pinned prebuilt OpenVAF-Reloaded compiler",
+    "build_script": "sim/tools/build-osdi.sh",
+    "compiler_repo": "OpenVAF/OpenVAF-Reloaded",
+    "compiler_tag": "v24.0.1mob",
+    "compiler_invocation_name": "openvaf-r",
+    "compiler_asset_sha256": {
+      "openvaf-r-v24.0.1mob-macos-aarch64.tar.gz": "b59a6d7ffba0cdc2e3d3d27edb62d686cde72e7fbe9931f7bed6a4538c15e85e",
+      "openvaf-r-v24.0.1mob-macos-x86_64.tar.gz": "1635e728a81830326c06d4f81e96f2a8943e661b906d4046084c35ff7595f41e",
+      "openvaf-r-v24.0.1mob-linux-x86_64.tar.gz": "3297e32f68becf5e0d4709d7f731d7d26f87f88dc136041334677d3ab36279e3"
+    },
+    "asset_sha256_source": "GitHub release API digest field for the v24.0.1mob release, re-checked 2026-08-21",
+    "platform_actually_exercised": "macos-aarch64 (Darwin 26.6 / arm64) and, as of issue #14, linux-x86_64 (Ubuntu 24.04/noble) -- the windows pin is upstream-attested but not yet executed in this repo. linux-x86_64 needs a fix-up: the pinned openvaf-r-v24.0.1mob-linux-x86_64 release ships lib/libLLVM.so.21.1 as a dangling symlink to ../../x86_64-linux-gnu/libLLVM.so.21.1 -- it assumes the HOST provides a system-installed LLVM 21, which stock Ubuntu 24.04 does not (max system package is libllvm20). As of issue #31, sim/tools/build-osdi.sh handles this automatically on Linux/x86_64: it fetches + sha256-verifies the real libLLVM.so.21.1 from apt.llvm.org's libllvm21 .deb (extracted unprivileged via dpkg-deb -x) and points LD_LIBRARY_PATH at it for its own openvaf-r invocations -- no manual pre-step needed. See libllvm21_deb below for the pin.",
+    "libllvm21_deb": {
+      "_comment": "Linux/x86_64-only pin (issue #31): the real libLLVM.so.21 shared library sim/tools/build-osdi.sh fetches to work around the dangling symlink in the openvaf-r linux-x86_64 release (see platform_actually_exercised above).",
+      "url": "https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-21/libllvm21_21.1.8~++20251221032922+2078da43e25a-1~exp1~20251221153059.70_amd64.deb",
+      "sha256": "f1f058fff19f9d711c32b9efe5cd473dd2f0e7d5338d082fa5a25858322048cd",
+      "distro_release_codename": "noble",
+      "sha256_source": "apt.llvm.org, checked by direct curl + sha256sum against the pin, 2026-08-21"
+    },
+    "models_built": ["psp103.osdi", "psp103_nqs.osdi", "r3_cmc.osdi", "mosvar.osdi"],
+    "install_dir": "PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi (PDK-install territory, not tracked in this repo)",
+    "compile_command": "openvaf-r -D__NGSPICE__ -o <install_dir>/<model>.osdi <model>.va, run from PDK_ROOT/ihp-sg13g2/libs.tech/verilog-a/<model_dir> -- the same flags and model list as the PDK's own libs.tech/verilog-a/openvaf-compile-va.sh",
+    "ngspice_actually_used": "ngspice-47 (homebrew), which has OSDI support compiled in; the PDK's versions.txt documents ngspice 43"
+  }
+}
