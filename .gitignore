@@ -9,6 +9,11 @@ __pycache__/
 # (append-only record trail), so they escape the *.log rule.
 !sim/*/corners/**/*.log
 sim/build/
+# OSDI device-model binaries are platform-specific and rebuilt from the PDK's
+# Verilog-A (sim/harness/common/tools/build-osdi.sh); never committed.
+*.osdi
+# PDK smoke records are append-only evidence: keep their logs.
+!sim/pdk-smoke/**/*.log
 # synthesis / P&R scratch
 flow/build/
 # local klt install, created by the setup script

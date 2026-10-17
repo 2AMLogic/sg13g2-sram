@@ -1,0 +1,55 @@
+{
+  "stamp": "20261017T220236Z",
+  "pdk_release_tag": "v0.3.0",
+  "openvaf_r_version": "v24.0.1mob",
+  "ngspice_version": "ngspice-47",
+  "corner": "mos_tt",
+  "temp_c": 27,
+  "devices": {
+    "sg13_lv_nmos": {
+      "lib": "cornerMOSlv.lib",
+      "w": "1u",
+      "l": "0.13u",
+      "converged": true,
+      "ngspice_rc": 0,
+      "op_id_a": -1.83689e-05,
+      "sweep_points": 34,
+      "id_at_vgs_max_a": -0.00035183268,
+      "id_at_vgs_0_a": -1.55279211e-11
+    },
+    "sg13_lv_pmos": {
+      "lib": "cornerMOSlv.lib",
+      "w": "1u",
+      "l": "0.13u",
+      "converged": true,
+      "ngspice_rc": 0,
+      "op_id_a": 1.275485e-05,
+      "sweep_points": 34,
+      "id_at_vgs_max_a": 0.000173064132,
+      "id_at_vgs_0_a": 2.62463659e-11
+    },
+    "sg13_hv_nmos": {
+      "lib": "cornerMOShv.lib",
+      "w": "1u",
+      "l": "0.45u",
+      "converged": true,
+      "ngspice_rc": 0,
+      "op_id_a": -0.000138866,
+      "sweep_points": 34,
+      "id_at_vgs_max_a": -0.000489800878,
+      "id_at_vgs_0_a": -5.6152455e-14
+    },
+    "sg13_hv_pmos": {
+      "lib": "cornerMOShv.lib",
+      "w": "1u",
+      "l": "0.45u",
+      "converged": true,
+      "ngspice_rc": 0,
+      "op_id_a": 4.171496e-05,
+      "sweep_points": 34,
+      "id_at_vgs_max_a": 0.00018843898,
+      "id_at_vgs_0_a": 6.41413955e-14
+    }
+  },
+  "all_converged": true
+}
