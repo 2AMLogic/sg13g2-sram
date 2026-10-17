@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "imports": [
+    {
+      "from": "2AMLogic/gf180-sram",
+      "commit": "d0bacc0fceb6e9400e54e3efe15ec1630711faa9",
+      "mode": "vendored",
+      "files": [
+        {
+          "upstream": "sim/lib/snm_extract.py",
+          "local": "sim/lib/common/snm_extract.py",
+          "sha256": "56c044cda6ccb4190a6b159a0113f7528c7c7cf91a7f1426ba917a7398b36080"
+        },
+        {
+          "upstream": "sim/lib/test_snm_extract.py",
+          "local": "sim/lib/common/test_snm_extract.py",
+          "sha256": "82c73683aabc38bfd8179abc99349160aa0b9dc36d17e020918ba5047fd6ab41"
+        },
+        {
+          "upstream": "sim/lib/env_provenance.py",
+          "local": "sim/lib/common/env_provenance.py",
+          "sha256": "5569fe350132ab27fc3e141f38d8ca511df58309ceb01c357bb003a543ba8978"
+        },
+        {
+          "upstream": "sim/lib/mint_sim_envelope.py",
+          "local": "sim/lib/common/mint_sim_envelope.py",
+          "sha256": "aa9776afdbd4da8ba1e1f2bbc8ac6fa78acc0530ea01b1c7687cee6c07895b8f"
+        },
+        {
+          "upstream": "sim/lib/render_signoff_table.py",
+          "local": "sim/lib/common/render_signoff_table.py",
+          "sha256": "d7592ff84250594650709a35f12acfc6a9e436ffe66881db77c100f8686d3f42"
+        }
+      ]
+    }
+  ],
+  "in_tree": [
+    {
+      "block": "sim/lib/run_mc_campaign.py",
+      "sibling": "2AMLogic/gf180-sram",
+      "status": "evaluate",
+      "reason": "shells out to pdk_env.sh, reads GF180_MODEL_FILE and hard-codes the gf180mcu corner-label map; does not separate cleanly, re-derived with the IHP MC runner"
+    },
+    {
+      "block": "scripts/ci/check_signoff_freshness.py",
+      "sibling": "2AMLogic/gf180-sram",
+      "status": "evaluate",
+      "reason": "needs signoff/block-manifest.json, signoff-report.json and a pinned klt, none of which exist here yet"
+    },
+    {
+      "block": "scripts/ci/check_evidence_format.py",
+      "sibling": "2AMLogic/gf180-sram",
+      "status": "evaluate",
+      "reason": "hard-codes gf180-sram paths (views/ and signoff/ READMEs, measurements/generate_report.py) and REPO_ROOT=parents[2], which is wrong under scripts/ci/common/; generalisation belongs upstream"
+    }
+  ]
+}
