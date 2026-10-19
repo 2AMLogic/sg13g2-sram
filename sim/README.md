@@ -6,7 +6,7 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
 
 ## Layout
 
-- `pdk.json`: pinned IHP-Open-PDK release, tarball sha256 and OpenVAF-Reloaded pin.
+- `pdk.json`: pinned IHP-Open-PDK release and tarball sha256.
 - `harness/common/tools/build-osdi.sh`, `harness/common/env.sh`: vendored
   byte-identical from `2AMLogic/sg13g2-bandgap` (see `../reuse.lock.json`).
   Their echo hints mention `sim/tools/build-osdi.sh` and `sim/env.sh`; the real

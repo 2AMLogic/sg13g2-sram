@@ -74,7 +74,7 @@ DECK
   sed -i "s|${PDK_ROOT}|\${PDK_ROOT}|g" "${REC}/logs/${name}.log"
 done
 
-OV="$(grep -o '"compiler_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
+OV="$(sed -n 's/^OPENVAF_TAG="\([^"]*\)".*/\1/p' "${SIM_DIR}/harness/common/tools/build-osdi.sh" | head -1)"
 PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
 NGV="$(ngspice --version 2>&1 | grep -m1 -o 'ngspice-[0-9.]*')"
 
