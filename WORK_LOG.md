@@ -3,6 +3,10 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-10-21
+
+- **PR #12**: Bump Repo Skills 0.24.3 -> 0.24.7
+
 ### 2026-10-19
 
 - **PR #10**: refactor(sim): take OpenVAF tag from build-osdi.sh and drop duplicate pins in pdk.json
