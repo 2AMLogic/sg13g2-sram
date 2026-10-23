@@ -12,6 +12,8 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
   Their echo hints mention `sim/tools/build-osdi.sh` and `sim/env.sh`; the real
   paths are the ones here.
 - `pdk-smoke/`: smoke runner and append-only records under `records/<UTC>/`.
+- `bitcell/`: 6T bitcell hold/read SNM and write margin over the 45 corners
+  (`bitcell/README.md`).
 
 ## Cold start (Linux x86_64)
 

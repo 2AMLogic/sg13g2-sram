@@ -1,0 +1,14 @@
+# Project xschemrc: symbol search path for klt netlist --rcfile.
+# Resolves the IHP SG13G2 device symbols (sg13g2_pr/) from PDK_ROOT/PDK
+# (default ihp-sg13g2), the same resolution sim/harness/common/env.sh uses.
+if {![info exists env(PDK)]} { set env(PDK) ihp-sg13g2 }
+if {[info exists env(PDK_ROOT)]} {
+  set PDK_ROOT $env(PDK_ROOT)
+} else {
+  set PDK_ROOT $env(HOME)/share/pdk
+}
+set PDK $env(PDK)
+set XSCHEM_LIBRARY_PATH {}
+# xschem's own devices/ library (lab_pin, ipin, ...), referenced as devices/<sym>
+append XSCHEM_LIBRARY_PATH :/usr/share/xschem/xschem_library
+append XSCHEM_LIBRARY_PATH :${PDK_ROOT}/${PDK}/libs.tech/xschem

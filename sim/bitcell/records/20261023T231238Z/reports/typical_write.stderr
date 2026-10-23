@@ -1,0 +1,5 @@
+klt: batch job klt-sim-bca4d6453b6e submitting to s3://<bucket>/jobs/klt-sim-bca4d6453b6e
+klt sim: batch job klt-sim-bca4d6453b6e: submitted
+klt sim: batch job klt-sim-bca4d6453b6e launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-bca4d6453b6e`
+klt sim: batch job klt-sim-bca4d6453b6e state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-bca4d6453b6e: done
