@@ -1,0 +1,16 @@
+{
+  "_comment": "Pinned SG13G2 PDK revision this sim/ tree's committed evidence records were generated against. Every record under sim/*/records/ must trace to this file (or a later commit that bumps it) -- see sim/README.md 'PDK pin' section. sim/pdk-smoke/run_smoke.sh reads release_tag from here. The OpenVAF-Reloaded compiler pin lives only in sim/harness/common/tools/build-osdi.sh (OPENVAF_TAG).",
+  "source": "IHP-GmbH/IHP-Open-PDK",
+  "fetch_method": "klayout-tools scripts/fetch-ihp-sg13g2.sh (2AMLogic/klayout-tools), same fetch this repo's design/README.md documents for schematic-entry work",
+  "release_tag": "v0.3.0",
+  "release_url": "https://github.com/IHP-GmbH/IHP-Open-PDK/archive/refs/tags/v0.3.0.tar.gz",
+  "tarball_sha256": "f6afb7a8d2adf3e40acd3fd2c7892fc93510e6f760565409a8df2b5b242254fc",
+  "pdk_root_layout": "PDK_ROOT/ihp-sg13g2 (open_pdks-shaped install, klt pdk find/list convention)",
+  "variant": "ihp-sg13g2",
+  "documented_tool_versions_from_pdk_versions_txt": {
+    "openvaf": "23.5.0",
+    "ngspice": "43",
+    "xschem": "3.4.6",
+    "note": "This PDK release's own versions.txt names openvaf 23.5.0 as the tool used to build its Verilog-A device models to OSDI. That upstream release ships source only (no binary assets), so this repo builds the same models with the PDK-preferred OpenVAF-Reloaded fork instead -- see sim/harness/common/tools/build-osdi.sh and sim/README.md 'OSDI device models'."
+  }
+}

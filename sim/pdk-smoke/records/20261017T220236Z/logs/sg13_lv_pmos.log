@@ -1,0 +1,16 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * sg13_lv_pmos smoke: dc op + id-vgs, mos_tt, 27 c. toolchain check only, not a spec bias.
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+ Reference value :  0.00000e+00
+No. of Data Rows : 1
+i(vd) = 1.275485e-05
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+ Reference value : -3.63636e-02 Reference value : -1.09091e-01 Reference value : -1.81818e-01 Reference value : -2.54545e-01 Reference value : -3.27273e-01 Reference value : -4.00000e-01 Reference value : -4.72727e-01 Reference value : -5.45455e-01 Reference value : -6.18182e-01 Reference value : -6.90909e-01 Reference value : -7.63636e-01 Reference value : -8.36364e-01 Reference value : -9.09091e-01 Reference value : -9.81818e-01 Reference value : -1.05455e+00 Reference value : -1.16364e+00
+No. of Data Rows : 34
+Note: Simulation executed from .control section 

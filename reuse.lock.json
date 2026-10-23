@@ -32,6 +32,23 @@
           "sha256": "d7592ff84250594650709a35f12acfc6a9e436ffe66881db77c100f8686d3f42"
         }
       ]
+    },
+    {
+      "from": "2AMLogic/sg13g2-bandgap",
+      "commit": "52535387e6ccf0a89f6490901a9abb2b78144176",
+      "mode": "vendored",
+      "files": [
+        {
+          "upstream": "sim/tools/build-osdi.sh",
+          "local": "sim/harness/common/tools/build-osdi.sh",
+          "sha256": "d022ddc32a02280081d32bb7186ba1920b0b3399b00b0a5ad5eeda717d1396bd"
+        },
+        {
+          "upstream": "sim/env.sh",
+          "local": "sim/harness/common/env.sh",
+          "sha256": "f4efe75194c10df579fe4b42bd0d6e8475f9f89c17c0c7563ffe6d980945ba61"
+        }
+      ]
     }
   ],
   "in_tree": [

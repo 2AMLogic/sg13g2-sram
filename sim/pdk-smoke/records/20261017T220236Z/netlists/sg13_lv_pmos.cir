@@ -1,0 +1,17 @@
+* sg13_lv_pmos smoke: DC op + Id-Vgs, mos_tt, 27 C. Toolchain check only, not a spec bias.
+.lib "${PDK_ROOT}/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib" mos_tt
+.temp 27
+Vd d 0 dc -0.6
+Vg g 0 dc -0.6
+XM d g 0 0 sg13_lv_pmos w=1u l=0.13u ng=1 m=1
+.control
+pre_osdi ${PDK_ROOT}/ihp-sg13g2/libs.tech/ngspice/osdi/psp103.osdi
+pre_osdi ${PDK_ROOT}/ihp-sg13g2/libs.tech/ngspice/osdi/psp103_nqs.osdi
+pre_osdi ${PDK_ROOT}/ihp-sg13g2/libs.tech/ngspice/osdi/r3_cmc.osdi
+pre_osdi ${PDK_ROOT}/ihp-sg13g2/libs.tech/ngspice/osdi/mosvar.osdi
+op
+print i(Vd)
+dc Vg 0 -1.2 -0.03636363636363636
+wrdata /tmp/tmp.zgbEge5Lw0/sg13_lv_pmos.sweep.txt i(Vd)
+.endc
+.end
