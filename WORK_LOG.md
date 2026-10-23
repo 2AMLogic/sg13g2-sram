@@ -3,6 +3,13 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-10-23
+
+- **PR #6**: chore: vendor gf180-sram PDK-free harness via reuse.lock.json and test it in CI
+- **PR #19**: ci: add klt signoff manifest and byte-compare workflow
+- **Issue #4** (closed): Port of gf180-sram: take the PDK-independent sim harness and CI checkers by pinned reference (reuse.lock.json)
+- **Issue #17** (closed): T1 item 10: commit a klt signoff block manifest, vendored checklist and a signoff CI job as the verdict of record
+
 ### 2026-10-21
 
 - **PR #12**: Bump Repo Skills 0.24.3 -> 0.24.7
