@@ -1,0 +1,14 @@
+{
+  "label": "typical",
+  "kind": "simulated",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/27C",
+      "klt_status": "pass",
+      "hold_snm_v": 0.48583337839088236,
+      "hold_snm_vgap_v": 0.5613868094276815,
+      "read_snm_v": 0.21317047273854042,
+      "read_snm_vgap_v": 0.30966950379461544
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "stamp": "20261023T231238Z",
+  "kind": "simulated",
+  "pdk_release_tag": "v0.3.0",
+  "cell": "6T, pull-down sg13_lv_nmos 300n/130n, pull-up sg13_lv_pmos 150n/130n, access sg13_lv_nmos 300n/130n (spec/bitcell-decision.md evidence 1)",
+  "engine": {
+    "version_banner": "******\n** ngspice-42 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2023, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Sun Mar 31 20:15:14 UTC 2024\n******",
+    "batch_job_ids": "klt-sim-268aa6e1c67b",
+    "runner_klt_version": "0.7.0"
+  },
+  "snm_method": "inscribed square (Seevinck), exact on the sampled polylines; snm_extract.py vertical-gap value recorded as *_snm_vgap_v (over-reads)",
+  "write_margin_method": "highest constant bit-line low level (25 mV grid, 0..0.8 V) at which the cell flips within one 1 ns wordline pulse; BLB at VDD",
+  "typical": {
+    "corner": "mos_tt/1.200V/27C",
+    "hold_snm_v": 0.48583337839088236,
+    "read_snm_v": 0.21317047273854042,
+    "write_margin_v": 0.4
+  },
+  "negative_control": {
+    "what": "pull-downs 150n, access 600n (beta 0.25)",
+    "read_snm_v": 0.1312418221817742,
+    "detected": true
+  },
+  "grid": {
+    "corners": 45,
+    "worst_hold_snm_v": [
+      0.38983674283171066,
+      "mos_ff/1.080V/125C"
+    ],
+    "worst_read_snm_v": [
+      0.14297407903529394,
+      "mos_fs/1.080V/125C"
+    ],
+    "worst_write_margin_v": [
+      0.25,
+      "mos_sf/1.080V/-40C"
+    ],
+    "corners_not_strictly_positive": [],
+    "corners_with_errors": []
+  },
+  "not_established": [
+    "write flip time at mos_ss/1.08 V/125 C (spec/write-pulse-width-decision.md open item)",
+    "0.5/1/2 ns pulse sensitivity",
+    "Monte Carlo (separate evidence item)",
+    "rail sharing decision"
+  ]
+}
