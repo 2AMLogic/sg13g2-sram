@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-10-23
 
+- **PR #21**: feat: 6T bitcell reference cell with hold/read SNM and write margin over 45 corners
+- **Issue #18** (closed): design+sim: SG13G2 6T bitcell schematic and hold/read SNM + 1 ns write-margin bench (typical corner, then the 45-corner grid)
 - **PR #6**: chore: vendor gf180-sram PDK-free harness via reuse.lock.json and test it in CI
 - **PR #19**: ci: add klt signoff manifest and byte-compare workflow
 - **Issue #4** (closed): Port of gf180-sram: take the PDK-independent sim harness and CI checkers by pinned reference (reuse.lock.json)

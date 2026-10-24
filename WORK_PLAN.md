@@ -8,7 +8,7 @@ Only the region between the markers is machine-generated.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#6**: chore: vendor gf180-sram PDK-free harness via reuse.lock.json and test it in CI
+_None._
 
 ## Very Important
 
@@ -20,7 +20,7 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#4**: Port of gf180-sram: take the PDK-independent sim harness and CI checkers by pinned reference (reuse.lock.json)
+_None._
 
 ## Ready
 
@@ -32,7 +32,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#4**: Port of gf180-sram: take the PDK-independent sim harness and CI checkers by pinned reference (reuse.lock.json)
+_None._
 
 ## PRs Awaiting Review
 
@@ -44,13 +44,13 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#6**: chore: vendor gf180-sram PDK-free harness via reuse.lock.json and test it in CI
+_None._
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#4**: Port of gf180-sram: take the PDK-independent sim harness and CI checkers by pinned reference (reuse.lock.json) *(curated)*
+_None._
 
 ## Proposed (Architect / Hermit)
 
@@ -68,14 +68,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 1 |
+| Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
+| Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 1 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 0 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
