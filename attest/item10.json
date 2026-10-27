@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 10,
+  "description": "Repo hygiene: README, license and CI present; PDK-free tests and the README-vs-spec table check pass.",
+  "hygiene": [
+    "README.md",
+    "LICENSE",
+    ".github/workflows/ci.yml",
+    ".github/workflows/signoff.yml"
+  ],
+  "checks": [
+    {
+      "name": "npm-test",
+      "argv": [
+        "npm",
+        "test"
+      ]
+    },
+    {
+      "name": "readme-spec-table",
+      "argv": [
+        "python3",
+        "-I",
+        "scripts/check_readme_spec_table.py"
+      ]
+    }
+  ]
+}

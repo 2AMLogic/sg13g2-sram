@@ -1,5 +1,7 @@
 {
   "block": "sg13g2-sram",
   "kind": "analog",
-  "evidence": {}
+  "evidence": {
+    "10": {"file": "attest/item10.envelope.json", "content_hash": "sha256:c832c41b5efc0695a644af8245a849fc590fbe41cdc7e0c4d7b057825cb8aa09"}
+  }
 }
