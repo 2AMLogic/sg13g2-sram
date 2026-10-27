@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+env:
+  # Keep in sync with manifests/README.md and signoff.yml.
+  KLT_VERSION: "0.8.0"
+
 jobs:
   harness-tests:
     name: vendored harness unit tests
@@ -18,3 +22,9 @@ jobs:
 
       - name: Run PDK-free harness tests
         run: npm test
+
+      - name: Install pinned klayout-tools
+        run: pip install "klayout-tools==${KLT_VERSION}"
+
+      - name: Item 10 attestation has not drifted
+        run: klt signoff --attest 10 --inventory attest/item10.json --check attest/item10.envelope.json
