@@ -1,0 +1,44 @@
+{
+  "label": "nominal",
+  "kind": "simulated",
+  "corner_id": "mos_tt/1.200V/27C",
+  "klt_status": "pass",
+  "cases": {
+    "c": {
+      "stored_before": 1,
+      "written": 0,
+      "q_minus_qb_at_pulse_end_v": -1.19989,
+      "q_minus_qb_at_2p8ns_v": -1.2,
+      "flip_time_ns": 0.0874,
+      "bl_split_during_write_v": -1.18191,
+      "half_selected_cell_after_v": -1.2,
+      "half_selected_bl_min_v": 0.0711553,
+      "checks": {
+        "flipped_within_1ns_pulse": true,
+        "written_value_holds": true,
+        "half_selected_cell_retained": true,
+        "unselected_column_bit_lines_hold": false
+      },
+      "pass": false
+    },
+    "d": {
+      "stored_before": 0,
+      "written": 1,
+      "q_minus_qb_at_pulse_end_v": 1.1999,
+      "q_minus_qb_at_2p8ns_v": 1.2,
+      "flip_time_ns": 0.0634,
+      "bl_split_during_write_v": 1.18706,
+      "half_selected_cell_after_v": 1.2,
+      "half_selected_bl_min_v": 0.0711553,
+      "checks": {
+        "flipped_within_1ns_pulse": true,
+        "written_value_holds": true,
+        "half_selected_cell_retained": true,
+        "unselected_column_bit_lines_hold": false
+      },
+      "pass": false
+    }
+  },
+  "all_pass": false,
+  "any_fail": true
+}

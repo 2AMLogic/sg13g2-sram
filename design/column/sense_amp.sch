@@ -90,4 +90,4 @@ C {devices/iopin.sym} -900 -100 0 0 {name=p33 lab=VDD}
 C {devices/iopin.sym} -900 -60 0 0 {name=p34 lab=VSS}
 C {devices/code_shown.sym} -900 80 0 0 {name=NOTE only_toplevel=false
 place=header
-value="* latch sense amp: SAE low = isolation PMOS pass the bit-line pair to OUT/OUTB, SAE high = isolate and latch"}
+value="* latch SA: SAE low = isolation PMOS pass bit lines to OUT/OUTB, SAE high = latch"}

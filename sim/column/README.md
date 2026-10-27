@@ -24,13 +24,23 @@ under 1 ns, value holds at 2.8 ns.
 
 ## Status
 
-**Simulation NOT performed; no record exists.** `run_column.sh` has never run
-to completion, and none of the verdict limits has been compared with a
-measurement. On 2026-10-27 the batch submit failed: the fleet runner is klt
-0.7.0 and refuses clients 0.8.0 and 0.8.1.dev55 (`batch_runner_version_mismatch`,
-the only client on this host); klt 0.7.0 itself rejects `options.osdi_preload`
-on the batch backend (and lacks `--report-out`). The bitcell record was made
-with a 0.7.1 development client that no longer resolves. This host's ngspice 42
-cannot load the OSDI v0.4 models, so no local run is possible either, and none
-was attempted. Needed: a client compatible with the runner (or a runner
-update), then `sim/column/run_column.sh`.
+Record: `records/20261027T211740Z/` (nominal, mos_tt / 1.20 V / 27 C; batch job
+`klt-sim-96ff8ca5102a`, runner klt 0.8.0, ngspice 46). `all_pass` is **false**.
+
+- Read of 0 and of 1: the sense amp resolves the stored value, the bit-line
+  differential has the right sign, precharge and equalize complete, both cells
+  keep their value.
+- Write of 0 and of 1: the cell flips 0.06-0.09 ns after the wordline midpoint
+  (limit 1 ns) and the value holds at 2.8 ns.
+- Negative controls: the 0.15 um write driver and the SAE-with-wordline read are
+  both detected.
+- **Failing check, all four cases: `unselected_column_bit_lines_hold`.** The
+  unselected column's floating bit lines fall to about 0.07-0.08 V (limit
+  0.6 V) while the wordline is high, because the half-selected cell discharges
+  them. The limit was not relaxed. The cell itself keeps its value. Fixing it
+  means keeping the unselected pair precharged (a per-pair precharge enable),
+  which changes the column interface and is not done here.
+
+A klt batch run whose corner errors exits 4; `run_column.sh` accepts that only for
+the two negative controls (a driver that never flips the cell leaves the flip
+time without a value, which is the detection) and only if the report exists.

@@ -1,8 +1,12 @@
 ** sch_path: design/column/column.sch
 
-* one I/O column, mux 2: two bit-line pairs of 128 cells (7 row + 1 column address bits). WL = the
-*+ selected row (both pairs), WLU = the other 127 rows (shared net, held low). XU cells of a pair share one
-*+ Q/QB node pair UQ/UQB: 127 identical cells in the same state.
+* one I/O column, mux 2: two bit-line pairs of 128 cells (7 row + 1 column address bits).
+
+
+* WL = the selected row (both pairs), WLU = the other 127 rows (shared net, held low).
+
+
+* XU cells of a pair share one Q/QB node pair UQ/UQB: 127 identical cells, same state.
 
 .subckt column PRE_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS
 *.ipin PRE_B
@@ -379,8 +383,7 @@ XMNL1 OUTB OUT TAIL VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
 XMNT TAIL SAE VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
 **** begin user architecture code
 
-* latch sense amp: SAE low = isolation PMOS pass the bit-line pair to OUT/OUTB, SAE high = isolate
-*+ and latch
+* latch SA: SAE low = isolation PMOS pass bit lines to OUT/OUTB, SAE high = latch
 
 **** end user architecture code
 .ends

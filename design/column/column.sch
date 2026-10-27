@@ -92,4 +92,10 @@ C {devices/iopin.sym} -900 180 0 0 {name=p75 lab=VDD}
 C {devices/iopin.sym} -900 220 0 0 {name=p76 lab=VSS}
 C {devices/code_shown.sym} -900 360 0 0 {name=NOTE only_toplevel=false
 place=header
-value="* one I/O column, mux 2: two bit-line pairs of 128 cells (7 row + 1 column address bits). WL = the selected row (both pairs), WLU = the other 127 rows (shared net, held low). XU cells of a pair share one Q/QB node pair UQ/UQB: 127 identical cells in the same state."}
+value="* one I/O column, mux 2: two bit-line pairs of 128 cells (7 row + 1 column address bits)."}
+C {devices/code_shown.sym} -900 400 0 0 {name=NOTE2 only_toplevel=false
+place=header
+value="* WL = the selected row (both pairs), WLU = the other 127 rows (shared net, held low)."}
+C {devices/code_shown.sym} -900 440 0 0 {name=NOTE3 only_toplevel=false
+place=header
+value="* XU cells of a pair share one Q/QB node pair UQ/UQB: 127 identical cells, same state."}

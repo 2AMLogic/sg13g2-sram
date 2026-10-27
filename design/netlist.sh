@@ -13,8 +13,9 @@ MODE=""; [[ "${1:-}" == "--check" ]] && MODE="--check"
 BLOCKS=(bitcell/bitcell column/precharge column/column_mux column/sense_amp column/write_driver column/column)
 rc=0
 for b in "${BLOCKS[@]}"; do
-  klt netlist "${HERE}/${b}.sch" -o "${HERE}/${b}.spice" --block ${MODE} \
-    --rcfile "${HERE}/xschemrc" --pdk "${PDK}" --pdk-root "${PDK_ROOT}" >/dev/null || { echo "netlist.sh: ${b}.spice stale or failed" >&2; rc=3; }
+  # run from the schematic's directory: xschem resolves relative symbol paths (../bitcell/...) against the cwd
+  ( cd "${HERE}/$(dirname "${b}")" && klt netlist "$(basename "${b}").sch" -o "${HERE}/${b}.spice" --block ${MODE} \
+    --rcfile "${HERE}/xschemrc" --pdk "${PDK}" --pdk-root "${PDK_ROOT}" >/dev/null ) || { echo "netlist.sh: ${b}.spice stale or failed" >&2; rc=3; }
   # xschem writes the schematic's absolute path on line 1; keep it repo-relative
   [[ -z "${MODE}" ]] && sed -i "1s#.*#** sch_path: design/${b}.sch#" "${HERE}/${b}.spice"
 done
