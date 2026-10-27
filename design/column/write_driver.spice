@@ -1,0 +1,18 @@
+** sch_path: design/column/write_driver.sch
+
+* write driver: WE and DIN pull BLBM low, WE and DINB pull BLM low (cell Q takes DIN)
+
+.subckt write_driver WE DIN BLM BLBM VDD VSS
+*.ipin WE
+*.ipin DIN
+*.iopin BLM
+*.iopin BLBM
+*.iopin VDD
+*.iopin VSS
+XMPD DINB DIN VDD VDD sg13_lv_pmos w=0.5u l=0.13u ng=1 m=1
+XMND DINB DIN VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMNA0 BLM DINB WA VSS sg13_lv_nmos w=3.0u l=0.13u ng=1 m=1
+XMNA1 WA WE VSS VSS sg13_lv_nmos w=3.0u l=0.13u ng=1 m=1
+XMNB0 BLBM DIN WB VSS sg13_lv_nmos w=3.0u l=0.13u ng=1 m=1
+XMNB1 WB WE VSS VSS sg13_lv_nmos w=3.0u l=0.13u ng=1 m=1
+.ends

@@ -1,0 +1,14 @@
+** sch_path: design/column/precharge.sch
+
+* bit-line precharge to VDD and equalize, active-low PRE_B
+
+.subckt precharge PRE_B BL BLB VDD VSS
+*.ipin PRE_B
+*.iopin BL
+*.iopin BLB
+*.iopin VDD
+*.iopin VSS
+XMP0 BL PRE_B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 BLB PRE_B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP2 BL PRE_B BLB VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+.ends

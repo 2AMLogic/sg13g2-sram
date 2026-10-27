@@ -1,0 +1,26 @@
+** sch_path: design/column/column_mux.sch
+
+* 2:1 column mux: NMOS+PMOS transmission gates, SELn high / SELnB low selects column n
+
+.subckt column_mux SEL0 SEL0B SEL1 SEL1B BL0 BLB0 BL1 BLB1 BLM BLBM VDD VSS
+*.ipin SEL0
+*.ipin SEL0B
+*.ipin SEL1
+*.ipin SEL1B
+*.iopin BL0
+*.iopin BLB0
+*.iopin BL1
+*.iopin BLB1
+*.iopin BLM
+*.iopin BLBM
+*.iopin VDD
+*.iopin VSS
+XMN0T BL0 SEL0 BLM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP0T BL0 SEL0B BLM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN0B BLB0 SEL0 BLBM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP0B BLB0 SEL0B BLBM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN1T BL1 SEL1 BLM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP1T BL1 SEL1B BLM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN1B BLB1 SEL1 BLBM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP1B BLB1 SEL1B BLBM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+.ends

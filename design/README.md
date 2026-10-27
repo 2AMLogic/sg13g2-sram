@@ -4,11 +4,15 @@ Schematics (xschem) and the SPICE netlists derived from them.
 
 - `bitcell/`: the 6T bitcell at the reference sizing (hold/read SNM and write
   margin: `sim/bitcell/`).
+- `column/`: one I/O column (precharge, 2:1 mux, sense amp, write driver, cells
+  tiled 128 per bit line); see `column/README.md` and `column/INVENTORY.md`.
+- `bitcell/bitcell.sym`, `column/*.sym`: hand-written symbols for hierarchy.
 - `xschemrc`: symbol search path for `klt netlist --rcfile` (xschem's
   `devices/` plus the PDK's `sg13g2_pr` symbols; PDK from `PDK_ROOT`/`PDK`).
 
-Committed netlists are derived artifacts. Regenerate, or check for drift (exit 3
-if stale), with:
+Committed netlists are derived artifacts. Regenerate all of them, or check for
+drift (exit 3 if any is stale), with `design/netlist.sh [--check]`; per file that
+runs:
 
 ```bash
 source sim/harness/common/env.sh

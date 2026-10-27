@@ -14,6 +14,7 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
 - `pdk-smoke/`: smoke runner and append-only records under `records/<UTC>/`.
 - `bitcell/`: 6T bitcell hold/read SNM and write margin over the 45 corners
   (`bitcell/README.md`).
+- `column/`: nominal read/write bench of the I/O column (`column/README.md`).
 
 ## Cold start (Linux x86_64)
 
