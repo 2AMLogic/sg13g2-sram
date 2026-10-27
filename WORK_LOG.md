@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-10-27
+
+- **PR #32**: docs: README spec table, reproduction steps and item 10 attestation (klt 0.8.0)
+- **Issue #25** (closed): T1 item 10 (repo hygiene): README reproduction steps and spec table, klt signoff --attest 10
+
 ### 2026-10-23
 
 - **PR #21**: feat: 6T bitcell reference cell with hold/read SNM and write margin over 45 corners
