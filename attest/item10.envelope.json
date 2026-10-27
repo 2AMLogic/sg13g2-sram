@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 10,
+  "summary": "T1 item 10 (Repo hygiene): 6/6 attestation checks passed (klt signoff --attest)",
+  "source": "attest/item10.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 6,
+    "passed_count": 6,
+    "checks": [
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": ".github/workflows/ci.yml",
+        "passed": true,
+        "content_hash": "sha256:b0d3244a9340542220bd402f699634c037362f19b7bf7af1b267d7c7bdc428d4"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": ".github/workflows/signoff.yml",
+        "passed": true,
+        "content_hash": "sha256:62dacd14c47ead84c25af63b959907f291b937d1ee6e2a420c11ef7a46cb9d10"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "LICENSE",
+        "passed": true,
+        "content_hash": "sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "README.md",
+        "passed": true,
+        "content_hash": "sha256:d63f3fb8724b5c477d0710261f97638ca2692b99d1c93f49e41b4b26f20238a7"
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "npm-test",
+        "argv": [
+          "npm",
+          "test"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "readme-spec-table",
+        "argv": [
+          "python3",
+          "-I",
+          "scripts/check_readme_spec_table.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.8.0",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "attest/item10.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:c832c41b5efc0695a644af8245a849fc590fbe41cdc7e0c4d7b057825cb8aa09"
+    }
+  }
+}

@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "worktree:return": "./.loom/scripts/worktree-return.sh",
-    "check:ci": "python3 -I sim/lib/common/test_snm_extract.py",
+    "check:ci": "python3 -I sim/lib/common/test_snm_extract.py && python3 -I sim/bitcell/test_bitcell_post.py && python3 -I scripts/test_check_readme_spec_table.py && python3 -I scripts/check_readme_spec_table.py",
     "check:all": "echo 'No checks configured. Customize this script for your project.' && exit 0",
-    "test": "python3 -I sim/lib/common/test_snm_extract.py",
+    "test": "python3 -I sim/lib/common/test_snm_extract.py && python3 -I sim/bitcell/test_bitcell_post.py && python3 -I scripts/test_check_readme_spec_table.py && python3 -I scripts/check_readme_spec_table.py",
     "lint": "echo 'No linter configured. Customize this script for your project.' && exit 0"
   }
 }
