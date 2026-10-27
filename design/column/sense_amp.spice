@@ -1,7 +1,6 @@
 ** sch_path: design/column/sense_amp.sch
 
-* latch sense amp: SAE low = isolation PMOS pass the bit-line pair to OUT/OUTB, SAE high = isolate
-*+ and latch
+* latch SA: SAE low = isolation PMOS pass bit lines to OUT/OUTB, SAE high = latch
 
 .subckt sense_amp SAE BLM BLBM OUT OUTB VDD VSS
 *.ipin SAE

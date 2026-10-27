@@ -33,12 +33,15 @@ REC="${HERE}/records/${STAMP}"
 mkdir -p "${REC}/reports" "${REC}/negctl"
 WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
 
-run_klt() {   # run_klt <request> <name>
-  local req="$1" name="$2" rc=0
+run_klt() {   # run_klt <request> <name> [negctl]
+  local req="$1" name="$2" negctl="${3:-}" rc=0
   klt sim "${req}" --backend batch -o "${WORK}/${name}" \
     --report-out "${REC}/reports/${name}.json.gz" --format json \
     > "${WORK}/${name}.out" 2> "${WORK}/${name}.stderr" || rc=$?
   sed -E 's#s3://[^ /]+#s3://<bucket>#g' "${WORK}/${name}.stderr" > "${REC}/reports/${name}.stderr"
+  # exit 4 = errored corner. For a negative control that is the detection itself (a driver that
+  # never flips the cell leaves the flip-time measurement without a value); the report must exist.
+  if [[ "${rc}" -eq 4 && -n "${negctl}" && -s "${REC}/reports/${name}.json.gz" ]]; then rc=0; fi
   if [[ "${rc}" -ne 0 && "${rc}" -ne 3 ]]; then
     echo "run_column.sh: klt sim ${name} failed (exit ${rc}); batch error, no local fallback:" >&2
     tail -5 "${REC}/reports/${name}.stderr" >&2
@@ -59,8 +62,8 @@ sed -E '/^XMN[AB][01] /s/w=3\.0u/w=0.15u/' "${REPO}/design/column/write_driver.s
 "${POST[@]}" request write "${REC}/negctl/request_write.json" --netlist bench_write.cir
 "${POST[@]}" negctl-bench "${HERE}/bench_read.cir" "${REC}/negctl/bench_read.cir" --sae-delay-ns 0.8
 "${POST[@]}" request read "${REC}/negctl/request_read.json" --netlist bench_read.cir
-run_klt "${REC}/negctl/request_write.json" negctl_write
-run_klt "${REC}/negctl/request_read.json" negctl_read
+run_klt "${REC}/negctl/request_write.json" negctl_write negctl
+run_klt "${REC}/negctl/request_read.json" negctl_read negctl
 
 # --- post-process and record ----------------------------------------------------
 "${POST[@]}" read "${REC}/reports/read.json.gz" nominal > "${REC}/read.json"
