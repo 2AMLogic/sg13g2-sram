@@ -1,0 +1,41 @@
+* I/O column write bench (circuit body for `klt sim`; no .control/.end).
+*
+* Two copies of design/column/column.spice (mux 2, 128 cells per bit line), column 0
+* selected, bit lines precharged to VDD and left floating (precharge off):
+*   xc: selected cell (row r, column 0) holds 1 and DIN = 0 (write 0 over 1). The other 127
+*       rows of column 0 hold 1. Half-selected cell (row r, column 1, WL high, mux off)
+*       holds 0; the other rows of column 1 hold 1.
+*   xd: every stored value inverted and DIN = 1 (write 1 over 0).
+* Timeline (ns): SEL0 static; WE high 0.4..1.64; WL pulse 0.5..1.52 (1 ns plateau, 50 % at
+* 0.51). Cell states are read at 1.5 (end of the pulse) and 2.8.
+* PRE0_B drives the selected pair (column 0); PRE1_B holds the unselected pair (column 1) precharged (low) throughout.
+.include ../../../../../design/bitcell/bitcell.spice
+.include ../../../../../design/column/precharge.spice
+.include ../../../../../design/column/column_mux.spice
+.include ../../../../../design/column/sense_amp.spice
+.include ./write_driver_weak.spice
+.include ../../../../../design/column/column.spice
+
+Vdd vdd 0 DC 1.2
+Vpre0 pre0b 0 DC 1.2
+Vpre1 pre1b 0 DC 0
+Vwl  wl   0 PULSE(0 1.2 0.5n 20p 20p 1n 100n)
+Vwe  we   0 PULSE(0 1.2 0.4n 20p 20p 1.2n 100n)
+Vsae sae  0 DC 0
+Vs0  sel0  0 DC 1.2
+Vs0b sel0b 0 DC 0
+Vs1  sel1  0 DC 0
+Vs1b sel1b 0 DC 1.2
+Vwlu wlu 0 DC 0
+Vdinc dinc 0 DC 0
+Vdind dind 0 DC 1.2
+*       PRE0_B PRE1_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS
+Xc pre0b pre1b sel0 sel0b sel1 sel1b sae we dinc wl wlu oc obc vdd 0 column
+Xd pre0b pre1b sel0 sel0b sel1 sel1b sae we dind wl wlu od obd vdd 0 column
+* stored values: 1 = Q 0.9 / QB 0.3 (rail-independent, as sim/bitcell)
+.ic v(xc.q0)=0.9 v(xc.qb0)=0.3 v(xc.uq0)=0.9 v(xc.uqb0)=0.3
+.ic v(xc.q1)=0.3 v(xc.qb1)=0.9 v(xc.uq1)=0.9 v(xc.uqb1)=0.3
+.ic v(xd.q0)=0.3 v(xd.qb0)=0.9 v(xd.uq0)=0.3 v(xd.uqb0)=0.9
+.ic v(xd.q1)=0.9 v(xd.qb1)=0.3 v(xd.uq1)=0.3 v(xd.uqb1)=0.9
+.ic v(xc.bl0)=1.2 v(xc.blb0)=1.2 v(xc.bl1)=1.2 v(xc.blb1)=1.2
+.ic v(xd.bl0)=1.2 v(xd.blb0)=1.2 v(xd.bl1)=1.2 v(xd.blb1)=1.2

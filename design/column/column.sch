@@ -37,13 +37,13 @@ C {devices/lab_pin.sym} 260 -280 0 0 {name=l25 lab=VSS}
 C {devices/lab_pin.sym} 260 -260 0 0 {name=l26 lab=UQ1}
 C {devices/lab_pin.sym} 260 -240 0 0 {name=l27 lab=UQB1}
 C {precharge.sym} -600 200 0 0 {name=XPC0}
-C {devices/lab_pin.sym} -640 160 0 0 {name=l28 lab=PRE_B}
+C {devices/lab_pin.sym} -640 160 0 0 {name=l28 lab=PRE0_B}
 C {devices/lab_pin.sym} -640 180 0 0 {name=l29 lab=BL0}
 C {devices/lab_pin.sym} -640 200 0 0 {name=l30 lab=BLB0}
 C {devices/lab_pin.sym} -640 220 0 0 {name=l31 lab=VDD}
 C {devices/lab_pin.sym} -640 240 0 0 {name=l32 lab=VSS}
 C {precharge.sym} -300 200 0 0 {name=XPC1}
-C {devices/lab_pin.sym} -340 160 0 0 {name=l33 lab=PRE_B}
+C {devices/lab_pin.sym} -340 160 0 0 {name=l33 lab=PRE1_B}
 C {devices/lab_pin.sym} -340 180 0 0 {name=l34 lab=BL1}
 C {devices/lab_pin.sym} -340 200 0 0 {name=l35 lab=BLB1}
 C {devices/lab_pin.sym} -340 220 0 0 {name=l36 lab=VDD}
@@ -76,7 +76,8 @@ C {devices/lab_pin.sym} 560 190 0 0 {name=l59 lab=BLM}
 C {devices/lab_pin.sym} 560 210 0 0 {name=l60 lab=BLBM}
 C {devices/lab_pin.sym} 560 230 0 0 {name=l61 lab=VDD}
 C {devices/lab_pin.sym} 560 250 0 0 {name=l62 lab=VSS}
-C {devices/ipin.sym} -900 -300 0 0 {name=p63 lab=PRE_B}
+C {devices/ipin.sym} -900 -340 0 0 {name=p63 lab=PRE0_B}
+C {devices/ipin.sym} -900 -300 0 0 {name=p77 lab=PRE1_B}
 C {devices/ipin.sym} -900 -260 0 0 {name=p64 lab=SEL0}
 C {devices/ipin.sym} -900 -220 0 0 {name=p65 lab=SEL0B}
 C {devices/ipin.sym} -900 -180 0 0 {name=p66 lab=SEL1}
