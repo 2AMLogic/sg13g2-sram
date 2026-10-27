@@ -1,0 +1,38 @@
+v {xschem version=3.4.8RC file_version=1.2}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=X1"}
+V {}
+S {}
+E {}
+L 4 -40 -130 40 -130 {}
+L 4 -40 130 40 130 {}
+L 4 -40 -130 -40 130 {}
+L 4 40 -130 40 130 {}
+B 5 -42.5 -112.5 -37.5 -107.5 {name=SEL0 dir=in}
+T {SEL0} -34 -114 0 0 0.2 0.2 {}
+B 5 -42.5 -92.5 -37.5 -87.5 {name=SEL0B dir=in}
+T {SEL0B} -34 -94 0 0 0.2 0.2 {}
+B 5 -42.5 -72.5 -37.5 -67.5 {name=SEL1 dir=in}
+T {SEL1} -34 -74 0 0 0.2 0.2 {}
+B 5 -42.5 -52.5 -37.5 -47.5 {name=SEL1B dir=in}
+T {SEL1B} -34 -54 0 0 0.2 0.2 {}
+B 5 -42.5 -32.5 -37.5 -27.5 {name=BL0 dir=inout}
+T {BL0} -34 -34 0 0 0.2 0.2 {}
+B 5 -42.5 -12.5 -37.5 -7.5 {name=BLB0 dir=inout}
+T {BLB0} -34 -14 0 0 0.2 0.2 {}
+B 5 -42.5 7.5 -37.5 12.5 {name=BL1 dir=inout}
+T {BL1} -34 6 0 0 0.2 0.2 {}
+B 5 -42.5 27.5 -37.5 32.5 {name=BLB1 dir=inout}
+T {BLB1} -34 26 0 0 0.2 0.2 {}
+B 5 -42.5 47.5 -37.5 52.5 {name=BLM dir=inout}
+T {BLM} -34 46 0 0 0.2 0.2 {}
+B 5 -42.5 67.5 -37.5 72.5 {name=BLBM dir=inout}
+T {BLBM} -34 66 0 0 0.2 0.2 {}
+B 5 -42.5 87.5 -37.5 92.5 {name=VDD dir=inout}
+T {VDD} -34 86 0 0 0.2 0.2 {}
+B 5 -42.5 107.5 -37.5 112.5 {name=VSS dir=inout}
+T {VSS} -34 106 0 0 0.2 0.2 {}
+T {@symname} 0 -160 0 0 0.3 0.3 {hcenter=true}
+T {@name} 0 140 0 0 0.2 0.2 {hcenter=true}
