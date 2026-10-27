@@ -5,6 +5,7 @@ triage agent. Newest first.
 
 ### 2026-10-27
 
+- **PR #34**: feat: column path schematics, derived netlists and nominal bench (bench not yet run)
 - **PR #32**: docs: README spec table, reproduction steps and item 10 attestation (klt 0.8.0)
 - **Issue #25** (closed): T1 item 10 (repo hygiene): README reproduction steps and spec table, klt signoff --attest 10
 
