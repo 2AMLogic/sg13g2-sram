@@ -32,7 +32,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver)
 
 ## PRs Awaiting Review
 
@@ -44,13 +44,14 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#34**: feat: column path schematics, derived netlists and nominal bench (bench not yet run)
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver) *(curated)*
+- **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -72,10 +73,10 @@ _None._
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 2 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
