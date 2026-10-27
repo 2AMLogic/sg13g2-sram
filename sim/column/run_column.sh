@@ -57,8 +57,10 @@ run_klt "${HERE}/.req_read.json" read
 run_klt "${HERE}/.req_write.json" write
 
 # --- negative controls ----------------------------------------------------------
-sed -E '/^XMN[AB][01] /s/w=3\.0u/w=0.15u/' "${REPO}/design/column/write_driver.spice" > "${REC}/negctl/write_driver_weak.spice"
-"${POST[@]}" negctl-bench "${HERE}/bench_write.cir" "${REC}/negctl/bench_write.cir" --replace write_driver.spice=./write_driver_weak.spice
+# column.spice embeds the write driver and the benches include nothing else, so weaken the embedded copy.
+sed -E '/^XMN[AB][01] /s/w=3\.0u/w=0.15u/' "${REPO}/design/column/column.spice" > "${REC}/negctl/column_weak.spice"
+grep -q 'w=0\.15u' "${REC}/negctl/column_weak.spice" || { echo "run_column.sh: write-driver weakening matched nothing" >&2; exit 7; }
+"${POST[@]}" negctl-bench "${HERE}/bench_write.cir" "${REC}/negctl/bench_write.cir" --replace column.spice=./column_weak.spice
 "${POST[@]}" request write "${REC}/negctl/request_write.json" --netlist bench_write.cir
 "${POST[@]}" negctl-bench "${HERE}/bench_read.cir" "${REC}/negctl/bench_read.cir" --sae-delay-ns 0.8
 "${POST[@]}" request read "${REC}/negctl/request_read.json" --netlist bench_read.cir

@@ -24,8 +24,11 @@ under 1 ns, value holds at 2.8 ns.
 
 ## Status
 
-Latest record: `records/20261027T220739Z/` (nominal, mos_tt / 1.20 V / 27 C; batch
-job `klt-sim-741c4293419d`, runner klt 0.8.0, ngspice 42). `all_pass` is **true**.
+Latest record: `records/20261027T234939Z/` (nominal, mos_tt / 1.20 V / 27 C; batch
+job `klt-sim-101d18689c47`, runner klt 0.8.0, ngspice 46). `all_pass` is **true**.
+The benches now include only `design/column/column.spice`, which embeds the bitcell and
+periphery subckts; before, each subckt was defined twice. Read and write verdicts match
+the previous record `records/20261027T220739Z/` (same flip-time range, same detections).
 The column has per-pair precharge enables (`PRE0_B`, `PRE1_B`); the benches hold the
 unselected pair's enable low (precharged) through the wordline pulse.
 

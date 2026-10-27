@@ -9,11 +9,6 @@
 * Timeline (ns): SEL0 static; WE high 0.4..1.64; WL pulse 0.5..1.52 (1 ns plateau, 50 % at
 * 0.51). Cell states are read at 1.5 (end of the pulse) and 2.8.
 * PRE0_B drives the selected pair (column 0); PRE1_B holds the unselected pair (column 1) precharged (low) throughout.
-.include ../../design/bitcell/bitcell.spice
-.include ../../design/column/precharge.spice
-.include ../../design/column/column_mux.spice
-.include ../../design/column/sense_amp.spice
-.include ../../design/column/write_driver.spice
 .include ../../design/column/column.spice
 
 Vdd vdd 0 DC 1.2

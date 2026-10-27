@@ -65,11 +65,11 @@ def main() -> int:
         out = Path(d) / "neg" / "bench_read.cir"
         out.parent.mkdir()
         cp.cmd_negctl_bench(str(HERE / "bench_read.cir"), str(out),
-                            {"write_driver.spice": "./wd_weak.spice"}, "0.8")
+                            {"column.spice": "./col_weak.spice"}, "0.8")
         t = out.read_text()
-        assert ".include ./wd_weak.spice" in t and "PULSE(0 1.2 0.8n" in t.split("Vsae")[1]
+        assert ".include ./col_weak.spice" in t and "PULSE(0 1.2 0.8n" in t.split("Vsae")[1]
         assert ".include ../../design/" not in t       # re-pointed relative to the new directory
-        assert (out.parent / t.split(".include ")[1].split()[0]).resolve().exists()
+        assert t.count(".include ") == 1                # the benches include only column.spice
     print("ok")
     return 0
 
