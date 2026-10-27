@@ -24,22 +24,24 @@ under 1 ns, value holds at 2.8 ns.
 
 ## Status
 
-Record: `records/20261027T211740Z/` (nominal, mos_tt / 1.20 V / 27 C; batch job
-`klt-sim-96ff8ca5102a`, runner klt 0.8.0, ngspice 46). `all_pass` is **false**.
+Latest record: `records/20261027T220739Z/` (nominal, mos_tt / 1.20 V / 27 C; batch
+job `klt-sim-741c4293419d`, runner klt 0.8.0, ngspice 42). `all_pass` is **true**.
+The column has per-pair precharge enables (`PRE0_B`, `PRE1_B`); the benches hold the
+unselected pair's enable low (precharged) through the wordline pulse.
 
 - Read of 0 and of 1: the sense amp resolves the stored value, the bit-line
   differential has the right sign, precharge and equalize complete, both cells
   keep their value.
 - Write of 0 and of 1: the cell flips 0.06-0.09 ns after the wordline midpoint
   (limit 1 ns) and the value holds at 2.8 ns.
+- Unselected column: bit lines stay at or above 1.118 V (limit 0.6 V, unchanged).
 - Negative controls: the 0.15 um write driver and the SAE-with-wordline read are
   both detected.
-- **Failing check, all four cases: `unselected_column_bit_lines_hold`.** The
-  unselected column's floating bit lines fall to about 0.07-0.08 V (limit
-  0.6 V) while the wordline is high, because the half-selected cell discharges
-  them. The limit was not relaxed. The cell itself keeps its value. Fixing it
-  means keeping the unselected pair precharged (a per-pair precharge enable),
-  which changes the column interface and is not done here.
+
+Earlier record `records/20261027T211740Z/` (shared `PRE_B`, `all_pass` false:
+the floating unselected pair fell to about 0.07 V) is kept unchanged as evidence.
+The write-driver sizing justification in `design/column/README.md` is still the
+hand estimate; the flip times above are its first measurement, not a sizing sweep.
 
 A klt batch run whose corner errors exits 4; `run_column.sh` accepts that only for
 the two negative controls (a driver that never flips the cell leaves the flip

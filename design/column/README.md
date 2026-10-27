@@ -24,7 +24,7 @@ reasoning, not a measurement. #24 inherits the split.
 | `column_mux` | `SEL0 SEL0B SEL1 SEL1B BL0 BLB0 BL1 BLB1 BLM BLBM VDD VSS` | 4 transmission gates, NMOS 2.0 µm + PMOS 2.0 µm |
 | `sense_amp` | `SAE BLM BLBM OUT OUTB VDD VSS` | 2 PMOS isolation 2.0 µm (gate `SAE`), cross-coupled latch NMOS 1.0 µm / PMOS 1.0 µm, tail NMOS 2.0 µm (gate `SAE`) |
 | `write_driver` | `WE DIN BLM BLBM VDD VSS` | inverter (0.5 µm), two 2-high NMOS stacks 3.0 µm: `WE`·`DIN` pulls `BLBM` low, `WE`·`DINB` pulls `BLM` low |
-| `column` | `PRE_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS` | 2 bit-line pairs × 128 `bitcell`, 2 `precharge`, `column_mux`, `sense_amp`, `write_driver` |
+| `column` | `PRE0_B PRE1_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS` | 2 bit-line pairs × 128 `bitcell`, 2 `precharge`, `column_mux`, `sense_amp`, `write_driver` |
 
 The cell is `../bitcell/bitcell.sch` at the reference sizing, unchanged. In
 `column`, `XC0`/`XC1` are the selected row's cell on each pair (`WL`);
