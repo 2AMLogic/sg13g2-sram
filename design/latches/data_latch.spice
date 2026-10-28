@@ -1,0 +1,152 @@
+** sch_path: design/latches/data_latch.sch
+
+* write-data input latch, transparent while CLK is low, holds while CLK is high
+
+.subckt data_latch CLK D[31] D[30] D[29] D[28] D[27] D[26] D[25] D[24] D[23] D[22] D[21] D[20] D[19] D[18] D[17] D[16] D[15]
++ D[14] D[13] D[12] D[11] D[10] D[9] D[8] D[7] D[6] D[5] D[4] D[3] D[2] D[1] D[0] Q[31] Q[30] Q[29] Q[28] Q[27] Q[26] Q[25] Q[24] Q[23]
++ Q[22] Q[21] Q[20] Q[19] Q[18] Q[17] Q[16] Q[15] Q[14] Q[13] Q[12] Q[11] Q[10] Q[9] Q[8] Q[7] Q[6] Q[5] Q[4] Q[3] Q[2] Q[1] Q[0] VDD VSS
+*.ipin CLK
+*.ipin D[31]
+*.ipin D[30]
+*.ipin D[29]
+*.ipin D[28]
+*.ipin D[27]
+*.ipin D[26]
+*.ipin D[25]
+*.ipin D[24]
+*.ipin D[23]
+*.ipin D[22]
+*.ipin D[21]
+*.ipin D[20]
+*.ipin D[19]
+*.ipin D[18]
+*.ipin D[17]
+*.ipin D[16]
+*.ipin D[15]
+*.ipin D[14]
+*.ipin D[13]
+*.ipin D[12]
+*.ipin D[11]
+*.ipin D[10]
+*.ipin D[9]
+*.ipin D[8]
+*.ipin D[7]
+*.ipin D[6]
+*.ipin D[5]
+*.ipin D[4]
+*.ipin D[3]
+*.ipin D[2]
+*.ipin D[1]
+*.ipin D[0]
+*.opin Q[31]
+*.opin Q[30]
+*.opin Q[29]
+*.opin Q[28]
+*.opin Q[27]
+*.opin Q[26]
+*.opin Q[25]
+*.opin Q[24]
+*.opin Q[23]
+*.opin Q[22]
+*.opin Q[21]
+*.opin Q[20]
+*.opin Q[19]
+*.opin Q[18]
+*.opin Q[17]
+*.opin Q[16]
+*.opin Q[15]
+*.opin Q[14]
+*.opin Q[13]
+*.opin Q[12]
+*.opin Q[11]
+*.opin Q[10]
+*.opin Q[9]
+*.opin Q[8]
+*.opin Q[7]
+*.opin Q[6]
+*.opin Q[5]
+*.opin Q[4]
+*.opin Q[3]
+*.opin Q[2]
+*.opin Q[1]
+*.opin Q[0]
+*.iopin VDD
+*.iopin VSS
+XCB CLK CLKB VDD VSS inv
+XL[31] D[31] CLKB CLK Q[31] VDD VSS dlatch
+XL[30] D[30] CLKB CLK Q[30] VDD VSS dlatch
+XL[29] D[29] CLKB CLK Q[29] VDD VSS dlatch
+XL[28] D[28] CLKB CLK Q[28] VDD VSS dlatch
+XL[27] D[27] CLKB CLK Q[27] VDD VSS dlatch
+XL[26] D[26] CLKB CLK Q[26] VDD VSS dlatch
+XL[25] D[25] CLKB CLK Q[25] VDD VSS dlatch
+XL[24] D[24] CLKB CLK Q[24] VDD VSS dlatch
+XL[23] D[23] CLKB CLK Q[23] VDD VSS dlatch
+XL[22] D[22] CLKB CLK Q[22] VDD VSS dlatch
+XL[21] D[21] CLKB CLK Q[21] VDD VSS dlatch
+XL[20] D[20] CLKB CLK Q[20] VDD VSS dlatch
+XL[19] D[19] CLKB CLK Q[19] VDD VSS dlatch
+XL[18] D[18] CLKB CLK Q[18] VDD VSS dlatch
+XL[17] D[17] CLKB CLK Q[17] VDD VSS dlatch
+XL[16] D[16] CLKB CLK Q[16] VDD VSS dlatch
+XL[15] D[15] CLKB CLK Q[15] VDD VSS dlatch
+XL[14] D[14] CLKB CLK Q[14] VDD VSS dlatch
+XL[13] D[13] CLKB CLK Q[13] VDD VSS dlatch
+XL[12] D[12] CLKB CLK Q[12] VDD VSS dlatch
+XL[11] D[11] CLKB CLK Q[11] VDD VSS dlatch
+XL[10] D[10] CLKB CLK Q[10] VDD VSS dlatch
+XL[9] D[9] CLKB CLK Q[9] VDD VSS dlatch
+XL[8] D[8] CLKB CLK Q[8] VDD VSS dlatch
+XL[7] D[7] CLKB CLK Q[7] VDD VSS dlatch
+XL[6] D[6] CLKB CLK Q[6] VDD VSS dlatch
+XL[5] D[5] CLKB CLK Q[5] VDD VSS dlatch
+XL[4] D[4] CLKB CLK Q[4] VDD VSS dlatch
+XL[3] D[3] CLKB CLK Q[3] VDD VSS dlatch
+XL[2] D[2] CLKB CLK Q[2] VDD VSS dlatch
+XL[1] D[1] CLKB CLK Q[1] VDD VSS dlatch
+XL[0] D[0] CLKB CLK Q[0] VDD VSS dlatch
+.ends
+
+* expanding   symbol:  gates/inv.sym # of pins=4
+** sym_path: design/gates/inv.sym
+** sch_path: design/gates/inv.sch
+.subckt inv A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* inverter, N 0.5 um / P 1.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  latches/dlatch.sym # of pins=6
+** sym_path: design/latches/dlatch.sym
+** sch_path: design/latches/dlatch.sch
+.subckt dlatch D EN ENB Q VDD VSS
+*.ipin D
+*.ipin EN
+*.ipin ENB
+*.opin Q
+*.iopin VDD
+*.iopin VSS
+XMNI N1 EN D VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMPI N1 ENB D VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 QB N1 VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN1 QB N1 VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMP2 Q QB VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN2 Q QB VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMNF N1 ENB Q VSS sg13_lv_nmos w=0.3u l=0.13u ng=1 m=1
+XMPF N1 EN Q VDD sg13_lv_pmos w=0.3u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* D latch: transparent while EN=1 (ENB=0); a weak feedback gate holds N1 when closed
+
+**** end user architecture code
+.ends
+

@@ -1,0 +1,110 @@
+** sch_path: design/decoder/predec4.sch
+
+* 4-to-16 predecoder, active-high one-hot Y[j], j = A[3:0]
+
+.subckt predec4 A[3] A[2] A[1] A[0] Y[15] Y[14] Y[13] Y[12] Y[11] Y[10] Y[9] Y[8] Y[7] Y[6] Y[5] Y[4] Y[3] Y[2] Y[1] Y[0] VDD
++ VSS
+*.ipin A[3]
+*.ipin A[2]
+*.ipin A[1]
+*.ipin A[0]
+*.opin Y[15]
+*.opin Y[14]
+*.opin Y[13]
+*.opin Y[12]
+*.opin Y[11]
+*.opin Y[10]
+*.opin Y[9]
+*.opin Y[8]
+*.opin Y[7]
+*.opin Y[6]
+*.opin Y[5]
+*.opin Y[4]
+*.opin Y[3]
+*.opin Y[2]
+*.opin Y[1]
+*.opin Y[0]
+*.iopin VDD
+*.iopin VSS
+XI0 A[0] A0B VDD VSS inv
+XI1 A[1] A1B VDD VSS inv
+XI2 A[2] A2B VDD VSS inv
+XI3 A[3] A3B VDD VSS inv
+XN0 A0B A1B A2B A3B N0 VDD VSS nand4
+XO0 N0 Y[0] VDD VSS inv
+XN1 A[0] A1B A2B A3B N1 VDD VSS nand4
+XO1 N1 Y[1] VDD VSS inv
+XN2 A0B A[1] A2B A3B N2 VDD VSS nand4
+XO2 N2 Y[2] VDD VSS inv
+XN3 A[0] A[1] A2B A3B N3 VDD VSS nand4
+XO3 N3 Y[3] VDD VSS inv
+XN4 A0B A1B A[2] A3B N4 VDD VSS nand4
+XO4 N4 Y[4] VDD VSS inv
+XN5 A[0] A1B A[2] A3B N5 VDD VSS nand4
+XO5 N5 Y[5] VDD VSS inv
+XN6 A0B A[1] A[2] A3B N6 VDD VSS nand4
+XO6 N6 Y[6] VDD VSS inv
+XN7 A[0] A[1] A[2] A3B N7 VDD VSS nand4
+XO7 N7 Y[7] VDD VSS inv
+XN8 A0B A1B A2B A[3] N8 VDD VSS nand4
+XO8 N8 Y[8] VDD VSS inv
+XN9 A[0] A1B A2B A[3] N9 VDD VSS nand4
+XO9 N9 Y[9] VDD VSS inv
+XN10 A0B A[1] A2B A[3] N10 VDD VSS nand4
+XO10 N10 Y[10] VDD VSS inv
+XN11 A[0] A[1] A2B A[3] N11 VDD VSS nand4
+XO11 N11 Y[11] VDD VSS inv
+XN12 A0B A1B A[2] A[3] N12 VDD VSS nand4
+XO12 N12 Y[12] VDD VSS inv
+XN13 A[0] A1B A[2] A[3] N13 VDD VSS nand4
+XO13 N13 Y[13] VDD VSS inv
+XN14 A0B A[1] A[2] A[3] N14 VDD VSS nand4
+XO14 N14 Y[14] VDD VSS inv
+XN15 A[0] A[1] A[2] A[3] N15 VDD VSS nand4
+XO15 N15 Y[15] VDD VSS inv
+.ends
+
+* expanding   symbol:  gates/inv.sym # of pins=4
+** sym_path: design/gates/inv.sym
+** sch_path: design/gates/inv.sch
+.subckt inv A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* inverter, N 0.5 um / P 1.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/nand4.sym # of pins=7
+** sym_path: design/gates/nand4.sym
+** sch_path: design/gates/nand4.sch
+.subckt nand4 A B C D Y VDD VSS
+*.ipin A
+*.ipin B
+*.ipin C
+*.ipin D
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 Y B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP2 Y C VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP3 Y D VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN0 Y A N1 VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMN1 N1 B N2 VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMN2 N2 C N3 VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMN3 N3 D VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 4-input NAND, N 2.0 um stack / P 1.0 um
+
+**** end user architecture code
+.ends
+

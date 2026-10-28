@@ -1,0 +1,20 @@
+** sch_path: design/decoder/wl_driver.sch
+
+* one wordline: NAND3(X, Y, WLEN) then a 4x inverter driving WL
+
+.subckt wl_driver X Y WLEN WL VDD VSS
+*.ipin X
+*.ipin Y
+*.ipin WLEN
+*.opin WL
+*.iopin VDD
+*.iopin VSS
+XMPA WLB X VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMPB WLB Y VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMPC WLB WLEN VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMNA WLB X N1 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMNB N1 Y N2 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMNC N2 WLEN VSS VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMPD WL WLB VDD VDD sg13_lv_pmos w=4.0u l=0.13u ng=1 m=1
+XMND WL WLB VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+.ends

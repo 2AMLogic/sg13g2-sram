@@ -1,0 +1,150 @@
+** sch_path: design/control/control.sch
+
+* timing: ACT = CLK & ~CENL; PRE_B follows ACT; WLEN = ACT & delayed ACT; SAE = WLEN & delayed WLEN & read; WE = WLEN & write;
+*+ SEL* from A0L
+
+.subckt control CLK CENL GWENL WENL A0L PRE_B WLEN SAE WE SEL0 SEL0B SEL1 SEL1B VDD VSS
+*.ipin CLK
+*.ipin CENL
+*.ipin GWENL
+*.ipin WENL
+*.ipin A0L
+*.opin PRE_B
+*.opin WLEN
+*.opin SAE
+*.opin WE
+*.opin SEL0
+*.opin SEL0B
+*.opin SEL1
+*.opin SEL1B
+*.iopin VDD
+*.iopin VSS
+XCB CLK CLKB VDD VSS inv
+XACT CLKB CENL ACT VDD VSS nor2
+XD1 ACT D1 VDD VSS inv
+XD2 D1 D2 VDD VSS inv
+XD3 D2 D3 VDD VSS inv
+XD4 D3 D4 VDD VSS inv
+XWN ACT D4 WLENB VDD VSS nand2
+XWO WLENB WLEN VDD VSS inv_x4
+XP1 ACT PREB1 VDD VSS inv
+XP2 PREB1 PRE_B VDD VSS inv
+XE1 WLEN E1 VDD VSS inv
+XE2 E1 E2 VDD VSS inv
+XE3 E2 E3 VDD VSS inv
+XE4 E3 E4 VDD VSS inv
+XWR GWENL WENL WRITE VDD VSS nor2
+XWRB WRITE WRITEB VDD VSS inv
+XSN WLEN E4 WRITEB SAEN VDD VSS nand3
+XSO SAEN SAE VDD VSS inv_x4
+XWEN WLEN WRITE WEB VDD VSS nand2
+XWEO WEB WE VDD VSS inv_x4
+XS1 A0L NA VDD VSS inv
+XS2 NA PA VDD VSS inv
+XS3 PA SEL0 VDD VSS inv_x4
+XS4 SEL0 SEL0B VDD VSS inv_x4
+XS5 NA SEL1 VDD VSS inv_x4
+XS6 SEL1 SEL1B VDD VSS inv_x4
+.ends
+
+* expanding   symbol:  gates/inv.sym # of pins=4
+** sym_path: design/gates/inv.sym
+** sch_path: design/gates/inv.sch
+.subckt inv A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* inverter, N 0.5 um / P 1.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/nor2.sym # of pins=5
+** sym_path: design/gates/nor2.sym
+** sch_path: design/gates/nor2.sch
+.subckt nor2 A B Y VDD VSS
+*.ipin A
+*.ipin B
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 N1 A VDD VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMP1 Y B N1 VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN0 Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMN1 Y B VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 2-input NOR, N 0.5 um / P 2.0 um stack
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/nand2.sym # of pins=5
+** sym_path: design/gates/nand2.sym
+** sch_path: design/gates/nand2.sch
+.subckt nand2 A B Y VDD VSS
+*.ipin A
+*.ipin B
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 Y B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN0 Y A N1 VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMN1 N1 B VSS VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 2-input NAND, N 1.0 um stack / P 1.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/inv_x4.sym # of pins=4
+** sym_path: design/gates/inv_x4.sym
+** sch_path: design/gates/inv_x4.sch
+.subckt inv_x4 A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=4.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* inverter, 4x drive: N 2.0 um / P 4.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/nand3.sym # of pins=6
+** sym_path: design/gates/nand3.sym
+** sch_path: design/gates/nand3.sch
+.subckt nand3 A B C Y VDD VSS
+*.ipin A
+*.ipin B
+*.ipin C
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 Y B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP2 Y C VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN0 Y A N1 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMN1 N1 B N2 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMN2 N2 C VSS VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 3-input NAND, N 1.5 um stack / P 1.0 um
+
+**** end user architecture code
+.ends
+

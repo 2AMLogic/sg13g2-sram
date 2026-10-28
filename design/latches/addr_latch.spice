@@ -1,0 +1,88 @@
+** sch_path: design/latches/addr_latch.sch
+
+* address and control input latches, transparent while CLK is low, hold while CLK is high
+
+.subckt addr_latch CLK A[7] A[6] A[5] A[4] A[3] A[2] A[1] A[0] CEN GWEN WEN AL[7] AL[6] AL[5] AL[4] AL[3] AL[2] AL[1] AL[0] CENL
++ GWENL WENL VDD VSS
+*.ipin CLK
+*.ipin A[7]
+*.ipin A[6]
+*.ipin A[5]
+*.ipin A[4]
+*.ipin A[3]
+*.ipin A[2]
+*.ipin A[1]
+*.ipin A[0]
+*.ipin CEN
+*.ipin GWEN
+*.ipin WEN
+*.opin AL[7]
+*.opin AL[6]
+*.opin AL[5]
+*.opin AL[4]
+*.opin AL[3]
+*.opin AL[2]
+*.opin AL[1]
+*.opin AL[0]
+*.opin CENL
+*.opin GWENL
+*.opin WENL
+*.iopin VDD
+*.iopin VSS
+XCB CLK CLKB VDD VSS inv
+XLA[7] A[7] CLKB CLK AL[7] VDD VSS dlatch
+XLA[6] A[6] CLKB CLK AL[6] VDD VSS dlatch
+XLA[5] A[5] CLKB CLK AL[5] VDD VSS dlatch
+XLA[4] A[4] CLKB CLK AL[4] VDD VSS dlatch
+XLA[3] A[3] CLKB CLK AL[3] VDD VSS dlatch
+XLA[2] A[2] CLKB CLK AL[2] VDD VSS dlatch
+XLA[1] A[1] CLKB CLK AL[1] VDD VSS dlatch
+XLA[0] A[0] CLKB CLK AL[0] VDD VSS dlatch
+XLC CEN CLKB CLK CENL VDD VSS dlatch
+XLG GWEN CLKB CLK GWENL VDD VSS dlatch
+XLW WEN CLKB CLK WENL VDD VSS dlatch
+.ends
+
+* expanding   symbol:  gates/inv.sym # of pins=4
+** sym_path: design/gates/inv.sym
+** sch_path: design/gates/inv.sch
+.subckt inv A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* inverter, N 0.5 um / P 1.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  latches/dlatch.sym # of pins=6
+** sym_path: design/latches/dlatch.sym
+** sch_path: design/latches/dlatch.sch
+.subckt dlatch D EN ENB Q VDD VSS
+*.ipin D
+*.ipin EN
+*.ipin ENB
+*.opin Q
+*.iopin VDD
+*.iopin VSS
+XMNI N1 EN D VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMPI N1 ENB D VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 QB N1 VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN1 QB N1 VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMP2 Q QB VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN2 Q QB VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMNF N1 ENB Q VSS sg13_lv_nmos w=0.3u l=0.13u ng=1 m=1
+XMPF N1 EN Q VDD sg13_lv_pmos w=0.3u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* D latch: transparent while EN=1 (ENB=0); a weak feedback gate holds N1 when closed
+
+**** end user architecture code
+.ends
+

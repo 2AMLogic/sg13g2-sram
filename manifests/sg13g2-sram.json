@@ -2,6 +2,7 @@
   "block": "sg13g2-sram",
   "kind": "analog",
   "evidence": {
+    "1": {"file": "attest/item1.envelope.json", "content_hash": "sha256:bccc9837d5f02c81a321bada7581df71f667c31f8504dd6fb4cd7a8408f2fbd3"},
     "10": {"file": "attest/item10.envelope.json", "content_hash": "sha256:c832c41b5efc0695a644af8245a849fc590fbe41cdc7e0c4d7b057825cb8aa09"}
   }
 }

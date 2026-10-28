@@ -1,0 +1,15 @@
+** sch_path: design/gates/nand2.sch
+
+* 2-input NAND, N 1.0 um stack / P 1.0 um
+
+.subckt nand2 A B Y VDD VSS
+*.ipin A
+*.ipin B
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 Y B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN0 Y A N1 VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMN1 N1 B VSS VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+.ends
