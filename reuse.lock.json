@@ -15,16 +15,6 @@
           "upstream": "sim/lib/test_snm_extract.py",
           "local": "sim/lib/common/test_snm_extract.py",
           "sha256": "82c73683aabc38bfd8179abc99349160aa0b9dc36d17e020918ba5047fd6ab41"
-        },
-        {
-          "upstream": "sim/lib/mint_sim_envelope.py",
-          "local": "sim/lib/common/mint_sim_envelope.py",
-          "sha256": "aa9776afdbd4da8ba1e1f2bbc8ac6fa78acc0530ea01b1c7687cee6c07895b8f"
-        },
-        {
-          "upstream": "sim/lib/render_signoff_table.py",
-          "local": "sim/lib/common/render_signoff_table.py",
-          "sha256": "d7592ff84250594650709a35f12acfc6a9e436ffe66881db77c100f8686d3f42"
         }
       ]
     },

@@ -24,7 +24,7 @@ records in this directory.
 | Grading: Cpk, sigma-to-spec and the exact empirical-yield lower bound; no numeric `target_yield` | `spec/target-yield-decision.md` | `spec/sram.md` |
 | Write margin measured against a fixed, stated pulse width; no independent macro timing target | `spec/write-pulse-width-decision.md` (rule only; the value is re-derived) | `spec/write-pulse-width-decision.md` |
 | Corner count stated as arithmetic with the product written out | `spec/corner-count-correction.md` | `spec/sram.md` |
-| Sim harness (corner sweep, MC campaign, SNM extraction, envelope tools) | `sim/lib/` (`run_corner_sweep.sh`, `run_mc_campaign.py`, `snm_extract.py`, `mint_sim_envelope.py`, `pdk_env.sh`, `render_signoff_table.py`) | by pinned reference, see #4. `env_provenance.py` is deliberately not vendored: `spec/env-provenance-departure-decision.md` |
+| Sim harness (corner sweep, MC campaign, SNM extraction) | `sim/lib/` (`run_corner_sweep.sh`, `run_mc_campaign.py`, `snm_extract.py`, `pdk_env.sh`) | by pinned reference, see #4; `mint_sim_envelope.py` and `render_signoff_table.py` not ported, see `spec/signoff-tooling-decision.md`; `env_provenance.py` not vendored, see `spec/env-provenance-departure-decision.md` |
 | Append-only `sim/` evidence | `CLAUDE.md` | `CLAUDE.md` |
 
 The harness is not vendored by this issue. The pinned-reference mechanism
