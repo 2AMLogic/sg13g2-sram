@@ -11,6 +11,8 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
   byte-identical from `2AMLogic/sg13g2-bandgap` (see `../reuse.lock.json`).
   Their echo hints mention `sim/tools/build-osdi.sh` and `sim/env.sh`; the real
   paths are the ones here.
+- `harness/common/run_klt.sh`: the one batch-only `klt sim` wrapper (`run_klt`,
+  exit-code policy, bucket redaction) sourced by every `sim/*/run_*.sh`.
 - `pdk-smoke/`: smoke runner and append-only records under `records/<UTC>/`.
 - `bitcell/`: 6T bitcell hold/read SNM and write margin over the 45 corners
   (`bitcell/README.md`).

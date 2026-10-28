@@ -31,6 +31,8 @@ SIM_DIR="$(cd "${HERE}/.." && pwd)"
 REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
 source "${SIM_DIR}/harness/common/env.sh"
+# shellcheck source=/dev/null
+source "${SIM_DIR}/harness/common/run_klt.sh"
 : "${PDK_ROOT:?run_bitcell.sh: no PDK install resolved; see sim/README.md}"
 command -v klt >/dev/null || { echo "run_bitcell.sh: klt not on PATH" >&2; exit 3; }
 POST=(python3 -I "${HERE}/bitcell_post.py")
@@ -45,22 +47,6 @@ REC="${HERE}/records/${STAMP}"
 mkdir -p "${REC}/reports" "${REC}/curves" "${REC}/negctl"
 WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
 
-# run_klt <request> <name>: batch run, report to the record, artifacts to WORK.
-run_klt() {
-  local req="$1" name="$2" rc=0
-  klt sim "${req}" --backend batch -o "${WORK}/${name}" \
-    --report-out "${REC}/reports/${name}.json.gz" --format json \
-    > "${WORK}/${name}.out" 2> "${WORK}/${name}.stderr" || rc=$?
-  # progress lines name the fleet bucket (an account id): keep them out of the record
-  sed -E 's#s3://[^ /]+#s3://<bucket>#g' "${WORK}/${name}.stderr" > "${REC}/reports/${name}.stderr"
-  # exit 0 = all pass, 3 = some measurement limits failed; anything else is a
-  # tool/fleet error (submit refused, job failed): report it, do not fall back.
-  if [[ "${rc}" -ne 0 && "${rc}" -ne 3 ]]; then
-    echo "run_bitcell.sh: klt sim ${name} failed (exit ${rc}); batch error, no local fallback:" >&2
-    tail -5 "${REC}/reports/${name}.stderr" >&2
-    exit 6
-  fi
-}
 
 # --- typical point -----------------------------------------------------------
 "${POST[@]}" typical-request "${HERE}/request_snm.json" "${HERE}/.typ_snm.json" --netlist bench_snm.cir

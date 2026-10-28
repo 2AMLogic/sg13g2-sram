@@ -20,6 +20,8 @@ SIM_DIR="$(cd "${HERE}/.." && pwd)"
 REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
 source "${SIM_DIR}/harness/common/env.sh"
+# shellcheck source=/dev/null
+source "${SIM_DIR}/harness/common/run_klt.sh"
 : "${PDK_ROOT:?run_column.sh: no PDK install resolved; see sim/README.md}"
 command -v klt >/dev/null || { echo "run_column.sh: klt not on PATH" >&2; exit 3; }
 POST=(python3 -I "${HERE}/column_post.py")
@@ -35,21 +37,6 @@ REC="${HERE}/records/${STAMP}"
 mkdir -p "${REC}/reports" "${REC}/negctl"
 WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
 
-run_klt() {   # run_klt <request> <name> [negctl]
-  local req="$1" name="$2" negctl="${3:-}" rc=0
-  klt sim "${req}" --backend batch -o "${WORK}/${name}" \
-    --report-out "${REC}/reports/${name}.json.gz" --format json \
-    > "${WORK}/${name}.out" 2> "${WORK}/${name}.stderr" || rc=$?
-  sed -E 's#s3://[^ /]+#s3://<bucket>#g' "${WORK}/${name}.stderr" > "${REC}/reports/${name}.stderr"
-  # exit 4 = errored corner. For a negative control that is the detection itself (a driver that
-  # never flips the cell leaves the flip-time measurement without a value); the report must exist.
-  if [[ "${rc}" -eq 4 && -n "${negctl}" && -s "${REC}/reports/${name}.json.gz" ]]; then rc=0; fi
-  if [[ "${rc}" -ne 0 && "${rc}" -ne 3 ]]; then
-    echo "run_column.sh: klt sim ${name} failed (exit ${rc}); batch error, no local fallback:" >&2
-    tail -5 "${REC}/reports/${name}.stderr" >&2
-    exit 6
-  fi
-}
 
 # --- nominal read and write ---------------------------------------------------
 "${POST[@]}" request read "${HERE}/.req_read.json"
@@ -66,8 +53,8 @@ grep -q 'w=0\.15u' "${REC}/negctl/column_weak.spice" || { echo "run_column.sh: w
 "${POST[@]}" request write "${REC}/negctl/request_write.json" --netlist bench_write.cir
 "${POST[@]}" negctl-bench "${HERE}/bench_read.cir" "${REC}/negctl/bench_read.cir" --sae-delay-ns 0.8
 "${POST[@]}" request read "${REC}/negctl/request_read.json" --netlist bench_read.cir
-run_klt "${REC}/negctl/request_write.json" negctl_write negctl
-run_klt "${REC}/negctl/request_read.json" negctl_read negctl
+run_klt "${REC}/negctl/request_write.json" negctl_write 1
+run_klt "${REC}/negctl/request_read.json" negctl_read 1
 
 # --- post-process and record ----------------------------------------------------
 "${POST[@]}" read "${REC}/reports/read.json.gz" nominal > "${REC}/read.json"
