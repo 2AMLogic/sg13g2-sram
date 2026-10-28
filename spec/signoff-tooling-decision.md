@@ -37,5 +37,6 @@ row is unchanged.
 - Re-import from `gf180-sram` and adapt to this repo's `sim/<block>/records`
   layout when a multi-record corner sweep exists to render.
 - `env_provenance.py` is out of scope (see #33).
-- Origin finding, to be filed on `gf180-sram`: the `parents[2]` default root
-  is wrong for a `sim/lib/common/` layout.
+- Origin finding, filed as `2AMLogic/gf180-sram#287`
+  (https://github.com/2AMLogic/gf180-sram/issues/287): the `parents[2]` default
+  root is wrong for a `sim/lib/common/` layout.
