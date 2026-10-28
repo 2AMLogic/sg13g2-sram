@@ -108,7 +108,7 @@ Records are append-only: each run writes a new `records/<UTC>/` directory.
 
    ```bash
    uvx --from "klayout-tools==0.8.0" klt signoff --manifest manifests/sg13g2-sram.json \
-     --tiers-doc manifests/design-evidence-tiers.md --format json > manifests/sg13g2-sram.signoff.json
+     --format json > manifests/sg13g2-sram.signoff.json
    ```
 
 5. **Repo hygiene attestation** (`attest/item10.envelope.json`):
