@@ -20,6 +20,7 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
+- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver)
 - **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check
 
 ## Ready
@@ -32,7 +33,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
+- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver)
 
 ## PRs Awaiting Review
 
@@ -52,13 +53,14 @@ Issues carrying `loom:curated`.
 
 - **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver) *(curated)*
 - **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check *(curated)*
-- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 
 
-_None._
+- **#33**: Remove env_provenance.py: dead vendored gf180 helper with no callers *(hermit)*
+- **#36**: Remove mint_sim_envelope.py and render_signoff_table.py: unrunnable vendored gf180 sign-off tooling (~660 LOC) *(hermit)*
+- **#41**: Remove vendored design-evidence-tiers.md: klt 0.8.0 bundles it (~1055 LOC) *(hermit)*
 
 ## Epics
 
@@ -72,12 +74,12 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
+| Important | 2 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 3 |
-| Architect / Hermit proposals | 0 |
+| Curated | 2 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
