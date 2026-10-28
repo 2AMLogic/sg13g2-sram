@@ -70,6 +70,26 @@ def main() -> int:
         assert ".include ./col_weak.spice" in t and "PULSE(0 1.2 0.8n" in t.split("Vsae")[1]
         assert ".include ../../design/" not in t       # re-pointed relative to the new directory
         assert t.count(".include ") == 1                # the benches include only column.spice
+    # sizing summary: a failing width reports its failed checks, min passing width is the smallest pass
+    import gzip, json
+    with tempfile.TemporaryDirectory() as d:
+        def rep(name, flips, cross):
+            ms = []
+            for c, (_, s) in cp.WRITE_CASES.items():
+                for k, v in good_write().items():
+                    if k.endswith("_" + c):
+                        ms.append({"name": k, "value": cross if k.startswith("tf_") else v})
+                ms = [m for m in ms if not (m["name"] == f"fl_{c}" and not flips)]
+                if not flips:
+                    ms.append({"name": f"fl_{c}", "value": 0.1})
+            p = Path(d) / name
+            p.write_bytes(gzip.compress(json.dumps(
+                {"corners": [{"corner_id": "x", "status": "pass", "measurements": ms}]}).encode()))
+            return str(p)
+        s = cp.cmd_sizing("t", [f"3.0={rep('a.gz', True, 0.6e-9)}", f"0.15={rep('b.gz', False, 2.0e-9)}",
+                                f"1.0={rep('c.gz', True, 0.8e-9)}"])
+        assert [r["width_um"] for r in s["widths"]] == [0.15, 1.0, 3.0]
+        assert s["min_passing_width_um"] == 1.0 and not s["widths"][0]["pass"] and s["widths"][0]["failed_checks"]
     print("ok")
     return 0
 

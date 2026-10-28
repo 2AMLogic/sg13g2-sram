@@ -9,6 +9,8 @@ Subcommands (reports are `klt sim` envelopes, plain or .json.gz):
       Copy a bench for a negative control: re-point its design includes so they
       resolve from <out.cir>'s directory, optionally swap one block netlist, and
       optionally move the SAE rise earlier.
+  sizing <label> <width_um>=<report> ...
+      Write-driver width sweep summary (flip time and verdict per width and case).
   read|write <report> <label>
       Per-case verdicts from the measurements; prints JSON, every number `simulated`.
 
@@ -156,6 +158,22 @@ def cmd_verdict(kind: str, report: str, label: str) -> dict:
     return out
 
 
+def cmd_sizing(label: str, items: list[str]) -> dict:
+    """Summarise a write-driver width sweep; items are `<width_um>=<report>`."""
+    rows = []
+    for it in items:
+        w, rep = it.split("=", 1)
+        v = cmd_verdict("write", rep, f"{label}_w{w}")
+        rows.append({"width_um": float(w), "klt_status": v["klt_status"], "pass": v["all_pass"],
+                     "flip_time_ns": {c: x.get("flip_time_ns") for c, x in v["cases"].items()},
+                     "failed_checks": {c: [k for k, ok in x["checks"].items() if not ok]
+                                       for c, x in v["cases"].items() if not x["pass"]}})
+    rows.sort(key=lambda r: r["width_um"])
+    passing = [r["width_um"] for r in rows if r["pass"]]
+    return {"label": label, "kind": "simulated", "corner": "mos_tt/1.200V/27C", "pulse_ns": PULSE_NS,
+            "widths": rows, "min_passing_width_um": min(passing) if passing else None}
+
+
 def cmd_negctl_bench(bench: str, dst: str, replace: dict[str, str], sae_delay: str | None) -> None:
     here = Path(bench).resolve().parent
     dst_dir = Path(dst).resolve().parent
@@ -190,6 +208,8 @@ def main() -> int:
                 sae = a[i + 1]
             i += 2
         cmd_negctl_bench(a[1], a[2], rep, sae)
+    elif a[0] == "sizing" and len(a) >= 3:
+        print(json.dumps(cmd_sizing(a[1], a[2:]), indent=2))
     elif a[0] in ("read", "write") and len(a) >= 3:
         print(json.dumps(cmd_verdict(a[0], a[1], a[2]), indent=2))
     else:
