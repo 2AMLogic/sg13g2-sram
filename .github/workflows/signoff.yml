@@ -29,8 +29,7 @@ jobs:
       - name: Re-run the grader (exit 0 and 3 are valid grader runs)
         run: |
           rc=0
-          klt signoff --manifest manifests/sg13g2-sram.json \
-            --tiers-doc manifests/design-evidence-tiers.md --format json \
+          klt signoff --manifest manifests/sg13g2-sram.json --format json \
             > "$RUNNER_TEMP/signoff.json" || rc=$?
           if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ]; then
             echo "::error::klt signoff errored (exit $rc)"
