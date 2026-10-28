@@ -2,7 +2,7 @@
 
 Nominal functional bench of the I/O column (`design/column/`): read of 0 and 1,
 write of 0 and 1, at mos_tt, 1.20 V, 27 °C only. The corner grid, Monte Carlo,
-access time and array-level margins are #26.
+access time and array-level margins are in `sim/array/` (#26).
 
 - `bench_read.cir`, `bench_write.cir`: two column copies each (real `bitcell`
   netlist, 127 unselected rows per bit line present, the half-selected cell of

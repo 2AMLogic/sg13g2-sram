@@ -1,0 +1,17 @@
+{
+  "label": "typical",
+  "kind": "simulated",
+  "bl_step_v": 0.025,
+  "pulse_ns": 1.0,
+  "decision": "flipped iff Q<QB at end of pulse (1.3 ns) and at 2.5 ns",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/27C",
+      "klt_status": "pass",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    }
+  ]
+}

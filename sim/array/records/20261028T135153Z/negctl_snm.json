@@ -1,0 +1,17 @@
+{
+  "label": "negctl_beta",
+  "kind": "simulated",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/25C",
+      "klt_status": "pass",
+      "read_snm_v": 0.13390672443721813,
+      "read_snm_vgap_v": 0.17882093887544698,
+      "pass": true
+    }
+  ],
+  "corner_count": 1,
+  "failing_corners": [],
+  "all_pass": true,
+  "any_fail": false
+}

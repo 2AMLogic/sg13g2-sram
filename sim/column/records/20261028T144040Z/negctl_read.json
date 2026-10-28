@@ -1,0 +1,50 @@
+{
+  "label": "negctl_early_sae",
+  "kind": "simulated",
+  "corner_id": "mos_tt/1.200V/27C",
+  "klt_status": "pass",
+  "cases": {
+    "a": {
+      "stored": 1,
+      "dout_v": -1.2,
+      "bl_diff_at_sae_v": 0.449811,
+      "precharge_bl_v": 1.22103,
+      "equalize_err_v": 0.00107448,
+      "selected_cell_after_v": 1.2,
+      "half_selected_cell_after_v": -1.2,
+      "half_selected_bl_min_v": 1.11843,
+      "checks": {
+        "sense_resolves_stored_value": false,
+        "bit_line_differential_has_right_sign": true,
+        "precharged": true,
+        "equalized": true,
+        "selected_cell_retained": true,
+        "half_selected_cell_retained": true,
+        "unselected_column_bit_lines_hold": true
+      },
+      "pass": false
+    },
+    "b": {
+      "stored": 0,
+      "dout_v": -1.2,
+      "bl_diff_at_sae_v": -0.455194,
+      "precharge_bl_v": 1.22103,
+      "equalize_err_v": 0.00107223,
+      "selected_cell_after_v": -1.2,
+      "half_selected_cell_after_v": 1.2,
+      "half_selected_bl_min_v": 1.11843,
+      "checks": {
+        "sense_resolves_stored_value": true,
+        "bit_line_differential_has_right_sign": true,
+        "precharged": true,
+        "equalized": true,
+        "selected_cell_retained": true,
+        "half_selected_cell_retained": true,
+        "unselected_column_bit_lines_hold": true
+      },
+      "pass": true
+    }
+  },
+  "all_pass": false,
+  "any_fail": true
+}

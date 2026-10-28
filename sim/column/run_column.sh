@@ -3,7 +3,7 @@
 # read of 0 and 1, write of 0 and 1, plus two negative controls.
 #
 # Steps:
-#   1. design/netlist.sh --check: every committed netlist matches its schematic (exit 5 if stale).
+#   1. design/netlist.sh --check bitcell/bitcell column/column: both netlists match their schematics (exit 5 if stale).
 #   2. bench_read.cir and bench_write.cir, one `klt sim` request each (batch fleet).
 #   3. Negative controls: (a) write driver stacks at 0.15 um must fail to write inside the
 #      1 ns pulse; (b) SAE fired with the wordline (no bit-line differential) must not
@@ -24,7 +24,9 @@ source "${SIM_DIR}/harness/common/env.sh"
 command -v klt >/dev/null || { echo "run_column.sh: klt not on PATH" >&2; exit 3; }
 POST=(python3 -I "${HERE}/column_post.py")
 
-"${REPO}/design/netlist.sh" --check >/dev/null \
+# bitcell and column only: `design/netlist.sh --check` also flags control/bit_slice/macro from the
+# checkout-specific sym_path/sch_path comment lines of nested blocks, which this bench does not use.
+"${REPO}/design/netlist.sh" --check bitcell/bitcell column/column >/dev/null \
   || { echo "run_column.sh: a design/ netlist drifted from its schematic (regenerate: design/README.md)" >&2; exit 5; }
 
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"

@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 9,
+  "summary": "T1 item 9 (Testbenches shipped): 30/30 attestation checks passed (klt signoff --attest)",
+  "source": "attest/item9.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 30,
+    "passed_count": 30,
+    "checks": [
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/README.md",
+        "passed": true,
+        "content_hash": "sha256:cf87f68ccfbad9e795d8a7cebe8fd02b8e3ca31925961f3ccdccf1cfe3f34353"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/README.md",
+        "passed": true,
+        "content_hash": "sha256:fd14d3aa98d3fa780cf146d26f818f50de19da46daab14088d6e1a0533d19742"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/array_post.py",
+        "passed": true,
+        "content_hash": "sha256:b1febab77ce7fb9a0e83335b958b07f26ef0ccec482930f18f60ae35d178e990"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/bench_access.cir",
+        "passed": true,
+        "content_hash": "sha256:72b5c240627559c2f559243cd19796ea3196d0ede9e0b42835caf0b7a553b924"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/bench_snm.cir",
+        "passed": true,
+        "content_hash": "sha256:a8712e0bf5689f00375421bb76a872576610ef3172955f20f5d2d2685290be36"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/bench_write.cir",
+        "passed": true,
+        "content_hash": "sha256:e9279682e6173f5dea1b90e7c7b8002d34e45ea2bf3047c46bd99e29b3370c66"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/run_array.sh",
+        "passed": true,
+        "content_hash": "sha256:9c22db0f7c1505fedbc8241e74ff38eca630f64a962c09a82d38eba6968b7ca0"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/array/test_array_post.py",
+        "passed": true,
+        "content_hash": "sha256:d876ea4f9ac225974f5563b36d35470305261d48d188043c25783585f352d47e"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/README.md",
+        "passed": true,
+        "content_hash": "sha256:a47f102697ee244529082e55dd390ac894c2dea1703f05771bf6cdcdfb12416c"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/bench_snm.cir",
+        "passed": true,
+        "content_hash": "sha256:2a618f705792251ec6947b32fc823cc1c8080b675f4893552ba846344a1417ba"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/bench_write.cir",
+        "passed": true,
+        "content_hash": "sha256:6533c4e9d6af3569638bd6ac2b92ac6323c9bd400ca3e49676fc886a742f03f9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/bitcell_post.py",
+        "passed": true,
+        "content_hash": "sha256:61480c2de926de82b94a31e0b8bc679ede7edea5ae7b4ad152538831fa8b3954"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/request_snm.json",
+        "passed": true,
+        "content_hash": "sha256:bff01d4354ab6d4e2892fdf2f32b53840cb2d6f3e44ed3710bd0d5ed8a8768a7"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/request_write.json",
+        "passed": true,
+        "content_hash": "sha256:e6695f492a5a85a53b499f801d8d3e3ce72f992f337957a90b6046de3c872a83"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/run_bitcell.sh",
+        "passed": true,
+        "content_hash": "sha256:ffc89cab26e674cdbf5a3ba2cd02db6822e28a0662df239fe1a0797679fa67cc"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bitcell/test_bitcell_post.py",
+        "passed": true,
+        "content_hash": "sha256:93120ae749a4b0dfa8f91fa432cdb91d916269eca3ffd5c9b56cfe976f24939b"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/column/README.md",
+        "passed": true,
+        "content_hash": "sha256:50da1f30ef6ace0461cb69f8cc69e4ae754060e9601dfeacf86b025a0914ab65"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/column/bench_read.cir",
+        "passed": true,
+        "content_hash": "sha256:5696d110603d14c637bb90a05f7970ad3dbd69b0a4239c45e99ab476630d56cb"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/column/bench_write.cir",
+        "passed": true,
+        "content_hash": "sha256:47f8d6d1b6308390c8f05cc5ca4f15b8b7f9a15e975221c24fac9a561ddf192f"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/column/column_post.py",
+        "passed": true,
+        "content_hash": "sha256:c8da82ebb6e7e8f618dd67d6cbce5f1229f295f5b8f227eeb3a7274f9847a06f"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/column/run_column.sh",
+        "passed": true,
+        "content_hash": "sha256:98e5ebe11701728b553381600d36fe3d5de1408b8d33b940abeacbb9f529cc46"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/column/test_column_post.py",
+        "passed": true,
+        "content_hash": "sha256:d255122af919706467a5c040757e4d28a1e2f4b235c57f3cd89c39acf93d36dc"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/harness/common/env.sh",
+        "passed": true,
+        "content_hash": "sha256:f4efe75194c10df579fe4b42bd0d6e8475f9f89c17c0c7563ffe6d980945ba61"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/harness/common/tools/build-osdi.sh",
+        "passed": true,
+        "content_hash": "sha256:d022ddc32a02280081d32bb7186ba1920b0b3399b00b0a5ad5eeda717d1396bd"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/lib/common/snm_extract.py",
+        "passed": true,
+        "content_hash": "sha256:56c044cda6ccb4190a6b159a0113f7528c7c7cf91a7f1426ba917a7398b36080"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/pdk.json",
+        "passed": true,
+        "content_hash": "sha256:263ba0dcac47d4fc308701ff35df016adf753786026e0f95edf1e8a2fbcc2696"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/run_all.sh",
+        "passed": true,
+        "content_hash": "sha256:8a3892570cb0b1fd97bef0d2a37ef63e5f402ebb4df74232ca683b66024c1cf4"
+      },
+      {
+        "check": "command",
+        "role": "cold_start",
+        "argv": [
+          "sim/run_all.sh"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "pin",
+        "role": "pdk",
+        "passed": true,
+        "value": {
+          "name": "ihp-sg13g2",
+          "revision": "IHP-Open-PDK v0.3.0 (tarball sha256 f6afb7a8d2adf3e40acd3fd2c7892fc93510e6f760565409a8df2b5b242254fc, sim/pdk.json)"
+        }
+      },
+      {
+        "check": "pin",
+        "role": "tools",
+        "passed": true,
+        "value": {
+          "klayout-tools": "0.8.0 (batch runner klt sim; CI pin)",
+          "ngspice": "46 (batch runner; local ngspice must be >= 43 for OSDI v0.4)",
+          "openvaf-reloaded": "v24.0.1mob (sim/harness/common/tools/build-osdi.sh)"
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.8.1.dev567+gfcc34ee6b141",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "attest/item9.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:58a0c5cdadf935f99bc22293c37b378cd8d22e4a94c6286ec6e5c955b109c4dc"
+    }
+  }
+}

@@ -31,3 +31,6 @@ jobs:
 
       - name: Item 10 attestation has not drifted
         run: klt signoff --attest 10 --inventory attest/item10.json --check attest/item10.envelope.json
+
+      - name: Item 9 attestation has not drifted
+        run: klt signoff --attest 9 --inventory attest/item9.json --check attest/item9.envelope.json

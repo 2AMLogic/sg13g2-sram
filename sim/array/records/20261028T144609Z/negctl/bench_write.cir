@@ -1,0 +1,143 @@
+* Write-margin bench through the real write driver (circuit body for `klt sim`; no .control/.end).
+*
+* Two copies of design/column/column.spice (mux 2, 128 cells per bit line), column 0 selected:
+*   xc: selected cell holds 1, DIN = 0 (write 0 over 1); the other 127 rows of column 0 hold 1.
+*   xd: every stored value inverted, DIN = 1 (write 1 over 0).
+* The half-selected cell (row r, column 1, WL high, mux off) holds the opposite value in each copy.
+* Plus 33 stand-alone bitcells (the column's own `bitcell` subckt), cell k with its BL held at a
+* constant low level L_k = 25 mV * k (k = 0..32) and BLB at VDD, same wordline pulse: the
+* highest L_k at which the cell flips within the pulse is the cell's trip level L_trip at this
+* corner (as sim/bitcell/bench_write.cir). Write margin through the real driver is
+*   L_trip - L_drv,   L_drv = bit-line low level the driver holds in situ at the end of the pulse,
+* positive iff the driver pulls the bit line below the level the cell needs.
+* Timeline (ns), all levels scale with VDD: precharge on 0.1..0.72 (bit lines start at 0.3 V);
+* WE high 0.9..2.14; WL pulse 1.0..2.04 (1 ns plateau, 50 % at 1.01 and 2.03). Cell state is read at
+* 1.95 (end of the pulse) and 3.4.
+.include ./column_weakdrv.spice
+
+Vdd vdd 0 DC 1.2
+Vppre ppre 0 PULSE(1 0 0.1n 20p 20p 0.6n 100n)
+Bpre0 pre0b 0 V = v(ppre)*v(vdd)
+Vpre1 pre1b 0 DC 0
+Vpwl pwl 0 PULSE(0 1 1.0n 20p 20p 1n 100n)
+Bwl  wl  0 V = v(pwl)*v(vdd)
+Vpwe pwe 0 PULSE(0 1 0.9n 20p 20p 1.2n 100n)
+Bwe  we  0 V = v(pwe)*v(vdd)
+Bs0   sel0  0 V = v(vdd)
+Bs1b  sel1b 0 V = v(vdd)
+Bdind dind  0 V = v(vdd)
+Vs0b  sel0b 0 DC 0
+Vs1   sel1  0 DC 0
+Vsae  sae   0 DC 0
+Vwlu  wlu   0 DC 0
+Vdinc dinc  0 DC 0
+*       PRE0_B PRE1_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS
+Xc pre0b pre1b sel0 sel0b sel1 sel1b sae we dinc wl wlu oc obc vdd 0 column
+Xd pre0b pre1b sel0 sel0b sel1 sel1b sae we dind wl wlu od obd vdd 0 column
+* stored values: 1 = Q 0.9 / QB 0.3 (rail-independent, as sim/bitcell)
+.ic v(xc.q0)=0.9 v(xc.qb0)=0.3 v(xc.uq0)=0.9 v(xc.uqb0)=0.3
+.ic v(xc.q1)=0.3 v(xc.qb1)=0.9 v(xc.uq1)=0.9 v(xc.uqb1)=0.3
+.ic v(xd.q0)=0.3 v(xd.qb0)=0.9 v(xd.uq0)=0.3 v(xd.uqb0)=0.9
+.ic v(xd.q1)=0.9 v(xd.qb1)=0.3 v(xd.uq1)=0.3 v(xd.uqb1)=0.9
+.ic v(xc.bl0)=0.3 v(xc.blb0)=0.3 v(xc.bl1)=0.3 v(xc.blb1)=0.3
+.ic v(xd.bl0)=0.3 v(xd.blb0)=0.3 v(xd.bl1)=0.3 v(xd.blb1)=0.3
+* trip-level cells: BL = L_k (constant), BLB = VDD, cell starts holding Q=1
+Vbl0 bl0 0 DC 0.000
+Xt0 bl0 vdd wl vdd 0 q0 qb0 bitcell
+Vbl1 bl1 0 DC 0.025
+Xt1 bl1 vdd wl vdd 0 q1 qb1 bitcell
+Vbl2 bl2 0 DC 0.050
+Xt2 bl2 vdd wl vdd 0 q2 qb2 bitcell
+Vbl3 bl3 0 DC 0.075
+Xt3 bl3 vdd wl vdd 0 q3 qb3 bitcell
+Vbl4 bl4 0 DC 0.100
+Xt4 bl4 vdd wl vdd 0 q4 qb4 bitcell
+Vbl5 bl5 0 DC 0.125
+Xt5 bl5 vdd wl vdd 0 q5 qb5 bitcell
+Vbl6 bl6 0 DC 0.150
+Xt6 bl6 vdd wl vdd 0 q6 qb6 bitcell
+Vbl7 bl7 0 DC 0.175
+Xt7 bl7 vdd wl vdd 0 q7 qb7 bitcell
+Vbl8 bl8 0 DC 0.200
+Xt8 bl8 vdd wl vdd 0 q8 qb8 bitcell
+Vbl9 bl9 0 DC 0.225
+Xt9 bl9 vdd wl vdd 0 q9 qb9 bitcell
+Vbl10 bl10 0 DC 0.250
+Xt10 bl10 vdd wl vdd 0 q10 qb10 bitcell
+Vbl11 bl11 0 DC 0.275
+Xt11 bl11 vdd wl vdd 0 q11 qb11 bitcell
+Vbl12 bl12 0 DC 0.300
+Xt12 bl12 vdd wl vdd 0 q12 qb12 bitcell
+Vbl13 bl13 0 DC 0.325
+Xt13 bl13 vdd wl vdd 0 q13 qb13 bitcell
+Vbl14 bl14 0 DC 0.350
+Xt14 bl14 vdd wl vdd 0 q14 qb14 bitcell
+Vbl15 bl15 0 DC 0.375
+Xt15 bl15 vdd wl vdd 0 q15 qb15 bitcell
+Vbl16 bl16 0 DC 0.400
+Xt16 bl16 vdd wl vdd 0 q16 qb16 bitcell
+Vbl17 bl17 0 DC 0.425
+Xt17 bl17 vdd wl vdd 0 q17 qb17 bitcell
+Vbl18 bl18 0 DC 0.450
+Xt18 bl18 vdd wl vdd 0 q18 qb18 bitcell
+Vbl19 bl19 0 DC 0.475
+Xt19 bl19 vdd wl vdd 0 q19 qb19 bitcell
+Vbl20 bl20 0 DC 0.500
+Xt20 bl20 vdd wl vdd 0 q20 qb20 bitcell
+Vbl21 bl21 0 DC 0.525
+Xt21 bl21 vdd wl vdd 0 q21 qb21 bitcell
+Vbl22 bl22 0 DC 0.550
+Xt22 bl22 vdd wl vdd 0 q22 qb22 bitcell
+Vbl23 bl23 0 DC 0.575
+Xt23 bl23 vdd wl vdd 0 q23 qb23 bitcell
+Vbl24 bl24 0 DC 0.600
+Xt24 bl24 vdd wl vdd 0 q24 qb24 bitcell
+Vbl25 bl25 0 DC 0.625
+Xt25 bl25 vdd wl vdd 0 q25 qb25 bitcell
+Vbl26 bl26 0 DC 0.650
+Xt26 bl26 vdd wl vdd 0 q26 qb26 bitcell
+Vbl27 bl27 0 DC 0.675
+Xt27 bl27 vdd wl vdd 0 q27 qb27 bitcell
+Vbl28 bl28 0 DC 0.700
+Xt28 bl28 vdd wl vdd 0 q28 qb28 bitcell
+Vbl29 bl29 0 DC 0.725
+Xt29 bl29 vdd wl vdd 0 q29 qb29 bitcell
+Vbl30 bl30 0 DC 0.750
+Xt30 bl30 vdd wl vdd 0 q30 qb30 bitcell
+Vbl31 bl31 0 DC 0.775
+Xt31 bl31 vdd wl vdd 0 q31 qb31 bitcell
+Vbl32 bl32 0 DC 0.800
+Xt32 bl32 vdd wl vdd 0 q32 qb32 bitcell
+.ic v(q0)=0.9 v(qb0)=0.3
+.ic v(q1)=0.9 v(qb1)=0.3
+.ic v(q2)=0.9 v(qb2)=0.3
+.ic v(q3)=0.9 v(qb3)=0.3
+.ic v(q4)=0.9 v(qb4)=0.3
+.ic v(q5)=0.9 v(qb5)=0.3
+.ic v(q6)=0.9 v(qb6)=0.3
+.ic v(q7)=0.9 v(qb7)=0.3
+.ic v(q8)=0.9 v(qb8)=0.3
+.ic v(q9)=0.9 v(qb9)=0.3
+.ic v(q10)=0.9 v(qb10)=0.3
+.ic v(q11)=0.9 v(qb11)=0.3
+.ic v(q12)=0.9 v(qb12)=0.3
+.ic v(q13)=0.9 v(qb13)=0.3
+.ic v(q14)=0.9 v(qb14)=0.3
+.ic v(q15)=0.9 v(qb15)=0.3
+.ic v(q16)=0.9 v(qb16)=0.3
+.ic v(q17)=0.9 v(qb17)=0.3
+.ic v(q18)=0.9 v(qb18)=0.3
+.ic v(q19)=0.9 v(qb19)=0.3
+.ic v(q20)=0.9 v(qb20)=0.3
+.ic v(q21)=0.9 v(qb21)=0.3
+.ic v(q22)=0.9 v(qb22)=0.3
+.ic v(q23)=0.9 v(qb23)=0.3
+.ic v(q24)=0.9 v(qb24)=0.3
+.ic v(q25)=0.9 v(qb25)=0.3
+.ic v(q26)=0.9 v(qb26)=0.3
+.ic v(q27)=0.9 v(qb27)=0.3
+.ic v(q28)=0.9 v(qb28)=0.3
+.ic v(q29)=0.9 v(qb29)=0.3
+.ic v(q30)=0.9 v(qb30)=0.3
+.ic v(q31)=0.9 v(qb31)=0.3
+.ic v(q32)=0.9 v(qb32)=0.3

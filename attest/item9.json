@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 9,
+  "description": "Testbenches shipped: the bitcell, I/O column and array-level benches (read/hold SNM, write margin, access time and write completion), their run scripts and post-processors, one cold-start invocation (sim/run_all.sh, fleet batch backend), and the pinned PDK and tool versions.",
+  "testbenches": [
+    "sim/pdk.json",
+    "sim/README.md",
+    "sim/harness/common/env.sh",
+    "sim/harness/common/tools/build-osdi.sh",
+    "sim/run_all.sh",
+    "sim/bitcell/bench_snm.cir",
+    "sim/bitcell/bench_write.cir",
+    "sim/bitcell/request_snm.json",
+    "sim/bitcell/request_write.json",
+    "sim/bitcell/bitcell_post.py",
+    "sim/bitcell/run_bitcell.sh",
+    "sim/bitcell/test_bitcell_post.py",
+    "sim/bitcell/README.md",
+    "sim/lib/common/snm_extract.py",
+    "sim/column/bench_read.cir",
+    "sim/column/bench_write.cir",
+    "sim/column/column_post.py",
+    "sim/column/run_column.sh",
+    "sim/column/test_column_post.py",
+    "sim/column/README.md",
+    "sim/array/bench_snm.cir",
+    "sim/array/bench_write.cir",
+    "sim/array/bench_access.cir",
+    "sim/array/array_post.py",
+    "sim/array/run_array.sh",
+    "sim/array/test_array_post.py",
+    "sim/array/README.md"
+  ],
+  "cold_start": {
+    "argv": [
+      "sim/run_all.sh"
+    ],
+    "local_only": true,
+    "timeout_s": 21600
+  },
+  "pins": {
+    "pdk": {
+      "name": "ihp-sg13g2",
+      "revision": "IHP-Open-PDK v0.3.0 (tarball sha256 f6afb7a8d2adf3e40acd3fd2c7892fc93510e6f760565409a8df2b5b242254fc, sim/pdk.json)"
+    },
+    "tools": {
+      "ngspice": "46 (batch runner; local ngspice must be >= 43 for OSDI v0.4)",
+      "openvaf-reloaded": "v24.0.1mob (sim/harness/common/tools/build-osdi.sh)",
+      "klayout-tools": "0.8.0 (batch runner klt sim; CI pin)"
+    }
+  }
+}

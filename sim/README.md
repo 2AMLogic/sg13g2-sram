@@ -15,6 +15,10 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
 - `bitcell/`: 6T bitcell hold/read SNM and write margin over the 45 corners
   (`bitcell/README.md`).
 - `column/`: nominal read/write bench of the I/O column (`column/README.md`).
+- `array/`: in-situ read SNM, write margin through the real write driver, access time and
+  write completion over the 45 corners (`array/README.md`).
+- `run_all.sh`: the cold-start invocation of every claimed measurement (T1 item 9,
+  `attest/item9.json`).
 
 ## Cold start (Linux x86_64)
 

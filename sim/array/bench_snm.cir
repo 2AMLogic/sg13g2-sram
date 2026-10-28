@@ -1,0 +1,31 @@
+* In-situ read SNM bench (circuit body for `klt sim`; no .control/.end).
+*
+* Two copies of design/column/column.spice (mux 2, 128 cells per bit line): the selected
+* cell (row r, column 0) sits in its real bit-line environment: 127 unselected cells on
+* the same bit-line pair, the precharge devices, the column mux and the sense-amp input.
+* Each butterfly lobe is measured on the full cell with the storage loop broken by forcing
+* one storage node (as sim/bitcell/bench_snm.cir): instance "xa" forces Q (xa.q0) and reads
+* QB, instance "xb" forces QB (xb.qb0) and reads Q. x = u * VDD with u swept 0..1 by the
+* request, so the sweep follows every supply corner.
+* Read condition: WL = VDD, precharge on (PRE0_B low) so both bit lines sit at VDD, column 0
+* selected through the mux, sense amp and write driver off.
+.include ../../design/column/column.spice
+
+Vdd vdd 0 DC 1.2
+Vu  u   0 DC 0
+Bfa xa.q0  0 V = v(u)*v(vdd)
+Bfb xb.qb0 0 V = v(u)*v(vdd)
+Bwl   wl    0 V = v(vdd)
+Bs0   sel0  0 V = v(vdd)
+Bs1b  sel1b 0 V = v(vdd)
+Vpre0 pre0b 0 DC 0
+Vpre1 pre1b 0 DC 0
+Vs0b  sel0b 0 DC 0
+Vs1   sel1  0 DC 0
+Vwlu  wlu   0 DC 0
+Vsae  sae   0 DC 0
+Vwe   we    0 DC 0
+Vdin  din   0 DC 0
+*       PRE0_B PRE1_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS
+Xa pre0b pre1b sel0 sel0b sel1 sel1b sae we din wl wlu oa oba vdd 0 column
+Xb pre0b pre1b sel0 sel0b sel1 sel1b sae we din wl wlu ob obb vdd 0 column
