@@ -9,11 +9,6 @@
 * Timeline (ns): bit lines start unbalanced; precharge/equalize 0.1..0.72; WL pulse 0.8..1.82
 * (1 ns plateau); SAE rises at 1.2 and stays high. OUT/OUTB are read at 2.0, cell states at 2.8.
 * PRE0_B drives the selected pair (column 0); PRE1_B holds the unselected pair (column 1) precharged (low) throughout.
-.include ../../design/bitcell/bitcell.spice
-.include ../../design/column/precharge.spice
-.include ../../design/column/column_mux.spice
-.include ../../design/column/sense_amp.spice
-.include ../../design/column/write_driver.spice
 .include ../../design/column/column.spice
 
 Vdd vdd 0 DC 1.2
