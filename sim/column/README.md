@@ -46,6 +46,18 @@ the floating unselected pair fell to about 0.07 V) is kept unchanged as evidence
 The write-driver sizing justification in `design/column/README.md` is still the
 hand estimate; the flip times above are its first measurement, not a sizing sweep.
 
+## Write-driver width sweep
+
+`run_sizing.sh [width_um ...]` writes one write bench per driver-stack width
+(default 0.15 0.3 0.5 1.0 2.0 3.0 um, mos_tt / 1.20 V / 27 C) and submits them as one
+`klt sim --batch-set` (batch only, no local fallback, `--capacity-retries 4`). It leaves the
+reports under `sizing/<UTC>/` (append-only); summarise with
+`python3 -I column_post.py sizing <label> <width_um>=<report> ...`, which gives the flip
+time per width and the smallest passing width. **Not yet run**: on 2026-10-28 the fleet
+refused all six requests (`batch_no_capacity`, 224 vCPU in use against `BATCH_MAX_VCPU`,
+quota shared with ci-spot) across the retries, so no sizing evidence exists and the
+justification in `design/column/README.md` stays a hand estimate.
+
 A klt batch run whose corner errors exits 4; `run_column.sh` accepts that only for
 the two negative controls (a driver that never flips the cell leaves the flip
 time without a value, which is the detection) and only if the report exists.
