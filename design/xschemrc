@@ -12,3 +12,7 @@ set XSCHEM_LIBRARY_PATH {}
 # xschem's own devices/ library (lab_pin, ipin, ...), referenced as devices/<sym>
 append XSCHEM_LIBRARY_PATH :/usr/share/xschem/xschem_library
 append XSCHEM_LIBRARY_PATH :${PDK_ROOT}/${PDK}/libs.tech/xschem
+# design/ itself, so a symbol is referenced as <block dir>/<cell>.sym from any
+# schematic in the hierarchy (a path relative to the schematic breaks one level
+# below the top, since xschem resolves it against the netlisting cwd)
+append XSCHEM_LIBRARY_PATH :[file dirname [file normalize [info script]]]

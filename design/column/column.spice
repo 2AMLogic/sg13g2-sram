@@ -288,8 +288,8 @@ XWD WE DIN BLM BLBM VDD VSS write_driver
 .ends
 
 * expanding   symbol:  ../bitcell/bitcell.sym # of pins=7
-** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/bitcell/bitcell.sym
-** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/bitcell/bitcell.sch
+** sym_path: design/bitcell/bitcell.sym
+** sch_path: design/bitcell/bitcell.sch
 .subckt bitcell BL BLB WL VDD VSS Q QB
 *.iopin BL
 *.iopin BLB
@@ -313,8 +313,8 @@ XMN3 BLB WL QB VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
 
 
 * expanding   symbol:  precharge.sym # of pins=5
-** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/precharge.sym
-** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/precharge.sch
+** sym_path: design/column/precharge.sym
+** sch_path: design/column/precharge.sch
 .subckt precharge PRE_B BL BLB VDD VSS
 *.ipin PRE_B
 *.iopin BL
@@ -333,8 +333,8 @@ XMP2 BL PRE_B BLB VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
 
 
 * expanding   symbol:  column_mux.sym # of pins=12
-** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/column_mux.sym
-** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/column_mux.sch
+** sym_path: design/column/column_mux.sym
+** sch_path: design/column/column_mux.sch
 .subckt column_mux SEL0 SEL0B SEL1 SEL1B BL0 BLB0 BL1 BLB1 BLM BLBM VDD VSS
 *.ipin SEL0
 *.ipin SEL0B
@@ -365,8 +365,8 @@ XMP1B BLB1 SEL1B BLBM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
 
 
 * expanding   symbol:  sense_amp.sym # of pins=7
-** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/sense_amp.sym
-** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/sense_amp.sch
+** sym_path: design/column/sense_amp.sym
+** sch_path: design/column/sense_amp.sch
 .subckt sense_amp SAE BLM BLBM OUT OUTB VDD VSS
 *.ipin SAE
 *.iopin BLM
@@ -391,8 +391,8 @@ XMNT TAIL SAE VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
 
 
 * expanding   symbol:  write_driver.sym # of pins=6
-** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/write_driver.sym
-** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/write_driver.sch
+** sym_path: design/column/write_driver.sym
+** sch_path: design/column/write_driver.sch
 .subckt write_driver WE DIN BLM BLBM VDD VSS
 *.ipin WE
 *.ipin DIN

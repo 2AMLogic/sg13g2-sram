@@ -1,0 +1,12 @@
+** sch_path: design/gates/inv.sch
+
+* inverter, N 0.5 um / P 1.0 um
+
+.subckt inv A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+.ends

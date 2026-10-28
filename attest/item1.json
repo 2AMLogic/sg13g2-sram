@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 1,
+  "description": "Design sources: xschem schematics and symbols for the bitcell, column path, row decoder, control, latches and macro top, with the SPICE netlists derived from them by klt netlist.",
+  "sources": [
+    "design/bitcell/bitcell.sch",
+    "design/column/column.sch",
+    "design/column/column_mux.sch",
+    "design/column/precharge.sch",
+    "design/column/sense_amp.sch",
+    "design/column/write_driver.sch",
+    "design/control/control.sch",
+    "design/decoder/predec3.sch",
+    "design/decoder/predec4.sch",
+    "design/decoder/row_decoder.sch",
+    "design/decoder/wl_driver.sch",
+    "design/decoder/wl_drivers.sch",
+    "design/gates/inv.sch",
+    "design/gates/inv_x4.sch",
+    "design/gates/nand2.sch",
+    "design/gates/nand3.sch",
+    "design/gates/nand4.sch",
+    "design/gates/nor2.sch",
+    "design/latches/addr_latch.sch",
+    "design/latches/data_latch.sch",
+    "design/latches/dlatch.sch",
+    "design/latches/out_latch.sch",
+    "design/macro/bit_slice.sch",
+    "design/macro/bl_pair.sch",
+    "design/macro/macro.sch",
+    "design/bitcell/bitcell.sym",
+    "design/column/column.sym",
+    "design/column/column_mux.sym",
+    "design/column/precharge.sym",
+    "design/column/sense_amp.sym",
+    "design/column/write_driver.sym",
+    "design/control/control.sym",
+    "design/decoder/predec3.sym",
+    "design/decoder/predec4.sym",
+    "design/decoder/row_decoder.sym",
+    "design/decoder/wl_driver.sym",
+    "design/decoder/wl_drivers.sym",
+    "design/gates/inv.sym",
+    "design/gates/inv_x4.sym",
+    "design/gates/nand2.sym",
+    "design/gates/nand3.sym",
+    "design/gates/nand4.sym",
+    "design/gates/nor2.sym",
+    "design/latches/addr_latch.sym",
+    "design/latches/data_latch.sym",
+    "design/latches/dlatch.sym",
+    "design/latches/out_latch.sym",
+    "design/macro/bit_slice.sym",
+    "design/macro/bl_pair.sym",
+    "design/macro/macro.sym",
+    "design/xschemrc",
+    "design/netlist.sh"
+  ],
+  "derived": [
+    {
+      "path": "design/bitcell/bitcell.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "bitcell/bitcell"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/column/column.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/column"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/column/column_mux.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/column_mux"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/column/precharge.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/precharge"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/column/sense_amp.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/sense_amp"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/column/write_driver.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/write_driver"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/control/control.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "control/control"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/decoder/predec3.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/predec3"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/decoder/predec4.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/predec4"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/decoder/row_decoder.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/row_decoder"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/decoder/wl_driver.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/wl_driver"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/decoder/wl_drivers.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/wl_drivers"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/gates/inv.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/inv"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/gates/inv_x4.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/inv_x4"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/gates/nand2.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nand2"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/gates/nand3.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nand3"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/gates/nand4.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nand4"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/gates/nor2.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nor2"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/latches/addr_latch.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/addr_latch"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/latches/data_latch.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/data_latch"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/latches/dlatch.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/dlatch"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/latches/out_latch.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/out_latch"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/macro/bit_slice.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "macro/bit_slice"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/macro/bl_pair.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "macro/bl_pair"
+        ],
+        "local_only": true
+      }
+    },
+    {
+      "path": "design/macro/macro.spice",
+      "generator": "klt netlist --block",
+      "check": {
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "macro/macro"
+        ],
+        "local_only": true
+      }
+    }
+  ]
+}

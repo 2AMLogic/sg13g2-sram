@@ -1,0 +1,944 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 1,
+  "summary": "T1 item 1 (Design sources): 102/102 attestation checks passed (klt signoff --attest)",
+  "source": "attest/item1.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 102,
+    "passed_count": 102,
+    "checks": [
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/bitcell/bitcell.sch",
+        "passed": true,
+        "content_hash": "sha256:eea785c7304539bb8609fbe7f86e1599e3a66f03040277bccb20a85004f230a3"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/bitcell/bitcell.sym",
+        "passed": true,
+        "content_hash": "sha256:1ae9c2cb8288b1737bd6f1b1e5f3461531e7120e463932419177d70bc9821e8d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/column.sch",
+        "passed": true,
+        "content_hash": "sha256:30f480de2d4cd5d16fd01d195bb91d97aabebb310691eb31d28607483f76b530"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/column.sym",
+        "passed": true,
+        "content_hash": "sha256:3038f3428cbb550c70e575fa571f94c83a87b1aa7b1233ee48648c6a40f974d4"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/column_mux.sch",
+        "passed": true,
+        "content_hash": "sha256:a72f20db12cbee67ff8468b1ce07d2dd248cab303ad6a1466e930ba1e946af09"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/column_mux.sym",
+        "passed": true,
+        "content_hash": "sha256:7bece2739c225221fbde71b376395558f414177bc5456223ec27ebe07ab400c5"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/precharge.sch",
+        "passed": true,
+        "content_hash": "sha256:1d74c96e344442a3050528eab81df561d1058874063871856ae8a0079544caee"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/precharge.sym",
+        "passed": true,
+        "content_hash": "sha256:9440a07121c4a979e1f24d650636a736f928330bbf57365a9c4e6150b6e1c9dd"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/sense_amp.sch",
+        "passed": true,
+        "content_hash": "sha256:add72d02c3a8640edea1b982b1e1920dca3847f78e049d254d96e7a2f0b4b615"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/sense_amp.sym",
+        "passed": true,
+        "content_hash": "sha256:545ea3afa30b4306b8ba74c181ee5baa2ad0594226cc27266a476309644fe8ec"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/write_driver.sch",
+        "passed": true,
+        "content_hash": "sha256:1ff7b3715ee55447e34ad164a8c64302930b35ff41c113aaa007781599889e46"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/column/write_driver.sym",
+        "passed": true,
+        "content_hash": "sha256:5d71cc1b67ab6dc3c0b6305c855f9c29bc600edbd3576a891032b54c63fa4bf0"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/control/control.sch",
+        "passed": true,
+        "content_hash": "sha256:a2041aa27ef25f50caec785a43968694a231e00e753de51b2f6bf4d37cdc056d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/control/control.sym",
+        "passed": true,
+        "content_hash": "sha256:bcbeafbfb316aa25447b0a87a7e4b9416a55b5f08ca20d35aa3c808032d6f39a"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/predec3.sch",
+        "passed": true,
+        "content_hash": "sha256:c046b7bdc4e28f129d6665c9bcdbd31c4eda53a68ff4c5a79ab1ee70ddd0f804"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/predec3.sym",
+        "passed": true,
+        "content_hash": "sha256:d7c3a18d7657b36a81e1f585f35049e616db86e8584536ce25de57f48fa8f900"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/predec4.sch",
+        "passed": true,
+        "content_hash": "sha256:13c0b38ee618d332365f5bdbecfcf5abd12386c21e4fe6ef7ff0c6c9065c718d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/predec4.sym",
+        "passed": true,
+        "content_hash": "sha256:2163cec653d6af71c3e8c2481e510ca11163a3e972ca307a25e9d72c5f8aba2e"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/row_decoder.sch",
+        "passed": true,
+        "content_hash": "sha256:64d12f984f69ea67f84743b104bb2ccbd8d53c3cdefc4f48906801951ea72918"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/row_decoder.sym",
+        "passed": true,
+        "content_hash": "sha256:343bd94b7a0d6ac1715775243ad295bb8e7d858c15bd6aa39944e81a35631142"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/wl_driver.sch",
+        "passed": true,
+        "content_hash": "sha256:17ad28c14a2ccdd0c3ce2787f11ce2d884035761402d2f023d40da83778c943d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/wl_driver.sym",
+        "passed": true,
+        "content_hash": "sha256:079b2511dc5b04d00b11b1934dc4aba2d8a87bac298d5c2102733f184f410312"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/wl_drivers.sch",
+        "passed": true,
+        "content_hash": "sha256:0df3eae0dc45dcae2b419ecdbd6e396a513eb58304da27bc80ccf6ce4feb73d2"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/decoder/wl_drivers.sym",
+        "passed": true,
+        "content_hash": "sha256:155d63a019e61bd6b50ecde68c52c3eed9ab0047b026255ae354cf0b3720f51c"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/inv.sch",
+        "passed": true,
+        "content_hash": "sha256:a4b92a1db65b09e0137efc35fdf20ccb9f302f86acc999ed83ba436d97637cb5"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/inv.sym",
+        "passed": true,
+        "content_hash": "sha256:422c507334c29b6791dd68e59ffd4a218b7dd7c82ac19ed7aacf90a3e8bd3f29"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/inv_x4.sch",
+        "passed": true,
+        "content_hash": "sha256:40a905ff73bdd9761611002e83f30defa2b8bbb2bd91437ce7b5125a5586a6eb"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/inv_x4.sym",
+        "passed": true,
+        "content_hash": "sha256:422c507334c29b6791dd68e59ffd4a218b7dd7c82ac19ed7aacf90a3e8bd3f29"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nand2.sch",
+        "passed": true,
+        "content_hash": "sha256:228ff87740704d371cdddcb3bb25fd97adaac07c03ac72fb65e71a25a30716ef"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nand2.sym",
+        "passed": true,
+        "content_hash": "sha256:52fdfb2e7e4d134058dc503efe6f7c04008ab48400755c8151dfca093fb6b2da"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nand3.sch",
+        "passed": true,
+        "content_hash": "sha256:7ce2b8f25ad4eacf020b9a944deb392079db6cc2139e9a6bec669a0ccf13895e"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nand3.sym",
+        "passed": true,
+        "content_hash": "sha256:45a1a49b748f104368df182c6f041b5fffec134b220f4ec1872749f54500e978"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nand4.sch",
+        "passed": true,
+        "content_hash": "sha256:7265576378210591eae45ca299c408db183d942c228392feaf07efacaad74673"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nand4.sym",
+        "passed": true,
+        "content_hash": "sha256:fb5b413f085212611f77c3a821a9ab35fe5cdcdf9f10dcb291235809d5d2e3ca"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nor2.sch",
+        "passed": true,
+        "content_hash": "sha256:e670314b342e372b80e0d6b601afae67aa723a345e35011608cf1d128600731d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/gates/nor2.sym",
+        "passed": true,
+        "content_hash": "sha256:52fdfb2e7e4d134058dc503efe6f7c04008ab48400755c8151dfca093fb6b2da"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/addr_latch.sch",
+        "passed": true,
+        "content_hash": "sha256:33125b1c5c2fcaf0f02819f1b9f890e63d298761db4c6c08fd78bc2f17459e81"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/addr_latch.sym",
+        "passed": true,
+        "content_hash": "sha256:69ba7df53b049fd90eb11b822606c91e7bd10d9e3d796d782f1a184a6db7bea5"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/data_latch.sch",
+        "passed": true,
+        "content_hash": "sha256:e1a5257b5266227e9faa7fd00a1dd2c989289367749e3a8a1fb81a7bb0d1d5ed"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/data_latch.sym",
+        "passed": true,
+        "content_hash": "sha256:29a51b26c235a253f2c751f447f248e016657a19d44c86cefa27eaf05f98c2bb"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/dlatch.sch",
+        "passed": true,
+        "content_hash": "sha256:87f4f6f1cd6d32e4ee3b631d651f4092d375fb83ee9eae174aac5f3125582995"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/dlatch.sym",
+        "passed": true,
+        "content_hash": "sha256:fae7b24beb0f03e317d9abce75e778bc251f3e0871c0d5f653b09f9e4e1b3de2"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/out_latch.sch",
+        "passed": true,
+        "content_hash": "sha256:320497dc026e40da6f81836cdab69a6c981da8eccd0450c94a6941487471be3b"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/latches/out_latch.sym",
+        "passed": true,
+        "content_hash": "sha256:719845e10ce468f815b80dbcce4a48a703732cab0fc3e77a57d9a4170de5445d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/macro/bit_slice.sch",
+        "passed": true,
+        "content_hash": "sha256:4091e61e09e178e0c65f979ba3925402432d269d311b673030efb82bfbfd6fbb"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/macro/bit_slice.sym",
+        "passed": true,
+        "content_hash": "sha256:2c110f6aa1b9e92fd0132e501893591ade58fb610b9aaa90dcc69680aa7a853d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/macro/bl_pair.sch",
+        "passed": true,
+        "content_hash": "sha256:4470251839b1b2fa0bc92742423072b22454bc8dbdda7db3ac26f2fc6d9b8a42"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/macro/bl_pair.sym",
+        "passed": true,
+        "content_hash": "sha256:be3853b6de28a8a745282991f2fb94dd03465e9bff7c5f74921ab4c4369bf096"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/macro/macro.sch",
+        "passed": true,
+        "content_hash": "sha256:7c4bc58d365f183c92bc9db8d6a6cb7813bd7cb6dcd9379fe86fdb364242c09e"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/macro/macro.sym",
+        "passed": true,
+        "content_hash": "sha256:aca4e98f158d53d98373a910b912617e41bf2e37cb11b4747b025e09d8e5df72"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/netlist.sh",
+        "passed": true,
+        "content_hash": "sha256:1050034ebf57eb4fafa81b3e7ede275bbb154aac9ae62210a346f3b9c3cc5f73"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/xschemrc",
+        "passed": true,
+        "content_hash": "sha256:a144f53523ad004adde94033bde74aa64ed360788cfbe1a21b99da62b4eef7e9"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/bitcell/bitcell.spice",
+        "passed": true,
+        "content_hash": "sha256:1fdf13f2753259b1c751a19f21fed5b57487d71883ad935a604b957a0c959fda"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/column/column.spice",
+        "passed": true,
+        "content_hash": "sha256:9c791168bc1bfdd6d660d8a9ed02e048e4c91ad718aa8c31a14e1e07674d3f25"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/column/column_mux.spice",
+        "passed": true,
+        "content_hash": "sha256:ab9b02d1ccc49762644614f0c47e02b5cb0db33e1a19fdbbb9ac70d20ed5be37"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/column/precharge.spice",
+        "passed": true,
+        "content_hash": "sha256:e817a1d20504fb0cc23c164846395c2f187b2ffa7b33441c80180a2a1bbf9b48"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/column/sense_amp.spice",
+        "passed": true,
+        "content_hash": "sha256:bd57e97771956889eb491fbe15aca5f8e9a6d4d0df69f4bc0b85286b1dcf7d02"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/column/write_driver.spice",
+        "passed": true,
+        "content_hash": "sha256:7b28397682fd7a4829bfa8cf989635dd5714ead558c0ad02bf92d0890097b2d0"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/control/control.spice",
+        "passed": true,
+        "content_hash": "sha256:e9003e7507a09bdb5e9a3711d41bbd103462ec382f6eddf19aebc9bf111cd2b1"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/decoder/predec3.spice",
+        "passed": true,
+        "content_hash": "sha256:68a31d6b874bb69c31c70b29a02dc89b3f5fcef03c36f85dc8a5969cf26fa3eb"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/decoder/predec4.spice",
+        "passed": true,
+        "content_hash": "sha256:31af2f1a584167851cbb8501116167acb0d42dca0180424ffaea5381856acce1"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/decoder/row_decoder.spice",
+        "passed": true,
+        "content_hash": "sha256:ba7281e42cff8e94c4c925456190331b805b03fd4d886fa2d53b73a24ac6b26e"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/decoder/wl_driver.spice",
+        "passed": true,
+        "content_hash": "sha256:4bd4528332e176fad4483231b88566c244a5d08fb065269b6e293ce261552875"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/decoder/wl_drivers.spice",
+        "passed": true,
+        "content_hash": "sha256:62f28111b89e6896070b5a620f1b498a5da3e953b45d309b3793fba730a12915"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/gates/inv.spice",
+        "passed": true,
+        "content_hash": "sha256:32bcfb3c2a176268ce643f660ab6ef9c5026036412ab3d68c9e0058b187650b8"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/gates/inv_x4.spice",
+        "passed": true,
+        "content_hash": "sha256:5d1ade712a9dca0a8d7fd44a97bb1916dbc9ccadfc53b9af61849a9efcb834ba"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/gates/nand2.spice",
+        "passed": true,
+        "content_hash": "sha256:178ecc678ec7b8bb964b648fbf80e554e1e01c9b7abed8545625c97c7373fd9d"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/gates/nand3.spice",
+        "passed": true,
+        "content_hash": "sha256:b9c909ac6cf75d444008a2fa43678309c3e9429a4d7f45d97c762ede7c1d4751"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/gates/nand4.spice",
+        "passed": true,
+        "content_hash": "sha256:d16ed2402721d3c2956c7cd8bc6b6cc31e8558cd0c2f46d70f3790716ab34d85"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/gates/nor2.spice",
+        "passed": true,
+        "content_hash": "sha256:11bf2fa3aa438ca67c688a0ea2e91d9e4153a95180eb5bb5f581822e7046e3c7"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/latches/addr_latch.spice",
+        "passed": true,
+        "content_hash": "sha256:2688be84edf65ffef63675543529c2d21b5439f97dfa68aad1bf1d63f94aa1c8"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/latches/data_latch.spice",
+        "passed": true,
+        "content_hash": "sha256:398e8d2529078cb00d8611ae5d74ddf589b92d5ce40825758b17ee912159b583"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/latches/dlatch.spice",
+        "passed": true,
+        "content_hash": "sha256:6ee1da733c3e9e00e937f1dda73fe06e9e2d7f9a5507d82f08de0d3d106ed893"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/latches/out_latch.spice",
+        "passed": true,
+        "content_hash": "sha256:cd67f6eb2cab0add934373af7f091fc3c71ef085d71c890f82262398a297cff4"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/macro/bit_slice.spice",
+        "passed": true,
+        "content_hash": "sha256:921d8050f10546d9ca66263fec7fe81cea7b3e80e9e83f47bd03f59604f16bff"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/macro/bl_pair.spice",
+        "passed": true,
+        "content_hash": "sha256:d143ac07ca5722827db817b33745b56deebb7f17799873d73b7b3c3add7937c4"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/macro/macro.spice",
+        "passed": true,
+        "content_hash": "sha256:5637521969c90e9dfffbf8fa731f69ec3c2e322f23c4296d739518ff71c221a1"
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/bitcell/bitcell.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "bitcell/bitcell"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/column/column.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/column"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/column/column_mux.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/column_mux"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/column/precharge.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/precharge"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/column/sense_amp.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/sense_amp"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/column/write_driver.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "column/write_driver"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/control/control.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "control/control"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/decoder/predec3.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/predec3"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/decoder/predec4.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/predec4"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/decoder/row_decoder.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/row_decoder"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/decoder/wl_driver.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/wl_driver"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/decoder/wl_drivers.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "decoder/wl_drivers"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/gates/inv.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/inv"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/gates/inv_x4.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/inv_x4"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/gates/nand2.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nand2"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/gates/nand3.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nand3"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/gates/nand4.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nand4"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/gates/nor2.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "gates/nor2"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/latches/addr_latch.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/addr_latch"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/latches/data_latch.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/data_latch"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/latches/dlatch.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/dlatch"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/latches/out_latch.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "latches/out_latch"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/macro/bit_slice.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "macro/bit_slice"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/macro/bl_pair.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "macro/bl_pair"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/macro/macro.spice",
+        "generator": "klt netlist --block",
+        "argv": [
+          "design/netlist.sh",
+          "--check",
+          "macro/macro"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true,
+        "local_only": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.8.0",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "attest/item1.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:22729c8aea6a4cc503f7c6ed964c146a0f975a4e4ee3ca508ff7d8dd9428cb61"
+    }
+  }
+}

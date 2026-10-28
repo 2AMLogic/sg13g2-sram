@@ -1,0 +1,323 @@
+** sch_path: design/decoder/wl_drivers.sch
+
+* 128 wordline drivers; row r = 8*j + k is driven by X[k] and Y[j]
+
+.subckt wl_drivers X[7] X[6] X[5] X[4] X[3] X[2] X[1] X[0] Y[15] Y[14] Y[13] Y[12] Y[11] Y[10] Y[9] Y[8] Y[7] Y[6] Y[5] Y[4]
++ Y[3] Y[2] Y[1] Y[0] WLEN WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116] WL[115]
++ WL[114] WL[113] WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103] WL[102] WL[101] WL[100] WL[99] WL[98]
++ WL[97] WL[96] WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79]
++ WL[78] WL[77] WL[76] WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60]
++ WL[59] WL[58] WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43] WL[42] WL[41]
++ WL[40] WL[39] WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28] WL[27] WL[26] WL[25] WL[24] WL[23] WL[22]
++ WL[21] WL[20] WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2]
++ WL[1] WL[0] VDD VSS
+*.ipin X[7]
+*.ipin X[6]
+*.ipin X[5]
+*.ipin X[4]
+*.ipin X[3]
+*.ipin X[2]
+*.ipin X[1]
+*.ipin X[0]
+*.ipin Y[15]
+*.ipin Y[14]
+*.ipin Y[13]
+*.ipin Y[12]
+*.ipin Y[11]
+*.ipin Y[10]
+*.ipin Y[9]
+*.ipin Y[8]
+*.ipin Y[7]
+*.ipin Y[6]
+*.ipin Y[5]
+*.ipin Y[4]
+*.ipin Y[3]
+*.ipin Y[2]
+*.ipin Y[1]
+*.ipin Y[0]
+*.ipin WLEN
+*.opin WL[127]
+*.opin WL[126]
+*.opin WL[125]
+*.opin WL[124]
+*.opin WL[123]
+*.opin WL[122]
+*.opin WL[121]
+*.opin WL[120]
+*.opin WL[119]
+*.opin WL[118]
+*.opin WL[117]
+*.opin WL[116]
+*.opin WL[115]
+*.opin WL[114]
+*.opin WL[113]
+*.opin WL[112]
+*.opin WL[111]
+*.opin WL[110]
+*.opin WL[109]
+*.opin WL[108]
+*.opin WL[107]
+*.opin WL[106]
+*.opin WL[105]
+*.opin WL[104]
+*.opin WL[103]
+*.opin WL[102]
+*.opin WL[101]
+*.opin WL[100]
+*.opin WL[99]
+*.opin WL[98]
+*.opin WL[97]
+*.opin WL[96]
+*.opin WL[95]
+*.opin WL[94]
+*.opin WL[93]
+*.opin WL[92]
+*.opin WL[91]
+*.opin WL[90]
+*.opin WL[89]
+*.opin WL[88]
+*.opin WL[87]
+*.opin WL[86]
+*.opin WL[85]
+*.opin WL[84]
+*.opin WL[83]
+*.opin WL[82]
+*.opin WL[81]
+*.opin WL[80]
+*.opin WL[79]
+*.opin WL[78]
+*.opin WL[77]
+*.opin WL[76]
+*.opin WL[75]
+*.opin WL[74]
+*.opin WL[73]
+*.opin WL[72]
+*.opin WL[71]
+*.opin WL[70]
+*.opin WL[69]
+*.opin WL[68]
+*.opin WL[67]
+*.opin WL[66]
+*.opin WL[65]
+*.opin WL[64]
+*.opin WL[63]
+*.opin WL[62]
+*.opin WL[61]
+*.opin WL[60]
+*.opin WL[59]
+*.opin WL[58]
+*.opin WL[57]
+*.opin WL[56]
+*.opin WL[55]
+*.opin WL[54]
+*.opin WL[53]
+*.opin WL[52]
+*.opin WL[51]
+*.opin WL[50]
+*.opin WL[49]
+*.opin WL[48]
+*.opin WL[47]
+*.opin WL[46]
+*.opin WL[45]
+*.opin WL[44]
+*.opin WL[43]
+*.opin WL[42]
+*.opin WL[41]
+*.opin WL[40]
+*.opin WL[39]
+*.opin WL[38]
+*.opin WL[37]
+*.opin WL[36]
+*.opin WL[35]
+*.opin WL[34]
+*.opin WL[33]
+*.opin WL[32]
+*.opin WL[31]
+*.opin WL[30]
+*.opin WL[29]
+*.opin WL[28]
+*.opin WL[27]
+*.opin WL[26]
+*.opin WL[25]
+*.opin WL[24]
+*.opin WL[23]
+*.opin WL[22]
+*.opin WL[21]
+*.opin WL[20]
+*.opin WL[19]
+*.opin WL[18]
+*.opin WL[17]
+*.opin WL[16]
+*.opin WL[15]
+*.opin WL[14]
+*.opin WL[13]
+*.opin WL[12]
+*.opin WL[11]
+*.opin WL[10]
+*.opin WL[9]
+*.opin WL[8]
+*.opin WL[7]
+*.opin WL[6]
+*.opin WL[5]
+*.opin WL[4]
+*.opin WL[3]
+*.opin WL[2]
+*.opin WL[1]
+*.opin WL[0]
+*.iopin VDD
+*.iopin VSS
+XD[127] X[7] Y[15] WLEN WL[127] VDD VSS wl_driver
+XD[126] X[6] Y[15] WLEN WL[126] VDD VSS wl_driver
+XD[125] X[5] Y[15] WLEN WL[125] VDD VSS wl_driver
+XD[124] X[4] Y[15] WLEN WL[124] VDD VSS wl_driver
+XD[123] X[3] Y[15] WLEN WL[123] VDD VSS wl_driver
+XD[122] X[2] Y[15] WLEN WL[122] VDD VSS wl_driver
+XD[121] X[1] Y[15] WLEN WL[121] VDD VSS wl_driver
+XD[120] X[0] Y[15] WLEN WL[120] VDD VSS wl_driver
+XD[119] X[7] Y[14] WLEN WL[119] VDD VSS wl_driver
+XD[118] X[6] Y[14] WLEN WL[118] VDD VSS wl_driver
+XD[117] X[5] Y[14] WLEN WL[117] VDD VSS wl_driver
+XD[116] X[4] Y[14] WLEN WL[116] VDD VSS wl_driver
+XD[115] X[3] Y[14] WLEN WL[115] VDD VSS wl_driver
+XD[114] X[2] Y[14] WLEN WL[114] VDD VSS wl_driver
+XD[113] X[1] Y[14] WLEN WL[113] VDD VSS wl_driver
+XD[112] X[0] Y[14] WLEN WL[112] VDD VSS wl_driver
+XD[111] X[7] Y[13] WLEN WL[111] VDD VSS wl_driver
+XD[110] X[6] Y[13] WLEN WL[110] VDD VSS wl_driver
+XD[109] X[5] Y[13] WLEN WL[109] VDD VSS wl_driver
+XD[108] X[4] Y[13] WLEN WL[108] VDD VSS wl_driver
+XD[107] X[3] Y[13] WLEN WL[107] VDD VSS wl_driver
+XD[106] X[2] Y[13] WLEN WL[106] VDD VSS wl_driver
+XD[105] X[1] Y[13] WLEN WL[105] VDD VSS wl_driver
+XD[104] X[0] Y[13] WLEN WL[104] VDD VSS wl_driver
+XD[103] X[7] Y[12] WLEN WL[103] VDD VSS wl_driver
+XD[102] X[6] Y[12] WLEN WL[102] VDD VSS wl_driver
+XD[101] X[5] Y[12] WLEN WL[101] VDD VSS wl_driver
+XD[100] X[4] Y[12] WLEN WL[100] VDD VSS wl_driver
+XD[99] X[3] Y[12] WLEN WL[99] VDD VSS wl_driver
+XD[98] X[2] Y[12] WLEN WL[98] VDD VSS wl_driver
+XD[97] X[1] Y[12] WLEN WL[97] VDD VSS wl_driver
+XD[96] X[0] Y[12] WLEN WL[96] VDD VSS wl_driver
+XD[95] X[7] Y[11] WLEN WL[95] VDD VSS wl_driver
+XD[94] X[6] Y[11] WLEN WL[94] VDD VSS wl_driver
+XD[93] X[5] Y[11] WLEN WL[93] VDD VSS wl_driver
+XD[92] X[4] Y[11] WLEN WL[92] VDD VSS wl_driver
+XD[91] X[3] Y[11] WLEN WL[91] VDD VSS wl_driver
+XD[90] X[2] Y[11] WLEN WL[90] VDD VSS wl_driver
+XD[89] X[1] Y[11] WLEN WL[89] VDD VSS wl_driver
+XD[88] X[0] Y[11] WLEN WL[88] VDD VSS wl_driver
+XD[87] X[7] Y[10] WLEN WL[87] VDD VSS wl_driver
+XD[86] X[6] Y[10] WLEN WL[86] VDD VSS wl_driver
+XD[85] X[5] Y[10] WLEN WL[85] VDD VSS wl_driver
+XD[84] X[4] Y[10] WLEN WL[84] VDD VSS wl_driver
+XD[83] X[3] Y[10] WLEN WL[83] VDD VSS wl_driver
+XD[82] X[2] Y[10] WLEN WL[82] VDD VSS wl_driver
+XD[81] X[1] Y[10] WLEN WL[81] VDD VSS wl_driver
+XD[80] X[0] Y[10] WLEN WL[80] VDD VSS wl_driver
+XD[79] X[7] Y[9] WLEN WL[79] VDD VSS wl_driver
+XD[78] X[6] Y[9] WLEN WL[78] VDD VSS wl_driver
+XD[77] X[5] Y[9] WLEN WL[77] VDD VSS wl_driver
+XD[76] X[4] Y[9] WLEN WL[76] VDD VSS wl_driver
+XD[75] X[3] Y[9] WLEN WL[75] VDD VSS wl_driver
+XD[74] X[2] Y[9] WLEN WL[74] VDD VSS wl_driver
+XD[73] X[1] Y[9] WLEN WL[73] VDD VSS wl_driver
+XD[72] X[0] Y[9] WLEN WL[72] VDD VSS wl_driver
+XD[71] X[7] Y[8] WLEN WL[71] VDD VSS wl_driver
+XD[70] X[6] Y[8] WLEN WL[70] VDD VSS wl_driver
+XD[69] X[5] Y[8] WLEN WL[69] VDD VSS wl_driver
+XD[68] X[4] Y[8] WLEN WL[68] VDD VSS wl_driver
+XD[67] X[3] Y[8] WLEN WL[67] VDD VSS wl_driver
+XD[66] X[2] Y[8] WLEN WL[66] VDD VSS wl_driver
+XD[65] X[1] Y[8] WLEN WL[65] VDD VSS wl_driver
+XD[64] X[0] Y[8] WLEN WL[64] VDD VSS wl_driver
+XD[63] X[7] Y[7] WLEN WL[63] VDD VSS wl_driver
+XD[62] X[6] Y[7] WLEN WL[62] VDD VSS wl_driver
+XD[61] X[5] Y[7] WLEN WL[61] VDD VSS wl_driver
+XD[60] X[4] Y[7] WLEN WL[60] VDD VSS wl_driver
+XD[59] X[3] Y[7] WLEN WL[59] VDD VSS wl_driver
+XD[58] X[2] Y[7] WLEN WL[58] VDD VSS wl_driver
+XD[57] X[1] Y[7] WLEN WL[57] VDD VSS wl_driver
+XD[56] X[0] Y[7] WLEN WL[56] VDD VSS wl_driver
+XD[55] X[7] Y[6] WLEN WL[55] VDD VSS wl_driver
+XD[54] X[6] Y[6] WLEN WL[54] VDD VSS wl_driver
+XD[53] X[5] Y[6] WLEN WL[53] VDD VSS wl_driver
+XD[52] X[4] Y[6] WLEN WL[52] VDD VSS wl_driver
+XD[51] X[3] Y[6] WLEN WL[51] VDD VSS wl_driver
+XD[50] X[2] Y[6] WLEN WL[50] VDD VSS wl_driver
+XD[49] X[1] Y[6] WLEN WL[49] VDD VSS wl_driver
+XD[48] X[0] Y[6] WLEN WL[48] VDD VSS wl_driver
+XD[47] X[7] Y[5] WLEN WL[47] VDD VSS wl_driver
+XD[46] X[6] Y[5] WLEN WL[46] VDD VSS wl_driver
+XD[45] X[5] Y[5] WLEN WL[45] VDD VSS wl_driver
+XD[44] X[4] Y[5] WLEN WL[44] VDD VSS wl_driver
+XD[43] X[3] Y[5] WLEN WL[43] VDD VSS wl_driver
+XD[42] X[2] Y[5] WLEN WL[42] VDD VSS wl_driver
+XD[41] X[1] Y[5] WLEN WL[41] VDD VSS wl_driver
+XD[40] X[0] Y[5] WLEN WL[40] VDD VSS wl_driver
+XD[39] X[7] Y[4] WLEN WL[39] VDD VSS wl_driver
+XD[38] X[6] Y[4] WLEN WL[38] VDD VSS wl_driver
+XD[37] X[5] Y[4] WLEN WL[37] VDD VSS wl_driver
+XD[36] X[4] Y[4] WLEN WL[36] VDD VSS wl_driver
+XD[35] X[3] Y[4] WLEN WL[35] VDD VSS wl_driver
+XD[34] X[2] Y[4] WLEN WL[34] VDD VSS wl_driver
+XD[33] X[1] Y[4] WLEN WL[33] VDD VSS wl_driver
+XD[32] X[0] Y[4] WLEN WL[32] VDD VSS wl_driver
+XD[31] X[7] Y[3] WLEN WL[31] VDD VSS wl_driver
+XD[30] X[6] Y[3] WLEN WL[30] VDD VSS wl_driver
+XD[29] X[5] Y[3] WLEN WL[29] VDD VSS wl_driver
+XD[28] X[4] Y[3] WLEN WL[28] VDD VSS wl_driver
+XD[27] X[3] Y[3] WLEN WL[27] VDD VSS wl_driver
+XD[26] X[2] Y[3] WLEN WL[26] VDD VSS wl_driver
+XD[25] X[1] Y[3] WLEN WL[25] VDD VSS wl_driver
+XD[24] X[0] Y[3] WLEN WL[24] VDD VSS wl_driver
+XD[23] X[7] Y[2] WLEN WL[23] VDD VSS wl_driver
+XD[22] X[6] Y[2] WLEN WL[22] VDD VSS wl_driver
+XD[21] X[5] Y[2] WLEN WL[21] VDD VSS wl_driver
+XD[20] X[4] Y[2] WLEN WL[20] VDD VSS wl_driver
+XD[19] X[3] Y[2] WLEN WL[19] VDD VSS wl_driver
+XD[18] X[2] Y[2] WLEN WL[18] VDD VSS wl_driver
+XD[17] X[1] Y[2] WLEN WL[17] VDD VSS wl_driver
+XD[16] X[0] Y[2] WLEN WL[16] VDD VSS wl_driver
+XD[15] X[7] Y[1] WLEN WL[15] VDD VSS wl_driver
+XD[14] X[6] Y[1] WLEN WL[14] VDD VSS wl_driver
+XD[13] X[5] Y[1] WLEN WL[13] VDD VSS wl_driver
+XD[12] X[4] Y[1] WLEN WL[12] VDD VSS wl_driver
+XD[11] X[3] Y[1] WLEN WL[11] VDD VSS wl_driver
+XD[10] X[2] Y[1] WLEN WL[10] VDD VSS wl_driver
+XD[9] X[1] Y[1] WLEN WL[9] VDD VSS wl_driver
+XD[8] X[0] Y[1] WLEN WL[8] VDD VSS wl_driver
+XD[7] X[7] Y[0] WLEN WL[7] VDD VSS wl_driver
+XD[6] X[6] Y[0] WLEN WL[6] VDD VSS wl_driver
+XD[5] X[5] Y[0] WLEN WL[5] VDD VSS wl_driver
+XD[4] X[4] Y[0] WLEN WL[4] VDD VSS wl_driver
+XD[3] X[3] Y[0] WLEN WL[3] VDD VSS wl_driver
+XD[2] X[2] Y[0] WLEN WL[2] VDD VSS wl_driver
+XD[1] X[1] Y[0] WLEN WL[1] VDD VSS wl_driver
+XD[0] X[0] Y[0] WLEN WL[0] VDD VSS wl_driver
+.ends
+
+* expanding   symbol:  decoder/wl_driver.sym # of pins=6
+** sym_path: design/decoder/wl_driver.sym
+** sch_path: design/decoder/wl_driver.sch
+.subckt wl_driver X Y WLEN WL VDD VSS
+*.ipin X
+*.ipin Y
+*.ipin WLEN
+*.opin WL
+*.iopin VDD
+*.iopin VSS
+XMPA WLB X VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMPB WLB Y VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMPC WLB WLEN VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMNA WLB X N1 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMNB N1 Y N2 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMNC N2 WLEN VSS VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMPD WL WLB VDD VDD sg13_lv_pmos w=4.0u l=0.13u ng=1 m=1
+XMND WL WLB VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* one wordline: NAND3(X, Y, WLEN) then a 4x inverter driving WL
+
+**** end user architecture code
+.ends
+

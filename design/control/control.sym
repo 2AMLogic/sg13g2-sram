@@ -1,0 +1,44 @@
+v {xschem version=3.4.8RC file_version=1.2}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=X1"}
+V {}
+S {}
+E {}
+L 4 -40 -160 40 -160 {}
+L 4 -40 160 40 160 {}
+L 4 -40 -160 -40 160 {}
+L 4 40 -160 40 160 {}
+B 5 -42.5 -142.5 -37.5 -137.5 {name=CLK dir=in}
+T {CLK} -34 -144 0 0 0.2 0.2 {}
+B 5 -42.5 -122.5 -37.5 -117.5 {name=CENL dir=in}
+T {CENL} -34 -124 0 0 0.2 0.2 {}
+B 5 -42.5 -102.5 -37.5 -97.5 {name=GWENL dir=in}
+T {GWENL} -34 -104 0 0 0.2 0.2 {}
+B 5 -42.5 -82.5 -37.5 -77.5 {name=WENL dir=in}
+T {WENL} -34 -84 0 0 0.2 0.2 {}
+B 5 -42.5 -62.5 -37.5 -57.5 {name=A0L dir=in}
+T {A0L} -34 -64 0 0 0.2 0.2 {}
+B 5 -42.5 -42.5 -37.5 -37.5 {name=PRE_B dir=out}
+T {PRE_B} -34 -44 0 0 0.2 0.2 {}
+B 5 -42.5 -22.5 -37.5 -17.5 {name=WLEN dir=out}
+T {WLEN} -34 -24 0 0 0.2 0.2 {}
+B 5 -42.5 -2.5 -37.5 2.5 {name=SAE dir=out}
+T {SAE} -34 -4 0 0 0.2 0.2 {}
+B 5 -42.5 17.5 -37.5 22.5 {name=WE dir=out}
+T {WE} -34 16 0 0 0.2 0.2 {}
+B 5 -42.5 37.5 -37.5 42.5 {name=SEL0 dir=out}
+T {SEL0} -34 36 0 0 0.2 0.2 {}
+B 5 -42.5 57.5 -37.5 62.5 {name=SEL0B dir=out}
+T {SEL0B} -34 56 0 0 0.2 0.2 {}
+B 5 -42.5 77.5 -37.5 82.5 {name=SEL1 dir=out}
+T {SEL1} -34 76 0 0 0.2 0.2 {}
+B 5 -42.5 97.5 -37.5 102.5 {name=SEL1B dir=out}
+T {SEL1B} -34 96 0 0 0.2 0.2 {}
+B 5 -42.5 117.5 -37.5 122.5 {name=VDD dir=inout}
+T {VDD} -34 116 0 0 0.2 0.2 {}
+B 5 -42.5 137.5 -37.5 142.5 {name=VSS dir=inout}
+T {VSS} -34 136 0 0 0.2 0.2 {}
+T {@symname} 0 -170 0 0 0.3 0.3 {hcenter=true}
+T {@name} 0 170 0 0 0.2 0.2 {hcenter=true}

@@ -1,0 +1,18 @@
+** sch_path: design/gates/nand3.sch
+
+* 3-input NAND, N 1.5 um stack / P 1.0 um
+
+.subckt nand3 A B C Y VDD VSS
+*.ipin A
+*.ipin B
+*.ipin C
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 Y B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP2 Y C VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN0 Y A N1 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMN1 N1 B N2 VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+XMN2 N2 C VSS VSS sg13_lv_nmos w=1.5u l=0.13u ng=1 m=1
+.ends

@@ -1,0 +1,15 @@
+** sch_path: design/gates/nor2.sch
+
+* 2-input NOR, N 0.5 um / P 2.0 um stack
+
+.subckt nor2 A B Y VDD VSS
+*.ipin A
+*.ipin B
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 N1 A VDD VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMP1 Y B N1 VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN0 Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMN1 Y B VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+.ends
