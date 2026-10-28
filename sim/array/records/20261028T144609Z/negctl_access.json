@@ -1,0 +1,35 @@
+{
+  "label": "negctl_weak_driver",
+  "kind": "simulated",
+  "definition": "access = CLK 50 % rise to Q[0] crossing 90 % (read of 1) or 10 % (read of 0) of VDD; write completion = CLK 50 % rise to the cell's Q = QB crossing, and the cell beyond 90 % of VDD from the written rail afterwards",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/25C",
+      "klt_status": "error",
+      "read1_access_ns": null,
+      "read0_access_ns": null,
+      "q_final_read1_first_v": 5.87703e-08,
+      "q_final_read0_v": 6.39886e-08,
+      "q_final_read1_v": 7.50486e-08,
+      "write1_flip_after_clk_ns": null,
+      "write1_flip_after_wl_ns": null,
+      "write0_flip_after_clk_ns": null,
+      "write0_flip_after_wl_ns": null,
+      "cell_after_write1_v": -1.2,
+      "cell_after_write0_v": -1.2,
+      "checks": {
+        "read1_valid": false,
+        "read0_valid": false,
+        "write1_completed": false,
+        "write0_completed": false
+      },
+      "pass": false
+    }
+  ],
+  "corner_count": 1,
+  "failing_corners": [
+    "mos_tt/1.200V/25C"
+  ],
+  "all_pass": false,
+  "any_fail": true
+}

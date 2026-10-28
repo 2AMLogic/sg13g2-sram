@@ -1,0 +1,52 @@
+{
+  "label": "negctl_weak_driver",
+  "kind": "simulated",
+  "bl_step_v": 0.025,
+  "pulse_ns": 1.0,
+  "margin_definition": "write_margin_v = L_trip - L_drv: L_trip = highest constant bit-line low level (25 mV grid) at which a stand-alone cell flips within the pulse; L_drv = bit-line low level the real write driver holds in situ at the end of the pulse; worst of write-0 and write-1",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/25C",
+      "klt_status": "error",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": 0.952692,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.464208,
+          "flip_time_ns": null,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": false,
+          "value_holds": false,
+          "half_selected_retained": true,
+          "margin_v": -0.064208,
+          "pass": false
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": -0.951956,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.463697,
+          "flip_time_ns": null,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": false,
+          "value_holds": false,
+          "half_selected_retained": true,
+          "margin_v": -0.063697,
+          "pass": false
+        }
+      },
+      "write_margin_v": -0.064208,
+      "pass": false
+    }
+  ],
+  "corner_count": 1,
+  "failing_corners": [
+    "mos_tt/1.200V/25C"
+  ],
+  "all_pass": false,
+  "any_fail": true
+}

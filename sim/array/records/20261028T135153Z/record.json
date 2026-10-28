@@ -1,0 +1,66 @@
+{
+  "stamp": "20261028T135153Z",
+  "kind": "simulated",
+  "pdk_release_tag": "v0.3.0",
+  "scope": "45 corners: 5 process x 3 supply x 3 temperature (spec/sram.md)",
+  "organization": "mux 2, 128 cells per bit line, 2 bit-line pairs per I/O; access bench: full control/decode/latches + 1 real bit slice + load of the other 31",
+  "engine": {
+    "version_banner": "******\n** ngspice-42 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2023, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Sun Mar 31 20:15:14 UTC 2024\n******",
+    "runner_klt_version": "0.8.0",
+    "batch_job_ids": {
+      "snm": "klt-sim-0c2ef8022317",
+      "write": "klt-sim-b2b32f9ac841",
+      "access": "klt-sim-1aa2298348dd",
+      "negctl_snm": "klt-sim-ed8954852983",
+      "negctl_write": "klt-sim-9fda5e792053",
+      "negctl_access": "klt-sim-f89c7454e5f9"
+    }
+  },
+  "read_snm_in_situ": {
+    "corners": 45,
+    "worst_v": [
+      0.14492221872483513,
+      "mos_fs/1.080V/125C"
+    ],
+    "failing_corners": []
+  },
+  "write_margin": {
+    "corners": 45,
+    "worst_v": [
+      0.249796,
+      "mos_sf/1.080V/-40C"
+    ],
+    "failing_corners": []
+  },
+  "access": {
+    "corners": 45,
+    "slowest_read1_ns": [
+      3.2241,
+      "mos_ss/1.080V/25C"
+    ],
+    "slowest_read0_ns": [
+      2.71,
+      "mos_ss/1.080V/125C"
+    ],
+    "slowest_write1_flip_after_clk_ns": [
+      2.5509,
+      "mos_ss/1.080V/-40C"
+    ],
+    "slowest_write0_flip_after_clk_ns": [
+      2.4398,
+      "mos_ss/1.080V/-40C"
+    ],
+    "failing_corners": []
+  },
+  "negative_controls_detected": {
+    "beta_cell_lowers_read_snm": true,
+    "weak_driver_fails_write_bench": true,
+    "weak_driver_fails_access_bench": true
+  },
+  "all_corners_pass": true,
+  "not_established": [
+    "Monte Carlo (separate evidence item)",
+    "parasitic-extracted timing",
+    "wire RC on wordline and bit lines"
+  ]
+}

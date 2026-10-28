@@ -1,0 +1,31 @@
+{
+  "stamp": "20261028T144040Z",
+  "kind": "simulated",
+  "pdk_release_tag": "v0.3.0",
+  "corner": "mos_tt, 1.20 V, 27 C (nominal only; the corner grid is #26)",
+  "organization": "mux 2, 128 cells per bit line, 2 bit-line pairs per I/O column",
+  "engine": {
+    "version_banner": "******\n** ngspice-42 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2023, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Sun Mar 31 20:15:14 UTC 2024\n******",
+    "batch_job_ids": "klt-sim-b84937305cb1",
+    "runner_klt_version": "0.8.0"
+  },
+  "read": {
+    "a": true,
+    "b": true
+  },
+  "write": {
+    "c": {
+      "pass": true,
+      "flip_time_ns": 0.0874
+    },
+    "d": {
+      "pass": true,
+      "flip_time_ns": 0.0634
+    }
+  },
+  "negative_controls": {
+    "weak_write_driver_detected": true,
+    "early_sae_detected": true
+  },
+  "all_pass": true
+}

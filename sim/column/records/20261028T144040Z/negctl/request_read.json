@@ -1,0 +1,117 @@
+{
+  "engine": "ngspice",
+  "models": {
+    "pdk": "ihp-sg13g2",
+    "lib": "libs.tech/ngspice/models/cornerMOSlv.lib"
+  },
+  "corners": {
+    "process": [
+      "mos_tt"
+    ],
+    "supply_v": {
+      "vdd": [
+        1.2
+      ]
+    },
+    "temperature_c": [
+      27
+    ]
+  },
+  "netlist": "bench_read.cir",
+  "backend": "batch",
+  "analysis": {
+    "kind": "tran",
+    "args": "5p 3n"
+  },
+  "measurements": [
+    {
+      "name": "rd_a",
+      "unit": "V",
+      "spice": ".meas tran rd_a FIND par('v(oa)-v(oba)') AT=2.0n"
+    },
+    {
+      "name": "eq_a",
+      "unit": "V",
+      "spice": ".meas tran eq_a FIND par('v(xa.bl0)-v(xa.blb0)') AT=0.78n"
+    },
+    {
+      "name": "pre_a",
+      "unit": "V",
+      "spice": ".meas tran pre_a FIND par('v(xa.bl0)') AT=0.78n"
+    },
+    {
+      "name": "eq1_a",
+      "unit": "V",
+      "spice": ".meas tran eq1_a FIND par('v(xa.bl1)-v(xa.blb1)') AT=0.78n"
+    },
+    {
+      "name": "dbl_a",
+      "unit": "V",
+      "spice": ".meas tran dbl_a FIND par('v(xa.bl0)-v(xa.blb0)') AT=1.2n"
+    },
+    {
+      "name": "ret_a",
+      "unit": "V",
+      "spice": ".meas tran ret_a FIND par('v(xa.q0)-v(xa.qb0)') AT=2.8n"
+    },
+    {
+      "name": "hs_a",
+      "unit": "V",
+      "spice": ".meas tran hs_a FIND par('v(xa.q1)-v(xa.qb1)') AT=2.8n"
+    },
+    {
+      "name": "hsbl_a",
+      "unit": "V",
+      "spice": ".meas tran hsbl_a MIN par('min(v(xa.bl1),v(xa.blb1))') FROM=0.8n TO=1.9n"
+    },
+    {
+      "name": "rd_b",
+      "unit": "V",
+      "spice": ".meas tran rd_b FIND par('v(ob)-v(obb)') AT=2.0n"
+    },
+    {
+      "name": "eq_b",
+      "unit": "V",
+      "spice": ".meas tran eq_b FIND par('v(xb.bl0)-v(xb.blb0)') AT=0.78n"
+    },
+    {
+      "name": "pre_b",
+      "unit": "V",
+      "spice": ".meas tran pre_b FIND par('v(xb.bl0)') AT=0.78n"
+    },
+    {
+      "name": "eq1_b",
+      "unit": "V",
+      "spice": ".meas tran eq1_b FIND par('v(xb.bl1)-v(xb.blb1)') AT=0.78n"
+    },
+    {
+      "name": "dbl_b",
+      "unit": "V",
+      "spice": ".meas tran dbl_b FIND par('v(xb.bl0)-v(xb.blb0)') AT=1.2n"
+    },
+    {
+      "name": "ret_b",
+      "unit": "V",
+      "spice": ".meas tran ret_b FIND par('v(xb.q0)-v(xb.qb0)') AT=2.8n"
+    },
+    {
+      "name": "hs_b",
+      "unit": "V",
+      "spice": ".meas tran hs_b FIND par('v(xb.q1)-v(xb.qb1)') AT=2.8n"
+    },
+    {
+      "name": "hsbl_b",
+      "unit": "V",
+      "spice": ".meas tran hsbl_b MIN par('min(v(xb.bl1),v(xb.blb1))') FROM=0.8n TO=1.9n"
+    }
+  ],
+  "options": {
+    "osdi_preload": [
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103_nqs.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/r3_cmc.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/mosvar.osdi"
+    ],
+    "timeout_s": 600
+  }
+}

@@ -1,0 +1,1678 @@
+{
+  "label": "grid",
+  "kind": "simulated",
+  "bl_step_v": 0.025,
+  "pulse_ns": 1.0,
+  "margin_definition": "write_margin_v = L_trip - L_drv: L_trip = highest constant bit-line low level (25 mV grid) at which a stand-alone cell flips within the pulse; L_drv = bit-line low level the real write driver holds in situ at the end of the pulse; worst of write-0 and write-1",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.080V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111100000000000000000000",
+      "trip_level_v": 0.3,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07992,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000160838,
+          "flip_time_ns": 0.142,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.299839,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07992,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000157203,
+          "flip_time_ns": 0.1128,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.299843,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.299839,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.080V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111000000000000000000",
+      "trip_level_v": 0.35,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07988,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000235303,
+          "flip_time_ns": 0.135,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349765,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07989,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000217715,
+          "flip_time_ns": 0.1069,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349782,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.349765,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.080V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111100000000000000000",
+      "trip_level_v": 0.375,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07979,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000401341,
+          "flip_time_ns": 0.141,
+          "half_selected_cell_after_v": -1.07999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.374599,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.0798,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000380805,
+          "flip_time_ns": 0.1152,
+          "half_selected_cell_after_v": 1.07999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.374619,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.374599,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.200V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111100000000000000000",
+      "trip_level_v": 0.375,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19993,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000144181,
+          "flip_time_ns": 0.0843,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.374856,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19993,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000130874,
+          "flip_time_ns": 0.0626,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.374869,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.374856,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.200V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19991,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.00018634,
+          "flip_time_ns": 0.0844,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399814,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19991,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000172971,
+          "flip_time_ns": 0.0633,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399827,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.399814,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.200V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111100000000000000",
+      "trip_level_v": 0.45,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19983,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000329623,
+          "flip_time_ns": 0.0958,
+          "half_selected_cell_after_v": -1.19999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.44967,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19984,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000314693,
+          "flip_time_ns": 0.0754,
+          "half_selected_cell_after_v": 1.19999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449685,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.44967,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.320V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111100000000000000",
+      "trip_level_v": 0.45,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31994,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000112199,
+          "flip_time_ns": 0.0499,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449888,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31995,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000105746,
+          "flip_time_ns": 0.0371,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449894,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.449888,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.320V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111110000000000000",
+      "trip_level_v": 0.475,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31992,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000151221,
+          "flip_time_ns": 0.0532,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.474849,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31993,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000143884,
+          "flip_time_ns": 0.04,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.474856,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.474849,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_tt/1.320V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111100000000000",
+      "trip_level_v": 0.525,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31985,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000282494,
+          "flip_time_ns": 0.066,
+          "half_selected_cell_after_v": -1.31999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.524718,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31986,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000272453,
+          "flip_time_ns": 0.0512,
+          "half_selected_cell_after_v": 1.31999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.524728,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.524718,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.080V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111100000000000000000000",
+      "trip_level_v": 0.3,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07996,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 7.16119e-05,
+          "flip_time_ns": 0.19,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.299928,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07996,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 7.18932e-05,
+          "flip_time_ns": 0.1543,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.299928,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.299928,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.080V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111110000000000000000000",
+      "trip_level_v": 0.325,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07994,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.00012327,
+          "flip_time_ns": 0.1827,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324877,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07994,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000125366,
+          "flip_time_ns": 0.1482,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324875,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.324875,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.080V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111000000000000000000",
+      "trip_level_v": 0.35,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07981,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000380295,
+          "flip_time_ns": 0.189,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.34962,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07982,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000362428,
+          "flip_time_ns": 0.1574,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349638,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.34962,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.200V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111000000000000000000",
+      "trip_level_v": 0.35,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19995,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000108253,
+          "flip_time_ns": 0.1167,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349892,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19994,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000111188,
+          "flip_time_ns": 0.0899,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349889,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.349889,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.200V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.1999,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000196929,
+          "flip_time_ns": 0.1182,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399803,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19991,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000182404,
+          "flip_time_ns": 0.0917,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399818,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.399803,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.200V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111000000000000000",
+      "trip_level_v": 0.425,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19984,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000322906,
+          "flip_time_ns": 0.1314,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424677,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19985,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000303847,
+          "flip_time_ns": 0.1061,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424696,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.424677,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.320V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111000000000000000",
+      "trip_level_v": 0.425,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31994,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000119341,
+          "flip_time_ns": 0.0723,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424881,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31995,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000108314,
+          "flip_time_ns": 0.0528,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424892,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.424881,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.320V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111100000000000000",
+      "trip_level_v": 0.45,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31992,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000163194,
+          "flip_time_ns": 0.0776,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449837,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31992,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000150963,
+          "flip_time_ns": 0.0578,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449849,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.449837,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ss/1.320V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111000000000000",
+      "trip_level_v": 0.5,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31987,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000265806,
+          "flip_time_ns": 0.0934,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499734,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31987,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000251225,
+          "flip_time_ns": 0.0731,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499749,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.499734,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.080V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111110000000000000000000",
+      "trip_level_v": 0.325,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07991,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000172106,
+          "flip_time_ns": 0.0972,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324828,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07992,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000157832,
+          "flip_time_ns": 0.0754,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324842,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.324828,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.080V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111000000000000000000",
+      "trip_level_v": 0.35,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07989,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000219858,
+          "flip_time_ns": 0.0943,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.34978,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.0799,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000206008,
+          "flip_time_ns": 0.0736,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349794,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.34978,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.080V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.0797,
+          "q_minus_qb_final_v": -1.07998,
+          "driver_bit_line_low_v": 0.000559375,
+          "flip_time_ns": 0.1026,
+          "half_selected_cell_after_v": -1.07997,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399441,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07971,
+          "q_minus_qb_final_v": 1.07998,
+          "driver_bit_line_low_v": 0.000544578,
+          "flip_time_ns": 0.0834,
+          "half_selected_cell_after_v": 1.07997,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399455,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.399441,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.200V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19993,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000132353,
+          "flip_time_ns": 0.0553,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399868,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19994,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000125219,
+          "flip_time_ns": 0.0417,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399875,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.399868,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.200V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111000000000000000",
+      "trip_level_v": 0.425,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19991,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000177809,
+          "flip_time_ns": 0.0571,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424822,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19991,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000170199,
+          "flip_time_ns": 0.0438,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.42483,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.424822,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.200V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111110000000000000",
+      "trip_level_v": 0.475,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19973,
+          "q_minus_qb_final_v": -1.19998,
+          "driver_bit_line_low_v": 0.000495047,
+          "flip_time_ns": 0.0682,
+          "half_selected_cell_after_v": -1.19997,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.474505,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19974,
+          "q_minus_qb_final_v": 1.19998,
+          "driver_bit_line_low_v": 0.000485313,
+          "flip_time_ns": 0.0545,
+          "half_selected_cell_after_v": 1.19997,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.474515,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.474505,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.320V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111110000000000000",
+      "trip_level_v": 0.475,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31994,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000110464,
+          "flip_time_ns": 0.0334,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.47489,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31995,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000107348,
+          "flip_time_ns": 0.0275,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.474893,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.47489,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.320V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111000000000000",
+      "trip_level_v": 0.5,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31992,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000153384,
+          "flip_time_ns": 0.0365,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499847,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31992,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.0001494,
+          "flip_time_ns": 0.0301,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499851,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.499847,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_ff/1.320V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111110000000000",
+      "trip_level_v": 0.55,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31975,
+          "q_minus_qb_final_v": -1.31998,
+          "driver_bit_line_low_v": 0.000454429,
+          "flip_time_ns": 0.0468,
+          "half_selected_cell_after_v": -1.31997,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.549546,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31976,
+          "q_minus_qb_final_v": 1.31998,
+          "driver_bit_line_low_v": 0.000448144,
+          "flip_time_ns": 0.0385,
+          "half_selected_cell_after_v": 1.31997,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.549552,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.549546,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.080V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111110000000000000000000000",
+      "trip_level_v": 0.25,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.0799,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000203937,
+          "flip_time_ns": 0.1691,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.249796,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.0799,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000189933,
+          "flip_time_ns": 0.1426,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.24981,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.249796,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.080V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111000000000000000000000",
+      "trip_level_v": 0.275,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07987,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000251737,
+          "flip_time_ns": 0.1623,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.274748,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07988,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000234078,
+          "flip_time_ns": 0.1367,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.274766,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.274748,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.080V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111110000000000000000000",
+      "trip_level_v": 0.325,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.0798,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000396258,
+          "flip_time_ns": 0.1698,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324604,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07981,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000376977,
+          "flip_time_ns": 0.146,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324623,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.324604,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.200V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111110000000000000000000",
+      "trip_level_v": 0.325,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19992,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000149498,
+          "flip_time_ns": 0.1004,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324851,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19993,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000137914,
+          "flip_time_ns": 0.0799,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.324862,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.324851,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.200V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111000000000000000000",
+      "trip_level_v": 0.35,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.1999,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000191407,
+          "flip_time_ns": 0.1016,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.349809,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19991,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000179748,
+          "flip_time_ns": 0.0816,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.34982,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.349809,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.200V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19984,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000319868,
+          "flip_time_ns": 0.1152,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.39968,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19984,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000306348,
+          "flip_time_ns": 0.0959,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399694,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.39968,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.320V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31994,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000115011,
+          "flip_time_ns": 0.0599,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399885,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31995,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.00010906,
+          "flip_time_ns": 0.046,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399891,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.399885,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.320V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111000000000000000",
+      "trip_level_v": 0.425,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31992,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000154742,
+          "flip_time_ns": 0.0646,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424845,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31993,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000147856,
+          "flip_time_ns": 0.0503,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424852,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.424845,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_sf/1.320V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111100000000000000",
+      "trip_level_v": 0.45,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31986,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000271094,
+          "flip_time_ns": 0.0798,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449729,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31987,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000261662,
+          "flip_time_ns": 0.0646,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449738,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.449729,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.080V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111100000000000000000",
+      "trip_level_v": 0.375,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07995,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000107212,
+          "flip_time_ns": 0.1169,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.374893,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07994,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.000115391,
+          "flip_time_ns": 0.0862,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.374885,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.374885,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.080V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111110000000000000000",
+      "trip_level_v": 0.4,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07989,
+          "q_minus_qb_final_v": -1.08,
+          "driver_bit_line_low_v": 0.000209254,
+          "flip_time_ns": 0.1117,
+          "half_selected_cell_after_v": -1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399791,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.0799,
+          "q_minus_qb_final_v": 1.08,
+          "driver_bit_line_low_v": 0.00019683,
+          "flip_time_ns": 0.0825,
+          "half_selected_cell_after_v": 1.08,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.399803,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.399791,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.080V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111000000000000000",
+      "trip_level_v": 0.425,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.07977,
+          "q_minus_qb_final_v": -1.07999,
+          "driver_bit_line_low_v": 0.000440444,
+          "flip_time_ns": 0.1178,
+          "half_selected_cell_after_v": -1.07999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.42456,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.07978,
+          "q_minus_qb_final_v": 1.07999,
+          "driver_bit_line_low_v": 0.000420151,
+          "flip_time_ns": 0.0912,
+          "half_selected_cell_after_v": 1.07999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.42458,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.42456,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.200V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111000000000000000",
+      "trip_level_v": 0.425,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19993,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000135528,
+          "flip_time_ns": 0.0692,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424864,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19994,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000123279,
+          "flip_time_ns": 0.0482,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.424877,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.424864,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.200V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111100000000000000",
+      "trip_level_v": 0.45,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.19991,
+          "q_minus_qb_final_v": -1.2,
+          "driver_bit_line_low_v": 0.000183753,
+          "flip_time_ns": 0.0699,
+          "half_selected_cell_after_v": -1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.449816,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19991,
+          "q_minus_qb_final_v": 1.2,
+          "driver_bit_line_low_v": 0.000169933,
+          "flip_time_ns": 0.0496,
+          "half_selected_cell_after_v": 1.2,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.44983,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.449816,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.200V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111000000000000",
+      "trip_level_v": 0.5,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.1998,
+          "q_minus_qb_final_v": -1.19999,
+          "driver_bit_line_low_v": 0.000373467,
+          "flip_time_ns": 0.0805,
+          "half_selected_cell_after_v": -1.19999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499627,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.19981,
+          "q_minus_qb_final_v": 1.19999,
+          "driver_bit_line_low_v": 0.00035761,
+          "flip_time_ns": 0.0605,
+          "half_selected_cell_after_v": 1.19999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499642,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.499627,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.320V/-40C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111000000000000",
+      "trip_level_v": 0.5,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31994,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000110806,
+          "flip_time_ns": 0.041,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499889,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31995,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000104318,
+          "flip_time_ns": 0.0306,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.499896,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.499889,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.320V/25C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111100000000000",
+      "trip_level_v": 0.525,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31992,
+          "q_minus_qb_final_v": -1.32,
+          "driver_bit_line_low_v": 0.000151533,
+          "flip_time_ns": 0.0443,
+          "half_selected_cell_after_v": -1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.524848,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31993,
+          "q_minus_qb_final_v": 1.32,
+          "driver_bit_line_low_v": 0.000144052,
+          "flip_time_ns": 0.0331,
+          "half_selected_cell_after_v": 1.32,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.524856,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.524848,
+      "pass": true
+    },
+    {
+      "corner_id": "mos_fs/1.320V/125C",
+      "klt_status": "pass",
+      "trip_flips": "111111111111111111111111000000000",
+      "trip_level_v": 0.575,
+      "trip_saturated": false,
+      "cases": {
+        "c": {
+          "written": 0,
+          "q_minus_qb_at_pulse_end_v": -1.31983,
+          "q_minus_qb_final_v": -1.31999,
+          "driver_bit_line_low_v": 0.000326382,
+          "flip_time_ns": 0.0557,
+          "half_selected_cell_after_v": -1.31999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.574674,
+          "pass": true
+        },
+        "d": {
+          "written": 1,
+          "q_minus_qb_at_pulse_end_v": 1.31983,
+          "q_minus_qb_final_v": 1.31999,
+          "driver_bit_line_low_v": 0.000316068,
+          "flip_time_ns": 0.0424,
+          "half_selected_cell_after_v": 1.31999,
+          "flipped_within_pulse": true,
+          "value_holds": true,
+          "half_selected_retained": true,
+          "margin_v": 0.574684,
+          "pass": true
+        }
+      },
+      "write_margin_v": 0.574674,
+      "pass": true
+    }
+  ],
+  "corner_count": 45,
+  "failing_corners": [],
+  "all_pass": true,
+  "any_fail": false
+}

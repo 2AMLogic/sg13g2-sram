@@ -1,0 +1,129 @@
+{
+  "engine": "ngspice",
+  "models": {
+    "pdk": "ihp-sg13g2",
+    "lib": "libs.tech/ngspice/models/cornerMOSlv.lib"
+  },
+  "corners": {
+    "process": [
+      "mos_tt"
+    ],
+    "supply_v": {
+      "vdd": [
+        1.2
+      ]
+    },
+    "temperature_c": [
+      25
+    ]
+  },
+  "netlist": "bench_access.cir",
+  "backend": "batch",
+  "analysis": {
+    "kind": "tran",
+    "args": "50p 52n 0 50p"
+  },
+  "measurements": [
+    {
+      "name": "vdd_check",
+      "unit": "V",
+      "spice": ".meas tran vdd_check FIND par('v(vdd)') AT=1n"
+    },
+    {
+      "name": "tclk_write1",
+      "unit": "s",
+      "spice": ".meas tran tclk_write1 WHEN v(clkm)=v(thr5) RISE=1 TD=3n"
+    },
+    {
+      "name": "tclk_read1",
+      "unit": "s",
+      "spice": ".meas tran tclk_read1 WHEN v(clkm)=v(thr5) RISE=1 TD=11n"
+    },
+    {
+      "name": "tclk_write0",
+      "unit": "s",
+      "spice": ".meas tran tclk_write0 WHEN v(clkm)=v(thr5) RISE=1 TD=19n"
+    },
+    {
+      "name": "tclk_read0",
+      "unit": "s",
+      "spice": ".meas tran tclk_read0 WHEN v(clkm)=v(thr5) RISE=1 TD=27n"
+    },
+    {
+      "name": "tclk_write1b",
+      "unit": "s",
+      "spice": ".meas tran tclk_write1b WHEN v(clkm)=v(thr5) RISE=1 TD=35n"
+    },
+    {
+      "name": "tclk_read1b",
+      "unit": "s",
+      "spice": ".meas tran tclk_read1b WHEN v(clkm)=v(thr5) RISE=1 TD=43n"
+    },
+    {
+      "name": "tq_read1b",
+      "unit": "s",
+      "spice": ".meas tran tq_read1b WHEN v(q0m)=v(thr9) RISE=1 TD=43n"
+    },
+    {
+      "name": "tq_read0",
+      "unit": "s",
+      "spice": ".meas tran tq_read0 WHEN v(q0m)=v(thr1) FALL=1 TD=27n"
+    },
+    {
+      "name": "qend_read1",
+      "unit": "V",
+      "spice": ".meas tran qend_read1 FIND par('v(q0m)') AT=19n"
+    },
+    {
+      "name": "qend_read0",
+      "unit": "V",
+      "spice": ".meas tran qend_read0 FIND par('v(q0m)') AT=35n"
+    },
+    {
+      "name": "qend_read1b",
+      "unit": "V",
+      "spice": ".meas tran qend_read1b FIND par('v(q0m)') AT=51n"
+    },
+    {
+      "name": "tflip_write1",
+      "unit": "s",
+      "spice": ".meas tran tflip_write1 WHEN v(cq)=v(cqb) CROSS=1 TD=3n"
+    },
+    {
+      "name": "twl_rise_write1",
+      "unit": "s",
+      "spice": ".meas tran twl_rise_write1 WHEN v(wl45m)=v(thr5) RISE=1 TD=3n"
+    },
+    {
+      "name": "cell_after_write1",
+      "unit": "V",
+      "spice": ".meas tran cell_after_write1 FIND par('v(cq)-v(cqb)') AT=11n"
+    },
+    {
+      "name": "tflip_write0",
+      "unit": "s",
+      "spice": ".meas tran tflip_write0 WHEN v(cq)=v(cqb) CROSS=1 TD=19n"
+    },
+    {
+      "name": "twl_rise_write0",
+      "unit": "s",
+      "spice": ".meas tran twl_rise_write0 WHEN v(wl45m)=v(thr5) RISE=1 TD=19n"
+    },
+    {
+      "name": "cell_after_write0",
+      "unit": "V",
+      "spice": ".meas tran cell_after_write0 FIND par('v(cq)-v(cqb)') AT=27n"
+    }
+  ],
+  "options": {
+    "osdi_preload": [
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103_nqs.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/r3_cmc.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/mosvar.osdi"
+    ],
+    "waveforms": false,
+    "keep_artifacts": false,
+    "timeout_s": 1800
+  }
+}
