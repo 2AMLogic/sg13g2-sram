@@ -23,6 +23,8 @@ SIM_DIR="$(cd "${HERE}/.." && pwd)"
 REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
 source "${SIM_DIR}/harness/common/env.sh"
+# shellcheck source=/dev/null
+source "${SIM_DIR}/harness/common/run_klt.sh"
 : "${PDK_ROOT:?run_array.sh: no PDK install resolved; see sim/README.md}"
 command -v klt >/dev/null || { echo "run_array.sh: klt not on PATH" >&2; exit 3; }
 POST=(python3 -I "${HERE}/array_post.py")
@@ -45,23 +47,6 @@ mkdir -p "${REC}/reports" "${REC}/curves" "${REC}/negctl"
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK}" "${HERE}"/.req_*.json' EXIT
 
-run_klt() {   # run_klt <request> <name>
-  local req="$1" name="$2" rc=0
-  klt sim "${req}" --backend batch -o "${WORK}/${name}" \
-    --report-out "${REC}/reports/${name}.json.gz" --format json \
-    > "${WORK}/${name}.out" 2> "${WORK}/${name}.stderr" || rc=$?
-  sed -E 's#s3://[^ /]+#s3://<bucket>#g' "${WORK}/${name}.stderr" > "${REC}/reports/${name}.stderr"
-  # exit 3 = a measurement limit failed; exit 4 = an errored corner (a measurement without a value, e.g. a
-  # driver that never flips the cell leaves a crossing time empty). Both are RESULTS when the report
-  # exists: the post-processing counts a corner without its measurements as failing, never drops it.
-  # An exit 4 with no report is a fleet/tool error and stops the run.
-  if [[ "${rc}" -eq 4 && -s "${REC}/reports/${name}.json.gz" ]]; then rc=0; fi
-  if [[ "${rc}" -ne 0 && "${rc}" -ne 3 ]]; then
-    echo "run_array.sh: klt sim ${name} failed (exit ${rc}); batch error, no local fallback:" >&2
-    tail -5 "${REC}/reports/${name}.stderr" >&2
-    exit 6
-  fi
-}
 
 # --- negative controls (mos_tt, 1.20 V, 25 C, a grid corner) --------------------------------------------------------
 COL="${REPO}/design/column/column.spice"
@@ -75,13 +60,13 @@ grep -q 'w=0\.15u' "${REC}/negctl/macro_weakdrv.spice" || { echo "run_array.sh: 
 "${POST[@]}" negctl-bench "${HERE}/bench_access.cir" "${REC}/negctl/bench_access.cir" --replace macro.spice=./macro_weakdrv.spice
 for b in snm write access; do
   "${POST[@]}" request "${b}" "${REC}/negctl/request_${b}.json" --typical --netlist bench_${b}.cir
-  run_klt "${REC}/negctl/request_${b}.json" "negctl_${b}"
+  run_klt "${REC}/negctl/request_${b}.json" "negctl_${b}" 1
 done
 
 # --- the grid ---------------------------------------------------------------------------------
 for b in snm write access; do
   "${POST[@]}" request "${b}" "${HERE}/.req_${b}.json" "${TYPICAL[@]}"
-  run_klt "${HERE}/.req_${b}.json" "${b}"
+  run_klt "${HERE}/.req_${b}.json" "${b}" 1
 done
 
 # --- post-process and record --------------------------------------------------------------------

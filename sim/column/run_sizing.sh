@@ -13,6 +13,8 @@ SIM_DIR="$(cd "${HERE}/.." && pwd)"
 REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
 source "${SIM_DIR}/harness/common/env.sh"
+# shellcheck source=/dev/null
+source "${SIM_DIR}/harness/common/run_klt.sh"
 : "${PDK_ROOT:?run_sizing.sh: no PDK install resolved; see sim/README.md}"
 command -v klt >/dev/null || { echo "run_sizing.sh: klt not on PATH" >&2; exit 3; }
 POST=(python3 -I "${HERE}/column_post.py")
@@ -40,7 +42,7 @@ done
 rc=0
 klt sim --batch-set "${REQS[@]}" --max-in-flight 2 --capacity-retries 4 -o "${WORK}/out" --format json \
   > "${REC}/reports/set.json" 2> "${WORK}/set.stderr" || rc=$?
-sed -E 's#s3://[^ /]+#s3://<bucket>#g' "${WORK}/set.stderr" > "${REC}/reports/set.stderr"
+klt_redact_bucket < "${WORK}/set.stderr" > "${REC}/reports/set.stderr"
 # exit 4 = an errored corner, expected for a driver too weak to flip the cell (no flip time).
 if [[ "${rc}" -ne 0 && "${rc}" -ne 3 && "${rc}" -ne 4 ]]; then
   echo "run_sizing.sh: klt sim --batch-set failed (exit ${rc}); batch error, no local fallback:" >&2

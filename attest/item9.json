@@ -2,11 +2,12 @@
   "schema_version": 1,
   "kind": "t1-attestation-inventory",
   "t1_item": 9,
-  "description": "Testbenches shipped: the bitcell, I/O column and array-level benches (read/hold SNM, write margin, access time and write completion), their run scripts and post-processors, one cold-start invocation (sim/run_all.sh, fleet batch backend), and the pinned PDK and tool versions.",
+  "description": "Testbenches shipped: the bitcell, I/O column and array-level benches (read/hold SNM, write margin, access time and write completion), their run scripts, the shared run_klt helper and post-processors, one cold-start invocation (sim/run_all.sh, fleet batch backend), and the pinned PDK and tool versions.",
   "testbenches": [
     "sim/pdk.json",
     "sim/README.md",
     "sim/harness/common/env.sh",
+    "sim/harness/common/run_klt.sh",
     "sim/harness/common/tools/build-osdi.sh",
     "sim/run_all.sh",
     "sim/bitcell/bench_snm.cir",
