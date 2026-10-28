@@ -5,6 +5,9 @@ triage agent. Newest first.
 
 ### 2026-10-28
 
+- **PR #51**: feat: record write-driver width sweep and justify driver sizing
+- **Issue #23** (closed): T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver)
+- **PR #49**: feat: batch-set write-driver width sweep and sizing summary for the column
 - **PR #47**: fix: define each column subckt once by including only column.spice in the benches
 - **Issue #46** (closed): Remove duplicated sub-block subckt definitions in the column deck (benches include them twice)
 

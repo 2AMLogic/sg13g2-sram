@@ -20,7 +20,6 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver)
 - **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check
 
 ## Ready
@@ -33,7 +32,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver)
+_None._
 
 ## PRs Awaiting Review
 
@@ -51,7 +50,6 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#23**: T1 item 1 (design sources): column path schematics (precharge, column mux, sense amp, write driver) *(curated)*
 - **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check *(curated)*
 
 ## Proposed (Architect / Hermit)
@@ -74,12 +72,12 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 2 |
+| Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
+| Curated | 1 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
