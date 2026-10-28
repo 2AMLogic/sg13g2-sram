@@ -26,5 +26,8 @@ jobs:
       - name: Install pinned klayout-tools
         run: pip install "klayout-tools==${KLT_VERSION}"
 
+      - name: Item 1 attestation has not drifted
+        run: klt signoff --attest 1 --inventory attest/item1.json --check attest/item1.envelope.json
+
       - name: Item 10 attestation has not drifted
         run: klt signoff --attest 10 --inventory attest/item10.json --check attest/item10.envelope.json
