@@ -1,0 +1,42 @@
+klt: batch job klt-sim-4260aef95df7 submitting to s3://<bucket>/jobs/klt-sim-4260aef95df7
+klt: batch job klt-sim-664ca97bfc81 submitting to s3://<bucket>/jobs/klt-sim-664ca97bfc81
+klt sim: batch job klt-sim-664ca97bfc81: submitted
+klt sim: batch job klt-sim-4260aef95df7: submitted
+klt sim: batch job klt-sim-4260aef95df7 launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-4260aef95df7`
+klt sim: batch job klt-sim-664ca97bfc81 launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-664ca97bfc81`
+klt sim: batch job klt-sim-4260aef95df7 state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-664ca97bfc81 state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-4260aef95df7: running
+klt sim: batch job klt-sim-4260aef95df7 state=running elapsed=32s
+klt sim: batch job klt-sim-664ca97bfc81: running
+klt sim: batch job klt-sim-664ca97bfc81 state=running elapsed=32s
+klt sim: batch job klt-sim-4260aef95df7: failed
+klt sim: batch job klt-sim-664ca97bfc81: done
+klt: batch job klt-sim-5381efad8efa submitting to s3://<bucket>/jobs/klt-sim-5381efad8efa
+klt: batch job klt-sim-295d17e3395a submitting to s3://<bucket>/jobs/klt-sim-295d17e3395a
+klt sim: batch job klt-sim-5381efad8efa: submitted
+klt sim: batch job klt-sim-295d17e3395a: submitted
+klt sim: batch job klt-sim-295d17e3395a launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-295d17e3395a`
+klt sim: batch job klt-sim-5381efad8efa launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-5381efad8efa`
+klt sim: batch job klt-sim-295d17e3395a state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-5381efad8efa state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-5381efad8efa: running
+klt sim: batch job klt-sim-5381efad8efa state=running elapsed=31s
+klt sim: batch job klt-sim-295d17e3395a: running
+klt sim: batch job klt-sim-295d17e3395a state=running elapsed=32s
+klt sim: batch job klt-sim-5381efad8efa: done
+klt sim: batch job klt-sim-295d17e3395a: done
+klt: batch job klt-sim-d9696586b9e4 submitting to s3://<bucket>/jobs/klt-sim-d9696586b9e4
+klt: batch job klt-sim-53428e526073 submitting to s3://<bucket>/jobs/klt-sim-53428e526073
+klt sim: batch job klt-sim-d9696586b9e4: submitted
+klt sim: batch job klt-sim-53428e526073: submitted
+klt sim: batch job klt-sim-53428e526073 launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-53428e526073`
+klt sim: batch job klt-sim-d9696586b9e4 launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-d9696586b9e4`
+klt sim: batch job klt-sim-53428e526073 state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-d9696586b9e4 state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-d9696586b9e4: running
+klt sim: batch job klt-sim-d9696586b9e4 state=running elapsed=62s
+klt sim: batch job klt-sim-53428e526073: running
+klt sim: batch job klt-sim-53428e526073 state=running elapsed=62s
+klt sim: batch job klt-sim-d9696586b9e4: done
+klt sim: batch job klt-sim-53428e526073: done

@@ -1,0 +1,97 @@
+{
+  "engine": "ngspice",
+  "models": {
+    "pdk": "ihp-sg13g2",
+    "lib": "libs.tech/ngspice/models/cornerMOSlv.lib"
+  },
+  "corners": {
+    "process": [
+      "mos_tt"
+    ],
+    "supply_v": {
+      "vdd": [
+        1.2
+      ]
+    },
+    "temperature_c": [
+      27
+    ]
+  },
+  "netlist": "bench_write.cir",
+  "backend": "batch",
+  "analysis": {
+    "kind": "tran",
+    "args": "5p 3n"
+  },
+  "measurements": [
+    {
+      "name": "fl_c",
+      "unit": "V",
+      "spice": ".meas tran fl_c FIND par('v(xc.q0)-v(xc.qb0)') AT=1.5n"
+    },
+    {
+      "name": "ff_c",
+      "unit": "V",
+      "spice": ".meas tran ff_c FIND par('v(xc.q0)-v(xc.qb0)') AT=2.8n"
+    },
+    {
+      "name": "hs_c",
+      "unit": "V",
+      "spice": ".meas tran hs_c FIND par('v(xc.q1)-v(xc.qb1)') AT=2.8n"
+    },
+    {
+      "name": "blw_c",
+      "unit": "V",
+      "spice": ".meas tran blw_c FIND par('v(xc.bl0)-v(xc.blb0)') AT=1.4n"
+    },
+    {
+      "name": "tf_c",
+      "unit": "s",
+      "spice": ".meas tran tf_c WHEN v(xc.q0)=v(xc.qb0) CROSS=1 TD=0.45n"
+    },
+    {
+      "name": "hsbl_c",
+      "unit": "V",
+      "spice": ".meas tran hsbl_c MIN par('min(v(xc.bl1),v(xc.blb1))') FROM=0.5n TO=1.6n"
+    },
+    {
+      "name": "fl_d",
+      "unit": "V",
+      "spice": ".meas tran fl_d FIND par('v(xd.q0)-v(xd.qb0)') AT=1.5n"
+    },
+    {
+      "name": "ff_d",
+      "unit": "V",
+      "spice": ".meas tran ff_d FIND par('v(xd.q0)-v(xd.qb0)') AT=2.8n"
+    },
+    {
+      "name": "hs_d",
+      "unit": "V",
+      "spice": ".meas tran hs_d FIND par('v(xd.q1)-v(xd.qb1)') AT=2.8n"
+    },
+    {
+      "name": "blw_d",
+      "unit": "V",
+      "spice": ".meas tran blw_d FIND par('v(xd.bl0)-v(xd.blb0)') AT=1.4n"
+    },
+    {
+      "name": "tf_d",
+      "unit": "s",
+      "spice": ".meas tran tf_d WHEN v(xd.q0)=v(xd.qb0) CROSS=1 TD=0.45n"
+    },
+    {
+      "name": "hsbl_d",
+      "unit": "V",
+      "spice": ".meas tran hsbl_d MIN par('min(v(xd.bl1),v(xd.blb1))') FROM=0.5n TO=1.6n"
+    }
+  ],
+  "options": {
+    "osdi_preload": [
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103_nqs.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/r3_cmc.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/mosvar.osdi"
+    ],
+    "timeout_s": 600
+  }
+}

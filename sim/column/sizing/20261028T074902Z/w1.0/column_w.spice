@@ -1,0 +1,415 @@
+** sch_path: design/column/column.sch
+
+* one I/O column, mux 2: two bit-line pairs of 128 cells (7 row + 1 column address bits).
+
+
+* WL = the selected row (both pairs), WLU = the other 127 rows (shared net, held low).
+
+
+* XU cells of a pair share one Q/QB node pair UQ/UQB: 127 identical cells, same state.
+
+.subckt column PRE0_B PRE1_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL WLU DOUT DOUTB VDD VSS
+*.ipin PRE0_B
+*.ipin PRE1_B
+*.ipin SEL0
+*.ipin SEL0B
+*.ipin SEL1
+*.ipin SEL1B
+*.ipin SAE
+*.ipin WE
+*.ipin DIN
+*.ipin WL
+*.ipin WLU
+*.iopin DOUT
+*.iopin DOUTB
+*.iopin VDD
+*.iopin VSS
+XC0 BL0 BLB0 WL VDD VSS Q0 QB0 bitcell
+XC1 BL1 BLB1 WL VDD VSS Q1 QB1 bitcell
+XU0[126] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[125] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[124] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[123] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[122] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[121] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[120] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[119] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[118] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[117] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[116] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[115] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[114] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[113] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[112] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[111] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[110] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[109] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[108] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[107] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[106] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[105] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[104] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[103] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[102] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[101] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[100] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[99] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[98] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[97] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[96] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[95] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[94] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[93] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[92] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[91] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[90] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[89] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[88] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[87] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[86] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[85] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[84] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[83] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[82] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[81] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[80] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[79] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[78] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[77] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[76] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[75] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[74] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[73] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[72] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[71] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[70] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[69] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[68] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[67] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[66] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[65] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[64] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[63] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[62] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[61] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[60] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[59] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[58] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[57] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[56] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[55] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[54] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[53] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[52] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[51] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[50] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[49] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[48] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[47] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[46] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[45] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[44] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[43] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[42] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[41] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[40] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[39] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[38] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[37] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[36] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[35] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[34] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[33] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[32] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[31] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[30] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[29] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[28] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[27] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[26] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[25] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[24] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[23] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[22] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[21] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[20] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[19] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[18] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[17] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[16] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[15] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[14] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[13] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[12] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[11] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[10] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[9] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[8] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[7] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[6] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[5] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[4] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[3] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[2] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[1] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU0[0] BL0 BLB0 WLU VDD VSS UQ0 UQB0 bitcell
+XU1[126] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[125] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[124] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[123] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[122] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[121] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[120] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[119] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[118] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[117] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[116] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[115] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[114] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[113] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[112] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[111] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[110] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[109] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[108] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[107] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[106] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[105] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[104] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[103] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[102] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[101] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[100] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[99] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[98] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[97] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[96] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[95] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[94] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[93] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[92] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[91] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[90] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[89] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[88] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[87] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[86] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[85] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[84] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[83] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[82] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[81] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[80] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[79] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[78] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[77] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[76] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[75] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[74] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[73] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[72] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[71] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[70] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[69] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[68] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[67] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[66] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[65] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[64] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[63] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[62] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[61] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[60] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[59] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[58] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[57] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[56] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[55] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[54] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[53] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[52] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[51] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[50] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[49] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[48] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[47] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[46] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[45] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[44] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[43] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[42] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[41] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[40] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[39] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[38] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[37] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[36] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[35] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[34] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[33] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[32] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[31] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[30] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[29] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[28] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[27] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[26] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[25] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[24] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[23] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[22] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[21] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[20] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[19] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[18] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[17] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[16] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[15] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[14] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[13] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[12] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[11] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[10] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[9] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[8] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[7] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[6] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[5] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[4] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[3] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[2] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[1] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XU1[0] BL1 BLB1 WLU VDD VSS UQ1 UQB1 bitcell
+XPC0 PRE0_B BL0 BLB0 VDD VSS precharge
+XPC1 PRE1_B BL1 BLB1 VDD VSS precharge
+XMUX SEL0 SEL0B SEL1 SEL1B BL0 BLB0 BL1 BLB1 BLM BLBM VDD VSS column_mux
+XSA SAE BLM BLBM DOUT DOUTB VDD VSS sense_amp
+XWD WE DIN BLM BLBM VDD VSS write_driver
+.ends
+
+* expanding   symbol:  ../bitcell/bitcell.sym # of pins=7
+** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/bitcell/bitcell.sym
+** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/bitcell/bitcell.sch
+.subckt bitcell BL BLB WL VDD VSS Q QB
+*.iopin BL
+*.iopin BLB
+*.ipin WL
+*.iopin VDD
+*.iopin VSS
+*.iopin Q
+*.iopin QB
+XMP0 Q QB VDD VDD sg13_lv_pmos w=0.15u l=0.13u ng=1 m=1
+XMN0 Q QB VSS VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+XMP1 QB Q VDD VDD sg13_lv_pmos w=0.15u l=0.13u ng=1 m=1
+XMN1 QB Q VSS VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+XMN2 BL WL Q VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+XMN3 BLB WL QB VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 6T SRAM bitcell, reference sizing from spec/bitcell-decision.md evidence 1
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  precharge.sym # of pins=5
+** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/precharge.sym
+** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/precharge.sch
+.subckt precharge PRE_B BL BLB VDD VSS
+*.ipin PRE_B
+*.iopin BL
+*.iopin BLB
+*.iopin VDD
+*.iopin VSS
+XMP0 BL PRE_B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP1 BLB PRE_B VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMP2 BL PRE_B BLB VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* bit-line precharge to VDD and equalize, active-low PRE_B
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  column_mux.sym # of pins=12
+** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/column_mux.sym
+** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/column_mux.sch
+.subckt column_mux SEL0 SEL0B SEL1 SEL1B BL0 BLB0 BL1 BLB1 BLM BLBM VDD VSS
+*.ipin SEL0
+*.ipin SEL0B
+*.ipin SEL1
+*.ipin SEL1B
+*.iopin BL0
+*.iopin BLB0
+*.iopin BL1
+*.iopin BLB1
+*.iopin BLM
+*.iopin BLBM
+*.iopin VDD
+*.iopin VSS
+XMN0T BL0 SEL0 BLM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP0T BL0 SEL0B BLM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN0B BLB0 SEL0 BLBM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP0B BLB0 SEL0B BLBM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN1T BL1 SEL1 BLM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP1T BL1 SEL1B BLM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN1B BLB1 SEL1 BLBM VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+XMP1B BLB1 SEL1B BLBM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 2:1 column mux: NMOS+PMOS transmission gates, SELn high / SELnB low selects column n
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  sense_amp.sym # of pins=7
+** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/sense_amp.sym
+** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/sense_amp.sch
+.subckt sense_amp SAE BLM BLBM OUT OUTB VDD VSS
+*.ipin SAE
+*.iopin BLM
+*.iopin BLBM
+*.iopin OUT
+*.iopin OUTB
+*.iopin VDD
+*.iopin VSS
+XMPI0 OUT SAE BLM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMPI1 OUTB SAE BLBM VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMPL0 OUT OUTB VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMPL1 OUTB OUT VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMNL0 OUT OUTB TAIL VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMNL1 OUTB OUT TAIL VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMNT TAIL SAE VSS VSS sg13_lv_nmos w=2.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* latch SA: SAE low = isolation PMOS pass bit lines to OUT/OUTB, SAE high = latch
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  write_driver.sym # of pins=6
+** sym_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/write_driver.sym
+** sch_path: /home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/design/column/write_driver.sch
+.subckt write_driver WE DIN BLM BLBM VDD VSS
+*.ipin WE
+*.ipin DIN
+*.iopin BLM
+*.iopin BLBM
+*.iopin VDD
+*.iopin VSS
+XMPD DINB DIN VDD VDD sg13_lv_pmos w=0.5u l=0.13u ng=1 m=1
+XMND DINB DIN VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMNA0 BLM DINB WA VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMNA1 WA WE VSS VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMNB0 BLBM DIN WB VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+XMNB1 WB WE VSS VSS sg13_lv_nmos w=1.0u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* write driver: WE and DIN pull BLBM low, WE and DINB pull BLM low (cell Q takes DIN)
+
+**** end user architecture code
+.ends
+
