@@ -15,11 +15,6 @@
           "upstream": "sim/lib/test_snm_extract.py",
           "local": "sim/lib/common/test_snm_extract.py",
           "sha256": "82c73683aabc38bfd8179abc99349160aa0b9dc36d17e020918ba5047fd6ab41"
-        },
-        {
-          "upstream": "sim/lib/env_provenance.py",
-          "local": "sim/lib/common/env_provenance.py",
-          "sha256": "5569fe350132ab27fc3e141f38d8ca511df58309ceb01c357bb003a543ba8978"
         }
       ]
     },
