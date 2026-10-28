@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-10-28
 
+- **PR #55**: feat: add array-level benches, testbench inventory and item 9 attestation
+- **Issue #26** (closed): T1 item 9 (testbenches shipped): array read/write and access-time benches, inventory and --attest 9
 - **PR #53**: feat: decoder, control, latch and macro-top schematics with item 1 attestation
 - **Issue #24** (closed): T1 item 1 (design sources): row decoder, control timing and 256x32 macro top netlist + attest 1
 - **PR #51**: feat: record write-driver width sweep and justify driver sizing
