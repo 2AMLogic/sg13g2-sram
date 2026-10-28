@@ -17,11 +17,6 @@
           "sha256": "82c73683aabc38bfd8179abc99349160aa0b9dc36d17e020918ba5047fd6ab41"
         },
         {
-          "upstream": "sim/lib/env_provenance.py",
-          "local": "sim/lib/common/env_provenance.py",
-          "sha256": "5569fe350132ab27fc3e141f38d8ca511df58309ceb01c357bb003a543ba8978"
-        },
-        {
           "upstream": "sim/lib/mint_sim_envelope.py",
           "local": "sim/lib/common/mint_sim_envelope.py",
           "sha256": "aa9776afdbd4da8ba1e1f2bbc8ac6fa78acc0530ea01b1c7687cee6c07895b8f"
