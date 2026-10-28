@@ -18,12 +18,12 @@ Pass/fail limits here are the bench's functional criteria, not spec values.
 """
 from __future__ import annotations
 
-import gzip
 import json
-import os
-import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib" / "common"))
+from post_common import base_request, load_report, meas as _meas, negctl_bench, parse_negctl_args  # noqa: E402
 
 VDD = 1.2
 T_WL_MID_NS = 0.51          # bench_write.cir: 50 % point of the WL rise
@@ -37,10 +37,6 @@ HS_BL_MIN_V = 0.6           # half-selected column bit line must not collapse
 # case -> (instance, stored value of the selected cell before the access)
 READ_CASES = {"a": ("xa", 1), "b": ("xb", 0)}
 WRITE_CASES = {"c": ("xc", 1), "d": ("xd", 0)}   # written value is the opposite
-
-
-def _meas(name: str, expr: str, at: str) -> dict:
-    return {"name": name, "unit": "V", "spice": f".meas tran {name} FIND par('{expr}') AT={at}"}
 
 
 def measurements(kind: str) -> list[dict]:
@@ -71,18 +67,9 @@ def measurements(kind: str) -> list[dict]:
 
 
 def make_request(kind: str, netlist: str | None = None) -> dict:
-    pdk = "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi"
-    return {
-        "engine": "ngspice",
-        "models": {"pdk": "ihp-sg13g2", "lib": "libs.tech/ngspice/models/cornerMOSlv.lib"},
-        "corners": {"process": ["mos_tt"], "supply_v": {"vdd": [1.2]}, "temperature_c": [27]},
-        "netlist": netlist or f"bench_{kind}.cir",
-        "backend": "batch",
-        "analysis": {"kind": "tran", "args": "5p 3n"},
-        "measurements": measurements(kind),
-        "options": {"osdi_preload": [f"{pdk}/{n}.osdi" for n in ("psp103", "psp103_nqs", "r3_cmc", "mosvar")],
-                    "timeout_s": 600},
-    }
+    return base_request({"process": ["mos_tt"], "supply_v": {"vdd": [1.2]}, "temperature_c": [27]},
+                        netlist or f"bench_{kind}.cir", {"kind": "tran", "args": "5p 3n"},
+                        measurements(kind), timeout_s=600)
 
 
 def verdict_read(m: dict) -> dict:
@@ -140,12 +127,6 @@ def verdict_write(m: dict) -> dict:
     return out
 
 
-def load_report(path: str) -> dict:
-    p = Path(path)
-    with (gzip.open if p.suffix == ".gz" else open)(p, "rt") as f:
-        return json.load(f)
-
-
 def cmd_verdict(kind: str, report: str, label: str) -> dict:
     corner = load_report(report)["corners"][0]
     m = {x["name"]: x["value"] for x in corner.get("measurements", [])}
@@ -174,22 +155,6 @@ def cmd_sizing(label: str, items: list[str]) -> dict:
             "widths": rows, "min_passing_width_um": min(passing) if passing else None}
 
 
-def cmd_negctl_bench(bench: str, dst: str, replace: dict[str, str], sae_delay: str | None) -> None:
-    here = Path(bench).resolve().parent
-    dst_dir = Path(dst).resolve().parent
-    out = []
-    for line in Path(bench).read_text().splitlines():
-        mi = re.match(r"\.include\s+(\S+)", line)
-        if mi:
-            name = os.path.basename(mi.group(1))
-            target = replace.get(name) or str((here / mi.group(1)).resolve())
-            line = f".include {os.path.relpath(target, dst_dir) if not target.startswith('./') else target}"
-        if sae_delay and line.startswith("Vsae"):
-            line = re.sub(r"PULSE\(0 1\.2 \S+", f"PULSE(0 1.2 {sae_delay}n", line)
-        out.append(line)
-    Path(dst).write_text("\n".join(out) + "\n")
-
-
 def main() -> int:
     a = sys.argv[1:]
     if not a:
@@ -199,15 +164,8 @@ def main() -> int:
         json.dump(make_request(a[1], a[4] if len(a) > 4 and a[3] == "--netlist" else None), open(a[2], "w"), indent=2)
         open(a[2], "a").write("\n")
     elif a[0] == "negctl-bench" and len(a) >= 3:
-        rep, sae, i = {}, None, 3
-        while i < len(a):
-            if a[i] == "--replace":
-                k, v = a[i + 1].split("=", 1)
-                rep[k] = v
-            elif a[i] == "--sae-delay-ns":
-                sae = a[i + 1]
-            i += 2
-        cmd_negctl_bench(a[1], a[2], rep, sae)
+        rep, other = parse_negctl_args(a, 3, ("--sae-delay-ns",))
+        negctl_bench(a[1], a[2], rep, other.get("--sae-delay-ns"))
     elif a[0] == "sizing" and len(a) >= 3:
         print(json.dumps(cmd_sizing(a[1], a[2:]), indent=2))
     elif a[0] in ("read", "write") and len(a) >= 3:
