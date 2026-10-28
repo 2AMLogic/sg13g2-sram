@@ -4,7 +4,7 @@
 # One write bench per width of the four driver NMOS stack devices (XMNA0/1, XMNB0/1; the
 # inverter XMND is unchanged), submitted as ONE `klt sim --batch-set`. Never a local loop and
 # never a local fallback: a failed submit exits 6. Output is append-only under
-# sim/column/sizing/<UTC>/ (summary.json plus the per-width reports).
+# sim/column/sizing/<UTC>/ (summary.json plus reports/w<W>.json per width).
 # Usage: run_sizing.sh [width_um ...]   (default: 0.15 0.3 0.5 1.0 2.0 3.0)
 set -euo pipefail
 
@@ -47,4 +47,14 @@ if [[ "${rc}" -ne 0 && "${rc}" -ne 3 && "${rc}" -ne 4 ]]; then
   tail -5 "${REC}/reports/set.stderr" >&2
   exit 6
 fi
+# The per-width reports live in the scratch dir; keep them (the envelope only points there).
+python3 -I - "${REC}" "${REC}/reports/set.json" <<'PY'
+import json, shutil, sys
+rec, env = sys.argv[1], sys.argv[2]
+for r in json.load(open(env))["requests"]:
+    if r.get("report"):
+        shutil.copy(r["report"], f"{rec}/reports/{r['request'].split('/')[-2]}.json")
+PY
+python3 -I "${HERE}/column_post.py" sizing "sizing-${STAMP}" \
+  $(for W in "${WIDTHS[@]}"; do echo "${W}=${REC}/reports/w${W}.json"; done) > "${REC}/summary.json"
 echo "batch-set done (exit ${rc}); envelope: ${REC}/reports/set.json" >&2

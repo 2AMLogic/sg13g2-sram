@@ -38,16 +38,23 @@ write drives `BLM`/`BLBM` so that `Q` takes `DIN`.
 
 ## Write driver sizing and its source
 
-**Status: first-pass value, not yet justified by a simulation.** The 3.0 µm
-stacks were chosen by hand estimate: pulling a ~128-cell bit line plus the
-transmission gate low well inside the 1 ns wordline pulse
-(`spec/write-pulse-width-decision.md`) needs an on-resistance of a few kΩ per
-stack, and 3 µm NMOS pairs in series give roughly that at 1.2 V. The estimate
-was not checked against a bit-line capacitance or a flip time: the bench
-(`sim/column/`) is written but its nominal run was not performed (see
-`sim/column/README.md`, "Status"). The sizing acceptance item stays open until
-`sim/column/records/<UTC>/` shows the flip time (`write.json`,
-`flip_time_ns`) well inside 1 ns, and the 0.15 µm negative control failing.
+**Status: justified at nominal (mos_tt, 1.20 V, 27 °C) by a width sweep; corner and
+Monte Carlo margin are #26's.** The four driver NMOS stack devices were swept with the
+write bench (real bitcell, 127 unselected rows per bit line, half-selected cell present;
+`sim/column/run_sizing.sh`, record `sim/column/sizing/20261028T074902Z/`). Flip time from
+the 50 % point of the wordline edge, worst of the two written values, against the 1 ns
+pulse (`spec/write-pulse-width-decision.md`):
+
+| stack width | 0.15 µm | 0.3 µm | 0.5 µm | 1.0 µm | 2.0 µm | 3.0 µm |
+|---|---|---|---|---|---|---|
+| flip time | no flip | 0.96 ns (fails) | 0.54 ns | 0.25 ns | 0.12 ns | 0.09 ns |
+
+The 3.0 µm stacks flip the cell in 0.09 ns, about 11x inside the pulse; the smallest
+passing width at nominal is 0.5 µm (1.8x inside). 3.0 µm is kept: it leaves room for
+slow corners, low supply and cell mismatch, which this nominal sweep does not cover.
+Shrinking it for area is a decision for the corner and Monte Carlo results in #26, not
+this nominal bench. The 0.15 µm run is also the negative control (the bench detects a
+driver too weak to write).
 
 ## Sources
 

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "status": "error",
+  "request_count": 6,
+  "max_in_flight": 2,
+  "submitted": 6,
+  "refused": 1,
+  "refused_codes": [],
+  "requests": [
+    {
+      "index": 0,
+      "request": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/sim/column/sizing/20261028T074902Z/w0.15/request.json",
+      "status": "error",
+      "exit_code": 4,
+      "job_id": "klt-sim-4260aef95df7",
+      "job_ids": [
+        "klt-sim-4260aef95df7"
+      ],
+      "report": "/tmp/tmp.UpAKXe7PTX/out/request/report.json",
+      "error": null
+    },
+    {
+      "index": 1,
+      "request": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/sim/column/sizing/20261028T074902Z/w0.3/request.json",
+      "status": "pass",
+      "exit_code": 0,
+      "job_id": "klt-sim-664ca97bfc81",
+      "job_ids": [
+        "klt-sim-664ca97bfc81"
+      ],
+      "report": "/tmp/tmp.UpAKXe7PTX/out/request-1/report.json",
+      "error": null
+    },
+    {
+      "index": 2,
+      "request": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/sim/column/sizing/20261028T074902Z/w0.5/request.json",
+      "status": "pass",
+      "exit_code": 0,
+      "job_id": "klt-sim-5381efad8efa",
+      "job_ids": [
+        "klt-sim-5381efad8efa"
+      ],
+      "report": "/tmp/tmp.UpAKXe7PTX/out/request-2/report.json",
+      "error": null
+    },
+    {
+      "index": 3,
+      "request": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/sim/column/sizing/20261028T074902Z/w1.0/request.json",
+      "status": "pass",
+      "exit_code": 0,
+      "job_id": "klt-sim-295d17e3395a",
+      "job_ids": [
+        "klt-sim-295d17e3395a"
+      ],
+      "report": "/tmp/tmp.UpAKXe7PTX/out/request-3/report.json",
+      "error": null
+    },
+    {
+      "index": 4,
+      "request": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/sim/column/sizing/20261028T074902Z/w2.0/request.json",
+      "status": "pass",
+      "exit_code": 0,
+      "job_id": "klt-sim-d9696586b9e4",
+      "job_ids": [
+        "klt-sim-d9696586b9e4"
+      ],
+      "report": "/tmp/tmp.UpAKXe7PTX/out/request-4/report.json",
+      "error": null
+    },
+    {
+      "index": 5,
+      "request": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-23/sim/column/sizing/20261028T074902Z/w3.0/request.json",
+      "status": "pass",
+      "exit_code": 0,
+      "job_id": "klt-sim-53428e526073",
+      "job_ids": [
+        "klt-sim-53428e526073"
+      ],
+      "report": "/tmp/tmp.UpAKXe7PTX/out/request-5/report.json",
+      "error": null
+    }
+  ]
+}

@@ -43,8 +43,7 @@ unselected pair's enable low (precharged) through the wordline pulse.
 
 Earlier record `records/20261027T211740Z/` (shared `PRE_B`, `all_pass` false:
 the floating unselected pair fell to about 0.07 V) is kept unchanged as evidence.
-The write-driver sizing justification in `design/column/README.md` is still the
-hand estimate; the flip times above are its first measurement, not a sizing sweep.
+The write-driver sizing justification is in `design/column/README.md` (sweep below).
 
 ## Write-driver width sweep
 
@@ -53,10 +52,13 @@ hand estimate; the flip times above are its first measurement, not a sizing swee
 `klt sim --batch-set` (batch only, no local fallback, `--capacity-retries 4`). It leaves the
 reports under `sizing/<UTC>/` (append-only); summarise with
 `python3 -I column_post.py sizing <label> <width_um>=<report> ...`, which gives the flip
-time per width and the smallest passing width. **Not yet run**: on 2026-10-28 the fleet
-refused all six requests (`batch_no_capacity`, 224 vCPU in use against `BATCH_MAX_VCPU`,
-quota shared with ci-spot) across the retries, so no sizing evidence exists and the
-justification in `design/column/README.md` stays a hand estimate.
+time per width and the smallest passing width; `run_sizing.sh` does this itself and writes
+`summary.json`. **Run** on 2026-10-28 (`sizing/20261028T074902Z/`, six batch jobs, runner
+klt 0.8.0): flip time at 0.15 / 0.3 / 0.5 / 1.0 / 2.0 / 3.0 µm is no flip / 0.96 (fails the
+1 ns check) / 0.54 / 0.25 / 0.12 / 0.09 ns (worst of the two written values); smallest
+passing width 0.5 µm. The per-width reports were fetched by re-attaching to the batch jobs
+(`--attach`) because the first version of the script deleted its scratch dir; the script now
+keeps them.
 
 A klt batch run whose corner errors exits 4; `run_column.sh` accepts that only for
 the two negative controls (a driver that never flips the cell leaves the flip

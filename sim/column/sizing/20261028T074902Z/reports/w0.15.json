@@ -1,0 +1,506 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/column/sizing/20261028T074902Z/w0.15/bench_write.cir",
+    "scope": "repo"
+  },
+  "status": "error",
+  "corner_count": 1,
+  "passed": 0,
+  "failed": 0,
+  "errored": 1,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "measurement": 2
+    },
+    "by_severity": {
+      "error": 2
+    },
+    "corners_with_diagnostics": 1
+  },
+  "metrics": {
+    "sim__corner__count": 1,
+    "sim__corner__passed_count": 0,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 1,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "46",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-42 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2023, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Sun Mar 31 20:15:14 UTC 2024\n******",
+      "binary_sha256": "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
+      "probe": "ok",
+      "reason": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "03d505847c880d233b341be115a1e5460edf4d8e9b3e8a7df791a52fa4455d67",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "2dc238d21c232bbab4dcd73cf8446ee27ffc081c5d5a887d06f10f8fedefc1d6",
+    "netlist_closure": [
+      {
+        "path": "sim/column/sizing/20261028T074902Z/w0.15/bench_write.cir",
+        "scope": "repo",
+        "sha256": "2dc238d21c232bbab4dcd73cf8446ee27ffc081c5d5a887d06f10f8fedefc1d6"
+      },
+      {
+        "path": "sim/column/sizing/20261028T074902Z/w0.15/column_w.spice",
+        "scope": "repo",
+        "sha256": "a9d07fd22e37fefa28137039e1d0dbfa4e2fb5009eb5c33b4d4261cd550c241c"
+      }
+    ],
+    "netlist_identity": "sha256:b4b096238e6b879be9bfb4908602d6acd2291282363ce127aef7ceecdc2f29f4",
+    "osdi_preload_runner_resolved": [
+      {
+        "entry": "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103.osdi",
+        "reason": "env_var"
+      },
+      {
+        "entry": "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103_nqs.osdi",
+        "reason": "env_var"
+      },
+      {
+        "entry": "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/r3_cmc.osdi",
+        "reason": "env_var"
+      },
+      {
+        "entry": "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/mosvar.osdi",
+        "reason": "env_var"
+      }
+    ],
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-4260aef95df7",
+      "region": "us-east-1",
+      "instance_id": "i-0fc41fe872b29d657",
+      "instance_type": "c7i.8xlarge",
+      "availability_zone": "us-east-1c",
+      "ami_id": "ami-0fe7e8c2bb10dc45a",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "4",
+      "concurrency": "2",
+      "physical_cores": "16",
+      "elapsed_seconds": 26,
+      "client_submitted_at": null,
+      "client_launched_at": null,
+      "client_status_terminal_at": "2026-10-28T07:54:25.881196Z",
+      "client_collected_at": "2026-10-28T07:54:26.626654Z",
+      "runner_klt_version": "0.8.0",
+      "client_klt_version": "0.8.1.dev511+gbbe05037064a",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "options.osdi_preload"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "ihp-sg13g2",
+          "root": "/opt/pdk",
+          "stamp_scheme": null,
+          "stamp_sha256": null,
+          "stamp_text": null,
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [
+          "pdk stamp unreadable: FileNotFoundError"
+        ],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "worker_stamp_unavailable"
+        },
+        "engine_build_comparison": {
+          "status": "mismatch",
+          "warning": "the worker's ngspice --version banner differs from the local binary's; build options (e.g. FFT linkage) may differ, so results derived from them can differ from a local run"
+        }
+      },
+      "runner_model_inputs": null
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/usr/bin/ngspice",
+    "backend": {
+      "resolved": "batch",
+      "source": "flag",
+      "requested": "batch"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 1,
+    "measurements_declared": 12,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"blw_c\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"blw_d\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"ff_c\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"ff_d\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"fl_c\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"fl_d\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"hs_c\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"hs_d\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"hsbl_c\"]/observation",
+      "measurement:[0,\"mos_tt/1.200V/27C\",\"hsbl_d\"]/observation"
+    ],
+    "skipped": [
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"tf_c\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"tf_d\"]/observation",
+        "reason": "unavailable_measurement"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"blw_c\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"blw_d\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"ff_c\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"ff_d\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"fl_c\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"fl_d\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"hs_c\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"hs_d\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"hsbl_c\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"hsbl_d\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"tf_c\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"mos_tt/1.200V/27C\",\"tf_d\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.8.1.dev511+gbbe05037064a",
+    "klt_git_commit": "bbe05037064aec1b0c99ad76bf8ba1c0ab8ab9dd",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@bbe05037064aec1b0c99ad76bf8ba1c0ab8ab9dd",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "ihp-sg13g2",
+      "source": "search root: ~/share/pdk",
+      "version": "fetched:0.3.0"
+    },
+    "deck": {
+      "name": "cornerMOSlv.lib",
+      "content_hash": "sha256:03d505847c880d233b341be115a1e5460edf4d8e9b3e8a7df791a52fa4455d67",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:2dc238d21c232bbab4dcd73cf8446ee27ffc081c5d5a887d06f10f8fedefc1d6",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "fl_c",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": 0.925076,
+        "margin": null
+      }
+    },
+    {
+      "name": "ff_c",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": 1.2,
+        "margin": null
+      }
+    },
+    {
+      "name": "hs_c",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": -1.2,
+        "margin": null
+      }
+    },
+    {
+      "name": "blw_c",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": 0.0971594,
+        "margin": null
+      }
+    },
+    {
+      "name": "tf_c",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "hsbl_c",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": 1.11843,
+        "margin": null
+      }
+    },
+    {
+      "name": "fl_d",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": -0.924129,
+        "margin": null
+      }
+    },
+    {
+      "name": "ff_d",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": -1.2,
+        "margin": null
+      }
+    },
+    {
+      "name": "hs_d",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": 1.2,
+        "margin": null
+      }
+    },
+    {
+      "name": "blw_d",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": -0.0962549,
+        "margin": null
+      }
+    },
+    {
+      "name": "tf_d",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "hsbl_d",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "mos_tt/1.200V/27C",
+        "value": 1.11843,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/27C",
+      "process": "mos_tt",
+      "supply_v": {
+        "vdd": 1.2
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 19.755,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "fl_c",
+          "value": 0.925076,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "ff_c",
+          "value": 1.2,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hs_c",
+          "value": -1.2,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "blw_c",
+          "value": 0.0971594,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tf_c",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "hsbl_c",
+          "value": 1.11843,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fl_d",
+          "value": -0.924129,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "ff_d",
+          "value": -1.2,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hs_d",
+          "value": 1.2,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "blw_d",
+          "value": -0.0962549,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tf_d",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "hsbl_d",
+          "value": 1.11843,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "measurement",
+          "message": "measurement 'tf_c' produced no value -- ngspice reported: out of interval"
+        },
+        {
+          "severity": "error",
+          "code": "measurement",
+          "message": "measurement 'tf_d' produced no value -- ngspice reported: out of interval"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    }
+  ]
+}
