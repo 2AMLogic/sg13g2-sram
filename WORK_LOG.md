@@ -3,8 +3,19 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-10-28
+
+- **PR #47**: fix: define each column subckt once by including only column.spice in the benches
+- **Issue #46** (closed): Remove duplicated sub-block subckt definitions in the column deck (benches include them twice)
+
 ### 2026-10-27
 
+- **PR #45**: chore: alias check:ci to npm test to remove drifted duplicate chain
+- **PR #44**: feat: per-pair precharge enables keep the unselected bit-line pair precharged
+- **PR #42**: feat: record nominal column bench on the batch fleet; fix netlist cwd and comment wrapping
+- **PR #40**: docs: install two-key ratification keys and open post-hoc review record
+- **Issue #43** (closed): Column bench: unselected-mux bit lines collapse to ~0.07 V while WL is high (needs per-pair precharge enable)
+- **Issue #38** (closed): Collapse package.json check:ci into 'npm test': hand-copied chain already drifted
 - **PR #34**: feat: column path schematics, derived netlists and nominal bench (bench not yet run)
 - **PR #32**: docs: README spec table, reproduction steps and item 10 attestation (klt 0.8.0)
 - **Issue #25** (closed): T1 item 10 (repo hygiene): README reproduction steps and spec table, klt signoff --attest 10
