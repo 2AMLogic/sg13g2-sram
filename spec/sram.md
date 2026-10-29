@@ -108,7 +108,7 @@ origin.
 | Axis | Points |
 |---|---|
 | Process | `mos_tt`, `mos_ss`, `mos_ff`, `mos_sf`, `mos_fs` (the PDK's MOS corner set in `libs.tech/ngspice/models/cornerMOSlv.lib`) |
-| Temperature | −40 °C, 25 °C, 125 °C |
+| Temperature | −40 °C, 25 °C (the typical point), 125 °C |
 | Voltage | 1.08 V, 1.20 V, 1.32 V |
 
 **The full cross is run: 5 × 3 × 3 = 45 corners.** No pruning. The
@@ -118,7 +118,7 @@ three process corners (3 × 3 × 3 = 27); the two skew corners are the
 addition. All corners are reported under `sim/`'s append-only evidence
 convention.
 
-The three process-corner names above were confirmed present in
+The five process-corner names above were confirmed present in
 `cornerMOSlv.lib` (`.LIB mos_tt`, `mos_ss`, `mos_ff`, `mos_sf`, `mos_fs`)
 on 2026-10-17.
 
@@ -126,8 +126,10 @@ on 2026-10-17.
 
 The macro is functional across PVT once DRC and LVS are clean on the full
 array and every one of the 45 corners has a strictly positive read SNM, hold
-SNM and write margin, plus a recorded access time. A corner that cannot be
-closed is recorded as an open result, not dropped.
+SNM and write margin, plus a recorded access time. Read SNM, hold SNM and
+write margin also carry Monte Carlo evidence per "Statistical treatment"
+above, combined with, never replacing, the corner matrix. A corner that
+cannot be closed is recorded as an open result, not dropped.
 
 ## Reference row: shipped `RM_IHPSG13_1P_256x32_c2_bm_bist`
 
@@ -193,6 +195,8 @@ protocol, described generically.
 | Origin harness on OSDI-loaded models | open, verify at first run | #5, #4 |
 | Rail sharing | open (target one rail) | bitcell characterization issue |
 | `SRAM.drawing` marker rules | open | bitcell layout issue |
+| Confirm the 1 ns write pulse (flip time at `mos_ss` / 1.08 V / 125 °C, 0.5 / 1 / 2 ns sensitivity sweep; `spec/write-pulse-width-decision.md`) | open, sweep not yet run | write-pulse confirmation issue |
+| Choice of Monte Carlo mismatch parameters on the SG13G2 models | open, decided when the harness runs on the OSDI models | #4, #5 |
 
 ## References
 
