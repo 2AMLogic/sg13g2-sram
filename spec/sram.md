@@ -31,6 +31,9 @@ organization and is the comparison point. A parameterized generator is a
 stretch, after the fixed instance is DRC/LVS clean and characterized.
 Free SRAM generators are references: cite, do not reimplement.
 
+The physical row/column split is not fixed here; see
+`spec/wordline-rc-decision.md`.
+
 ## Ports: 1RW, with the origin's pin interface
 
 **Target 1RW; stretch 1RW1R.** Inherited.
@@ -193,10 +196,12 @@ protocol, described generically.
 | Origin harness on OSDI-loaded models | open, verify at first run | #5, #4 |
 | Rail sharing | open (target one rail) | bitcell characterization issue |
 | `SRAM.drawing` marker rules | open | bitcell layout issue |
+| Physical row/column organization | open (candidate 128 × 64, `spec/wordline-rc-decision.md`) | array layout issue |
+| Wordline / bit-line wire-RC check | open (`spec/wordline-rc-decision.md`) | array layout issue |
 
 ## References
 
 - `spec/bitcell-decision.md`, `spec/porting-plan.md`,
-  `spec/write-pulse-width-decision.md`
+  `spec/write-pulse-width-decision.md`, `spec/wordline-rc-decision.md`
 - `gf180-sram` `spec/sram.md` @ `d0bacc0`
 - `~/share/pdk/ihp-sg13g2/libs.ref/sg13g2_sram/` (reference macro views)
