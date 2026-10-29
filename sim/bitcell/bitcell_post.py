@@ -11,8 +11,14 @@ Subcommands (all inputs are `klt sim` report envelopes, plain or .json.gz):
       Hold/read SNM per corner from the returned DC waveforms, extracted with
       sim/lib/common/snm_extract.py (pair mode: two independent VTCs). Writes
       the four VTC curves per corner as CSV into <curves-dir>, prints JSON.
-  write <report> <label>
-      Write margin per corner from the flip flags of the 33 bit-line levels.
+  write <report> <label> [--pulse-ns N]
+      Write margin per corner from the flip flags of the 33 bit-line levels, and
+      the BL = 0 V flip time (tflip_0) against the N ns wordline window (default 1).
+  sweep-request <request.json> <bench.cir> <out-dir> <pulse-ns> <cell.spice>
+      Derive the request and bench for a wordline pulse of <pulse-ns> (sampling
+      times follow the pulse) and the sweep corner subset, into <out-dir>.
+  write-sweep <label> <pulse-ns>=<write.json> ...
+      Tabulate write margin and flip time per corner across pulse widths.
 
 SNM is the inscribed-square side (square_snm, the Seevinck construction klt's own
 `snm` measurement uses). snm_extract.py's vertical-gap value is recorded beside it
@@ -34,6 +40,16 @@ import snm_extract  # noqa: E402
 
 BL_STEP_V = 0.025
 N_LEVELS = 33
+WL_T0_NS = 0.3  # wordline rise start in bench_write.cir
+WL_EDGE_NS = 0.02  # wordline rise/fall time in bench_write.cir
+# end-of-pulse sample sits at WL_T0_NS + pw, the final sample 1.2 ns later and the run
+# ends 0.5 ns after that: 1.3 / 2.5 / 3 ns at pw = 1 ns, as in the first record
+FINAL_AFTER_END_NS = 1.2
+STOP_AFTER_FINAL_NS = 0.5
+# 3 worst write-margin corners of the 45-corner record are mos_sf/1.08 V/-40 C (0.250 V),
+# mos_sf/1.08 V/25 C (0.275 V) and a tie at 0.300 V (mos_ss and mos_tt, 1.08 V, -40 C);
+# klt corners are a Cartesian grid, so the sweep runs the grid that contains all four
+SWEEP_CORNERS = {"process": ["mos_sf", "mos_ss", "mos_tt"], "supply_v": {"vdd": [1.08]}, "temperature_c": [-40, 25]}
 
 
 def square_snm(p1: list[tuple[float, float]], p2: list[tuple[float, float]]) -> float | None:
@@ -108,6 +124,48 @@ def cmd_typical_request(src: str, dst: str, netlist: str | None) -> None:
     open(dst, "a").write("\n")
 
 
+def _ns(x: float) -> str:
+    return f"{x:.6g}n"
+
+
+def cmd_sweep_request(src: str, bench: str, out_dir: str, pulse_ns: float, cell: str) -> None:
+    """Write <out-dir>/{request.json,bench_write.cir,<cell>}: the write request with the
+    wordline pulse width, the two sampling times and the run length set from pulse_ns,
+    restricted to the sweep corners. The cell netlist is copied beside the bench."""
+    d = Path(out_dir)
+    d.mkdir(parents=True, exist_ok=True)
+    t_end = WL_T0_NS + pulse_ns
+    t_fin = t_end + FINAL_AFTER_END_NS
+    text = open(bench).read()
+    if ".param pw=1n" not in text:
+        raise SystemExit("sweep-request: bench has no '.param pw=1n' line")
+    out = []
+    for line in text.splitlines():
+        if line.startswith(".param pw="):
+            line = f".param pw={_ns(pulse_ns)}"
+        elif line.startswith(".include"):
+            line = f".include ./{Path(cell).name}"
+        out.append(line)
+    (d / "bench_write.cir").write_text("\n".join(out) + "\n")
+    (d / Path(cell).name).write_text(open(cell).read())
+    r = json.load(open(src))
+    r["corners"] = SWEEP_CORNERS
+    r["netlist"] = "bench_write.cir"
+    r["analysis"]["args"] = f"5p {_ns(t_fin + STOP_AFTER_FINAL_NS)}"
+    for m in r["measurements"]:
+        m["spice"] = m["spice"].replace("AT=1.3n", f"AT={_ns(t_end)}").replace("AT=2.5n", f"AT={_ns(t_fin)}")
+    json.dump(r, open(d / "request.json", "w"), indent=2)
+    open(d / "request.json", "a").write("\n")
+
+
+def flip_time_check(flip_time_s: float | None, pulse_ns: float) -> str:
+    """Classify the BL = 0 V flip time (50 % WL rise to Q = QB) against the wordline
+    window, which at 50 % points is the pulse width plus one edge time."""
+    if flip_time_s is None:
+        return "never_flips"
+    return "within_pulse" if flip_time_s * 1e9 <= pulse_ns + WL_EDGE_NS else "after_pulse_end"
+
+
 def cmd_negctl_bench(bench: str, dst: str, cell: str) -> None:
     text = open(bench).read()
     out = []
@@ -164,10 +222,11 @@ def cmd_snm(report: str, art_root: str, curves_dir: str, label: str) -> dict:
     return out
 
 
-def cmd_write(report: str, label: str) -> dict:
+def cmd_write(report: str, label: str, pulse_ns: float = 1.0) -> dict:
     rep = load_report(report)
-    out = {"label": label, "kind": "simulated", "bl_step_v": BL_STEP_V,
-           "pulse_ns": 1.0, "decision": "flipped iff Q<QB at end of pulse (1.3 ns) and at 2.5 ns",
+    out = {"label": label, "kind": "simulated", "bl_step_v": BL_STEP_V, "pulse_ns": pulse_ns,
+           "decision": f"flipped iff Q<QB at end of pulse ({_ns(WL_T0_NS + pulse_ns)}) and "
+                       f"{_ns(WL_T0_NS + pulse_ns + FINAL_AFTER_END_NS)} after it",
            "corners": []}
     for c in rep["corners"]:
         entry = {"corner_id": c["corner_id"], "klt_status": c["status"]}
@@ -178,6 +237,9 @@ def cmd_write(report: str, label: str) -> dict:
             entry["error"] = "; ".join(d["message"] for d in c.get("diagnostics", []))[:300] or "missing flip measurements"
             out["corners"].append(entry)
             continue
+        tf = m.get("tflip_0")
+        entry["flip_time_s"] = tf if isinstance(tf, (int, float)) else None
+        entry["flip_time_check"] = flip_time_check(entry["flip_time_s"], pulse_ns)
         entry["flips"] = "".join("1" if f else "0" for f in flips)
         top = max((k for k, f in enumerate(flips) if f), default=None)
         entry["monotonic"] = all(flips[k] for k in range(top + 1)) if top is not None else True
@@ -189,6 +251,18 @@ def cmd_write(report: str, label: str) -> dict:
             entry["saturated"] = top == N_LEVELS - 1
         out["corners"].append(entry)
     return out
+
+
+def cmd_write_sweep(label: str, runs: list[tuple[float, str]]) -> dict:
+    """Per corner: write margin and flip time at every pulse width (runs = (ns, write.json))."""
+    by_corner: dict[str, dict] = {}
+    for pulse_ns, path in sorted(runs):
+        for c in json.load(open(path))["corners"]:
+            by_corner.setdefault(c["corner_id"], {})[_ns(pulse_ns)] = {
+                k: c.get(k) for k in ("write_margin_v", "flip_time_s", "flip_time_check", "error")
+                if k in c}
+    return {"label": label, "kind": "simulated", "pulse_widths_ns": [p for p, _ in sorted(runs)],
+            "corners": [{"corner_id": cid, "by_pulse": v} for cid, v in sorted(by_corner.items())]}
 
 
 def main() -> int:
@@ -203,7 +277,12 @@ def main() -> int:
     elif a[0] == "snm":
         print(json.dumps(cmd_snm(a[1], a[2], a[3], a[4]), indent=2))
     elif a[0] == "write":
-        print(json.dumps(cmd_write(a[1], a[2]), indent=2))
+        pulse = float(a[4]) if len(a) > 4 and a[3] == "--pulse-ns" else 1.0
+        print(json.dumps(cmd_write(a[1], a[2], pulse), indent=2))
+    elif a[0] == "sweep-request":
+        cmd_sweep_request(a[1], a[2], a[3], float(a[4]), a[5])
+    elif a[0] == "write-sweep":
+        print(json.dumps(cmd_write_sweep(a[1], [(float(x.split("=")[0]), x.split("=", 1)[1]) for x in a[2:]]), indent=2))
     else:
         print(__doc__, file=sys.stderr)
         return 2
