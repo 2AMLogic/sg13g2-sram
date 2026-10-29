@@ -32,7 +32,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
 
 ## PRs Awaiting Review
 
@@ -56,9 +56,6 @@ Issues carrying `loom:curated`.
 
 
 
-- **#33**: Remove env_provenance.py: dead vendored gf180 helper with no callers *(hermit)*
-- **#36**: Remove mint_sim_envelope.py and render_signoff_table.py: unrunnable vendored gf180 sign-off tooling (~660 LOC) *(hermit)*
-- **#41**: Remove vendored design-evidence-tiers.md: klt 0.8.0 bundles it (~1055 LOC) *(hermit)*
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module *(hermit)*
 
 ## Epics
@@ -75,10 +72,10 @@ _None._
 | Very important | 0 |
 | Important | 1 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 1 |
-| Architect / Hermit proposals | 4 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
