@@ -84,10 +84,15 @@ margin, not a pass/fail:
   cell within a fixed **1 ns** write pulse (`spec/write-pulse-width-decision.md`).
   Strictly positive. No independent macro timing target is ratified.
 - **Access time**: clock edge to valid output, and write completion, per
-  corner. Feeds the Liberty tables. Recorded, no pass threshold.
+  corner. Feeds the Liberty tables. Recorded at every corner; the typical
+  corner (`mos_tt`, 25 °C, 1.20 V) is proposed to pass at clock-to-Q no worse
+  than the comp's 3.05 ns (`spec/access-time-target-decision.md`, Proposed,
+  not ratified; until it is, no pass threshold applies).
 
 A corner passes only when read SNM, hold SNM and write margin are strictly
-positive and access time is recorded.
+positive and access time is recorded. The proposed typical-corner access-time
+threshold (`spec/access-time-target-decision.md`, Proposed) is not in force
+until ratified.
 
 ### Statistical treatment
 
@@ -126,7 +131,9 @@ on 2026-10-17.
 
 The macro is functional across PVT once DRC and LVS are clean on the full
 array and every one of the 45 corners has a strictly positive read SNM, hold
-SNM and write margin, plus a recorded access time. A corner that cannot be
+SNM and write margin, plus a recorded access time (and, if
+`spec/access-time-target-decision.md` is ratified, the typical-corner access
+time within its threshold). A corner that cannot be
 closed is recorded as an open result, not dropped.
 
 ## Reference row: shipped `RM_IHPSG13_1P_256x32_c2_bm_bist`
