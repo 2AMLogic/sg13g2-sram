@@ -5,6 +5,16 @@ triage agent. Newest first.
 
 ### 2026-10-28
 
+- **PR #65**: refactor: share one run_klt helper across the sim run scripts
+- **Issue #61** (closed): Consolidate duplicated run_klt helper across sim/*/run_*.sh (3 diverging copies)
+- **PR #63**: docs: link gf180-sram issue for parents[2] default-root finding
+- **Issue #62** (closed): Follow-on from PR #59: file the common/ layout parents[2] finding on gf180-sram
+- **PR #60**: chore: drop unused vendored env_provenance.py and record departure
+- **Issue #33** (closed): Remove env_provenance.py: dead vendored gf180 helper with no callers
+- **PR #59**: chore: remove unrunnable vendored sign-off tooling and record the departure
+- **Issue #36** (closed): Remove mint_sim_envelope.py and render_signoff_table.py: unrunnable vendored gf180 sign-off tooling (~660 LOC)
+- **PR #58**: chore: drop vendored design-evidence-tiers.md, use klt-bundled copy
+- **Issue #41** (closed): Remove vendored design-evidence-tiers.md: klt 0.8.0 bundles it (~1055 LOC)
 - **PR #55**: feat: add array-level benches, testbench inventory and item 9 attestation
 - **Issue #26** (closed): T1 item 9 (testbenches shipped): array read/write and access-time benches, inventory and --attest 9
 - **PR #53**: feat: decoder, control, latch and macro-top schematics with item 1 attestation
