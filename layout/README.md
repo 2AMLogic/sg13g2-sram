@@ -13,7 +13,9 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Generator tests | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
-| Re-mint the macro record, socket and LEF | `./layout/reports/generate-macro.sh` |
+| Re-mint the routed-macro record, socket and LEF (~2 min, runs `klt extract`) | `./layout/reports/generate-macro-routed.sh` |
+
+`generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and now refuses to overwrite it.
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
@@ -110,22 +112,41 @@ area and the klt/deck identity are in `layout/reports/macro-record.json`.
 - **Area**: 312.56 x 565.805 um = 176,848 um2, **3.57x** the shipped macro's
   49,488.5 um2 (recorded, no threshold). The bitcells alone are 84,757 um2.
 
+### Array-interface routing (issue #94, seam 3 of #88)
+
+The wordlines and bit lines are now wired to the periphery; `layout/reports/macro-record-routed.json`
+is the new record (`macro-record.json` is unchanged).
+
+- **Wordlines** (128): GatPoly landing pad left of the array edge, Cont, Metal1, Via1, Metal2,
+  Via2, Metal3 along the row, a private Metal2 lane per wire in the decoder-to-array gap,
+  a private Metal3 track per wire above its decoder terminal row, and Via1 on the first
+  `wl_driver` device on `WL` (its PMOS drain, `XMPD`).
+- **Bit lines** (128): a Via1/Via2 stack on a Metal1 pad abutting the bottom of each stripe
+  (the stripe is unchanged), a Metal3 lane at the stripe's x, and a Metal2 jog to one `BL`/`BLB`
+  terminal of the precharge and of the column mux.
+- Terminal coordinates come from the generator's placement record, every width/spacing/via size is
+  a named constant citing its `klt deck rules` id, and all of it is Metal2/Metal3/Via1/Via2.
+- **Area**: the 128 lanes at 0.42 um pitch widen the decoder-to-array gap from 3.0 to
+  55.34 um: 364.9 x 565.805 um = 206,462 um2, **4.17x** the shipped macro (was 3.57x). Recorded,
+  not a requirement.
+- **Evidence** (array interface only; reference comparison is #30): the layout net trace in
+  `test_macro.py` connects 128/128 wordlines (poly row to driver terminal) and 128/128 bit-line
+  nets (stripe to both terminals), with no short among those 256 nets; `klt extract` agrees
+  (128 wordline nets, each with 128 access gates; 128 bit-line nets carrying the macro,
+  precharge and mux labels). `klt drc --deck sg13g2` reports the same 522 `nwell.space.1` as the
+  unrouted macro and nothing on Metal2, Metal3 or the vias. The tests delete one Via2 / Via1 and
+  assert the trace then fails.
+
 ### What this macro is not (read before citing it)
 
-Issue #88 is landing in steps; this is the state after step 1 (taps). Every
-periphery transistor now carries a body tie (n+ Activ in the PMOS well; p+ Activ
-in pSD for NMOS) with a Metal1 pad labelled with the netlist bulk net. The ties
-are **not wired to a rail**, and there is still **no signal routing**: none in the
-periphery, none between the array and the column path or decoder, no wordline
-routing, no supply rails, and the LEF pins connect to nothing. `klt extract`
-recognises all 51,948 devices (34,118 nfet / 17,830 pfet, equal to the netlist's
-flattened count) but the nets are not the netlist's, so the macro is not
-LVS-able. Result: `layout/reports/macro-record-taps.json` (the #87 record
-`macro-record.json` is unchanged). Area 333.560 x 573.045 um = 191,144.9 um2,
-**3.86x** the reference.
-
-Known: the macro DRC (`klt drc --deck sg13g2`) reports `nwell.space.1` only, 522 on
-the #87 layout and 563 with the taps (the 41 added are the same rule, in the packed
-periphery); full macro DRC is #29. Remaining for #88, in order: supply rails and
-tie-to-rail, array-to-column-path and wordline routing, periphery signal nets and
-pin connection. Unrun here: PDK-native DRC and `klt array-check`.
+It is **partly routed**. The array interface (wordlines, bit lines) is wired, and every
+periphery transistor now carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
+with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`). The
+ties are **not wired to a rail**. There is still no signal wiring inside the periphery (a net
+with several device terminals in one cell, such as `BL` on both precharge PMOS drains, is reached
+at one of them) and none to the macro pins; no supply rails (#92). The LEF pins are drawn Metal2
+but are not connected to the logic, so the macro is not LVS-able yet. The wordline label on
+GatPoly text (5/1) sits mid-cell, off the poly row, and is not read by `klt extract`; the
+wordline nets take their names from the driver labels. Routing the rest is #92 and #95; #29
+(DRC), #30 (LVS) and #31 (power ERC) cannot proceed past them. Unrun here: the PDK-native DRC,
+`klt array-check`, and DRC of the periphery against rules the curated deck lacks.

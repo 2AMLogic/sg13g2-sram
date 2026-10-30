@@ -15,7 +15,7 @@
         "check": "stream_readable",
         "role": "layout",
         "passed": true,
-        "content_hash": "sha256:33c963621913482a613487e4a20ec2fd17d59747aeb46a3efaaa70cd16dc4c77"
+        "content_hash": "sha256:b8e3fdf449370701cb92e72747f290f3c096754270ec8b44c471c7126d6d29e2"
       },
       {
         "check": "top_cell_non_empty",
@@ -43,11 +43,11 @@
         "path": "layout/sram_256x32/macro.gds",
         "scope": "repo"
       },
-      "content_hash": "sha256:33c963621913482a613487e4a20ec2fd17d59747aeb46a3efaaa70cd16dc4c77"
+      "content_hash": "sha256:b8e3fdf449370701cb92e72747f290f3c096754270ec8b44c471c7126d6d29e2"
     },
     "regeneration": {
       "generator": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-      "regenerated_hash": "sha256:33c963621913482a613487e4a20ec2fd17d59747aeb46a3efaaa70cd16dc4c77"
+      "regenerated_hash": "sha256:b8e3fdf449370701cb92e72747f290f3c096754270ec8b44c471c7126d6d29e2"
     }
   }
 }

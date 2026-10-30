@@ -1,0 +1,86 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+  "record_command": "./layout/reports/generate-macro-routed.sh",
+  "supersedes_nothing": "macro-record.json (unrouted, #28) is kept as it was",
+  "gds": {
+    "layout/sram_256x32/macro.gds": "b8e3fdf449370701cb92e72747f290f3c096754270ec8b44c471c7126d6d29e2"
+  },
+  "lef": {
+    "layout/sram_256x32/macro.lef": "9e30bad35d2520218e029d0123e5b98ed525fd11b2f9915888deb046588edf94"
+  },
+  "socket": {
+    "layout/sram_256x32/macro.socket.json": "8c0f5b205190e9b60b8a39a2baba553877f776e965fdd3dbd89faf08b3d813c2"
+  },
+  "top_cell": "macro",
+  "macro_size_um": {
+    "x": 385.9,
+    "y": 573.045
+  },
+  "macro_area_um2": 221138.1,
+  "area_ratio_vs_reference": 4.47,
+  "area_change_vs_unrouted": {
+    "unrouted_area_um2": 176848.0,
+    "wordline_fanout_gap_um": 55.34,
+    "reason": "128 private Metal2 lanes at 0.42 um pitch between row decoder and array"
+  },
+  "routing": {
+    "layers": [
+      "Metal2",
+      "Metal3",
+      "Via1",
+      "Via2"
+    ],
+    "wordline_nets": 128,
+    "bitline_nets": 128,
+    "bitline_terminals": "one BL/BLB device terminal per precharge and per column mux (no periphery-internal routing: #95)",
+    "wordline_terminal": "drain of the first wl_driver device on WL (XMPD)"
+  },
+  "array_interface_connectivity": {
+    "geometric_trace": {
+      "wordlines_connected_of_128": 128,
+      "bitlines_connected_of_128": 128,
+      "distinct_wordline_nets": 128,
+      "distinct_bitline_nets": 128,
+      "wordline_or_bitline_shorted": false
+    },
+    "klt_extract": {
+      "bitline_nets_with_macro_precharge_and_mux_labels_of_128": 128,
+      "wordline_nets_named_from_driver_of_128": 128,
+      "access_gates_per_wordline_net": [
+        128
+      ],
+      "extract_device_count": 51948,
+      "extract_net_count": 26233
+    },
+    "note": "comparison against design/macro/macro.spice is LVS (#30), not made here"
+  },
+  "drc": {
+    "status": "violations",
+    "violation_count": 563,
+    "rule_counts": {
+      "nwell.space.1": 563
+    },
+    "unrouted_macro_violation_count": 522,
+    "note": "same 522 nwell.space.1 as the unrouted macro; no Metal2/Metal3/Via violations"
+  },
+  "socket_check": {
+    "status": "pass"
+  },
+  "lef_obs_mode": "coarse",
+  "not_drawn": [
+    "periphery signal routing",
+    "supply rails and body ties (#92)",
+    "periphery net and pin routing (#95)"
+  ],
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    }
+  },
+  "klt_version": "klt 0.8.1.dev774+g0c5e1675358e"
+}

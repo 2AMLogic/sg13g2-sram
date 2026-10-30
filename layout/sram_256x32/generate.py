@@ -70,7 +70,13 @@ GRID = 5  # manufacturing grid in dbu (0.005 um)
 
 L_METAL2 = (10, 0)
 L_METAL2_LBL = (10, 25)
+L_VIA1 = (19, 0)
+L_VIA2 = (29, 0)
+L_METAL3 = (30, 0)
 LAYER_NAMES = dict(bc._LAYER_NAMES)
+LAYER_NAMES[L_VIA1] = "Via1"
+LAYER_NAMES[L_VIA2] = "Via2"
+LAYER_NAMES[L_METAL3] = "Metal3"
 LAYER_NAMES[L_METAL2] = "Metal2"
 LAYER_NAMES[L_METAL2_LBL] = "Metal2_text"
 
@@ -83,9 +89,35 @@ SLICE_MARGIN = 0.4  # um kept clear on each side of a slice's column path
 PIN = 0.5  # um, macro pin square on Metal2
 PIN_PITCH = 1.0  # um between left-edge pins
 
+# ---- inter-block routing (rule values from `klt deck rules --deck sg13g2`) ----
+V1 = 0.19  # V1.a: Via1 is a fixed 0.19 square
+V1_SPACE = 0.22  # V1.b
+M1_ENC_V1 = 0.01  # V1.c: Metal1 enclosure of Via1
+M1_V1_PAD = V1 + 2 * M1_ENC_V1  # 0.21: Metal1 landing pad for a Via1 on a 0.20 wire
+M2_W = 0.20  # M2.a
+M2_SPACE = 0.21  # M2.b
+V2 = 0.19  # V2.a
+V2_SPACE = 0.22  # V2.b
+M3_W = 0.20  # M3.a
+M3_SPACE = 0.21  # M3.b
+# Metal2/3 wires are 0.20 wide, so a Via (0.19) is enclosed by 0.005 per side (V2.c 0.005)
+M2_ENC_V2 = 0.005
+TRACK_PITCH = M3_W + M3_SPACE  # 0.41: private Metal3 track pitch (M2: same widths)
+LANE_PITCH = 0.42  # Metal2 lane pitch in the wordline gap (>= M2_W + M2_SPACE)
+TRACK_OFFSET = 0.5  # first private track above its decoder terminal row
+LANE_MARGIN = 1.0  # um clear of the decoder edge / the array edge
+WL_PAD_X = -0.25  # x of the wordline contact column, left of the array edge
+BL_VIA_Y = -0.15  # y of the Via1 stack under each bit-line stripe
+WL_FANOUT_GAP = round(2 * LANE_MARGIN + (ROWS - 1) * LANE_PITCH, 3)  # decoder-to-array gap
+
 
 def dbu(v: float) -> int:
     return int(round(v / DBU))
+
+
+def snap(v: float) -> float:
+    """Round to the 0.005 um manufacturing grid."""
+    return round(v / (GRID * DBU)) * (GRID * DBU)
 
 
 # ---------------------------------------------------------------------------
@@ -152,6 +184,10 @@ class Gen:
         self.devs: dict[tuple[str, float, float], tuple[kdb.Cell, dict]] = {}
         self.cells: dict[str, kdb.Cell] = {}
         self.nl = parse_netlist(NETLIST)
+        # placement record: subckt -> {instance name: (dx, dy in dbu)}; devices
+        # also keep their D/G/S terminal points (um, in the parent's frame)
+        self.place_of: dict[str, dict[str, tuple[int, int]]] = {}
+        self.dev_pts: dict[str, dict[str, dict[str, tuple[float, float]]]] = {}
 
     def li(self, lp: tuple[int, int]) -> int:
         return self.layout.layer(*lp)
@@ -275,9 +311,13 @@ class Gen:
         widest = max(c.bbox().width() for c in items) * DBU
         mw = max_w if max_w is not None else max(widest, math.sqrt(area) * 1.6)
         placed, _, _ = self.pack(items, mw)
+        self.place_of[name] = {}
+        self.dev_pts[name] = {}
         for (inst, ch, pts), (_, dx, dy) in zip(meta, placed):
             self.place(cell, ch, dx, dy)
+            self.place_of[name][inst.name] = (dx, dy)
             if pts is not None:
+                self.dev_pts[name][inst.name] = {t: (p[0] + dx * DBU, p[1] + dy * DBU) for t, p in pts.items()}
                 # SPICE order: d g s b (B is the body tie)
                 for term, net in zip("DGSB", inst.nets[:4]):
                     px, py = pts[term]
@@ -294,6 +334,185 @@ class Gen:
         if name in ("precharge", "column_mux", "sense_amp", "write_driver"):
             return self.subckt(name, max_w=2 * bc.W_CELL - 2 * SLICE_MARGIN)
         return self.subckt(name)
+
+
+    # ---- routing ----------------------------------------------------------
+    def terminal(self, cellname: str, net: str) -> tuple[float, float] | None:
+        """Metal1 terminal point (um, in ``cellname``'s frame) of the first
+        device in the subcircuit hierarchy whose D/G/S is on ``net`` (a port of
+        ``cellname``), from the placement record."""
+        for inst in self.nl[cellname].insts:
+            off = self.place_of[cellname].get(inst.name)
+            if off is None:
+                continue
+            if inst.name in self.dev_pts[cellname]:
+                for t, n in zip("DGS", inst.nets[:3]):
+                    if n == net:
+                        return self.dev_pts[cellname][inst.name][t]
+            else:
+                sub = self.nl[inst.ref]
+                for port, n in zip(sub.ports, inst.nets):
+                    if n == net:
+                        r = self.terminal(inst.ref, port)
+                        if r is not None:
+                            return (r[0] + off[0] * DBU, r[1] + off[1] * DBU)
+        return None
+
+    def rect(self, cell: kdb.Cell, lp, cx: float, cy: float, w: float, h: float) -> None:
+        self.box(cell, lp, snap(cx - w / 2), snap(cy - h / 2), snap(cx + w / 2), snap(cy + h / 2))
+
+    def via_pad(self, cell: kdb.Cell, via, x: float, y: float) -> None:
+        self.rect(cell, via, x, y, V1, V1)
+
+    def seg(self, cell: kdb.Cell, lp, w: float, x0: float, y0: float, x1: float, y1: float) -> None:
+        """Manhattan wire of width w between two centre points (square ends)."""
+        self.box(cell, lp, snap(min(x0, x1) - w / 2), snap(min(y0, y1) - w / 2),
+                 snap(max(x0, x1) + w / 2), snap(max(y0, y1) + w / 2))
+
+    def m1_via1(self, cell: kdb.Cell, x: float, y: float) -> None:
+        """Via1 on a Metal1 landing pad, with a Metal2 pad over it."""
+        self.rect(cell, bc.L_METAL1, x, y, M1_V1_PAD, M1_V1_PAD)
+        self.via_pad(cell, L_VIA1, x, y)
+        self.rect(cell, L_METAL2, x, y, M2_W, M2_W)
+
+    def route_bitlines(self, cell: kdb.Cell) -> None:
+        """Bit-line stripe bottoms to one BL/BLB terminal of the precharge and of
+        the column mux. Per net: Via1 stack under the stripe, a Metal3 lane at the
+        stripe's own x, and a Metal2 jog from each terminal to the lane (the jog
+        y moves down in 0.1 um steps until it clears the other nets' Metal2)."""
+        self.bl_terms: dict[str, list[tuple[float, float]]] = {}
+        sl = {}  # net -> (stripe x, [terminal (x, y)])
+        for inst in self.nl["bit_slice"].insts:
+            if inst.ref != "bl_pair":
+                continue
+            col = int(inst.name[-1])
+            fx = (lambda x, c=col: (c + 1) * bc.W_CELL - x if c % 2 else c * bc.W_CELL + x)
+            sl[f"BL{col}"] = (snap(fx(bc.xc("pad_bl"))), [])
+            sl[f"BLB{col}"] = (snap(fx(bc.xc("pad_blb"))), [])
+        for inst in self.nl["bit_slice"].insts:
+            off = self.place_of["bit_slice"].get(inst.name)
+            if off is None or inst.ref not in ("precharge", "column_mux"):
+                continue
+            sub = self.nl[inst.ref]
+            for port, n in zip(sub.ports, inst.nets):
+                if n in sl:
+                    t = self.terminal(inst.ref, port)
+                    assert t is not None, (inst.name, port)
+                    sl[n][1].append((snap(t[0] + off[0] * DBU), snap(t[1] + off[1] * DBU)))
+        # every net's Metal2 pads are obstacles for the others from the start
+        def pad_region(x: float, y: float) -> kdb.Region:
+            return kdb.Region(kdb.Box(dbu(x - M2_W / 2), dbu(y - M2_W / 2), dbu(x + M2_W / 2), dbu(y + M2_W / 2)))
+
+        placed: dict[str, kdb.Region] = {}
+        for net, (xs, terms) in sl.items():
+            placed[net] = pad_region(xs, BL_VIA_Y)
+            for tx, ty in terms:
+                placed[net] += pad_region(tx, ty)
+        for net, (xs, terms) in sl.items():
+            self.m1_via1_stripe(cell, xs)
+            mine = kdb.Region()
+            lane_bot = BL_VIA_Y
+            for tx, ty in sorted(terms, key=lambda t: -t[1]):
+                self.m1_via1(cell, tx, ty)
+                for k in range(0, 40):
+                    yh = snap(ty - 0.1 * k)
+                    cand = kdb.Region()
+                    for (x0, y0, x1, y1) in ((tx, ty, tx, yh), (tx, yh, xs, yh)):
+                        w = M2_W
+                        cand.insert(kdb.Box(dbu(min(x0, x1) - w / 2), dbu(min(y0, y1) - w / 2),
+                                            dbu(max(x0, x1) + w / 2), dbu(max(y0, y1) + w / 2)))
+                    other = kdb.Region()
+                    for n2, rg in placed.items():
+                        if n2 != net:
+                            other += rg
+                    if (cand.sized(dbu(M2_SPACE) - 1) & other).is_empty():
+                        break
+                else:
+                    raise AssertionError(f"no clear Metal2 jog for {net} at {tx},{ty}")
+                self.seg(cell, L_METAL2, M2_W, tx, ty, tx, yh)
+                self.seg(cell, L_METAL2, M2_W, tx, yh, xs, yh)
+                self.via_pad(cell, L_VIA2, xs, yh)
+                mine += cand
+                lane_bot = min(lane_bot, yh)
+                self.bl_terms.setdefault(net, []).append((tx, ty))
+            self.seg(cell, L_METAL3, M3_W, xs, BL_VIA_Y, xs, lane_bot)
+            placed[net] = placed[net] + mine
+        self.bl_stripe_x = {n: v[0] for n, v in sl.items()}
+
+    def m1_via1_stripe(self, cell: kdb.Cell, xs: float) -> None:
+        """Via1/Via2 stack just below the bottom of a Metal1 stripe (the stripe
+        itself is not altered; the pad abuts its bottom end)."""
+        pad_bot = BL_VIA_Y - V1 / 2 - M1_ENC_V1
+        self.box(cell, bc.L_METAL1, snap(xs - M1_V1_PAD / 2), snap(pad_bot), snap(xs + M1_V1_PAD / 2), 0.0)
+        self.via_pad(cell, L_VIA1, xs, BL_VIA_Y)
+        self.rect(cell, L_METAL2, xs, BL_VIA_Y, M2_W, M2_W)
+        self.via_pad(cell, L_VIA2, xs, BL_VIA_Y)
+
+    def wl_y(self, r: int) -> float:
+        """y centre of wordline r's GatPoly row (odd rows are Y-mirrored)."""
+        yc = 0.5 * (bc.Y_WL[0] + bc.Y_WL[1])
+        return snap(r * bc.H_CELL + yc if r % 2 == 0 else (r + 1) * bc.H_CELL - yc)
+
+    def route_wordlines(self, top: kdb.Cell) -> None:
+        """Wordline r: poly pad at the array's left edge -> Cont -> Metal1 -> Via1 ->
+        Metal2/Via2 -> Metal3 (y = wl_y) -> Metal2 lane (private x) -> Metal3 track
+        (private y above the decoder terminal) -> Via1 on the wl_driver output."""
+        rd = self.place_of[TOP]["row_decoder"]
+        x_e = rd[0] * DBU + self.cells["row_decoder"].bbox().right * DBU
+        self.wl_terms: dict[int, tuple[float, float]] = {}
+        for r in range(ROWS):
+            t = self.terminal("row_decoder", f"WL[{r}]")
+            assert t is not None, r
+            self.wl_terms[r] = (snap(t[0] + rd[0] * DBU), snap(t[1] + rd[1] * DBU))
+        # private Metal3 track per net, stacked above its terminal row
+        rows: dict[float, list[int]] = {}
+        for r, (_, ty) in self.wl_terms.items():
+            rows.setdefault(round(ty, 2), []).append(r)
+        track: dict[int, float] = {}
+        ys_sorted = sorted(rows)
+        for i, ty in enumerate(ys_sorted):
+            nets = sorted(rows[ty], key=lambda r: -self.wl_terms[r][0])
+            for k, r in enumerate(nets):
+                track[r] = snap(self.wl_terms[r][1] + TRACK_OFFSET + k * TRACK_PITCH)
+            if i + 1 < len(ys_sorted):  # the next row's Metal2 pad must stay clear
+                assert track[nets[-1]] + M2_W / 2 + M2_SPACE <= ys_sorted[i + 1] - M2_W / 2, ty
+        # lane order: a before b when a's decoder track is within Metal3 spacing of
+        # b's array-side run (so a's run ends before b's starts)
+        pitch = M3_W + M3_SPACE
+        before = {r: set() for r in range(ROWS)}
+        for a in range(ROWS):
+            for b in range(ROWS):
+                if a != b and abs(track[a] - self.wl_y(b)) < pitch - 1e-6:
+                    before[b].add(a)
+        order: list[int] = []
+        done: set[int] = set()
+        while len(order) < ROWS:
+            ready = [r for r in range(ROWS) if r not in done and before[r] <= done]
+            assert ready, "cyclic wordline lane constraints"
+            order.append(ready[0])
+            done.add(ready[0])
+        lane = {r: snap(x_e + LANE_MARGIN + i * LANE_PITCH) for i, r in enumerate(order)}
+        assert max(lane.values()) + M2_W / 2 + M2_SPACE <= WL_PAD_X - M2_W / 2, "lanes overrun the array pad column"
+        for r in range(ROWS):
+            tx, ty = self.wl_terms[r]
+            ya, yt, xl = self.wl_y(r), track[r], lane[r]
+            self.m1_via1(top, tx, ty)
+            self.seg(top, L_METAL2, M2_W, tx, ty, tx, yt)  # stub up to the private track
+            self.via_pad(top, L_VIA2, tx, yt)
+            self.seg(top, L_METAL3, M3_W, tx, yt, xl, yt)
+            self.via_pad(top, L_VIA2, xl, yt)
+            self.seg(top, L_METAL2, M2_W, xl, yt, xl, ya)  # private lane to the wordline's y
+            self.via_pad(top, L_VIA2, xl, ya)
+            self.seg(top, L_METAL3, M3_W, xl, ya, WL_PAD_X, ya)
+            self.via_pad(top, L_VIA2, WL_PAD_X, ya)
+            self.m1_via1(top, WL_PAD_X, ya)
+            # Cont on a GatPoly landing pad, joined to the row's left end
+            self.rect(top, bc.L_GATPOLY, WL_PAD_X, ya, bc.POLY_PAD, bc.POLY_PAD)
+            self.box(top, bc.L_GATPOLY, snap(WL_PAD_X + bc.POLY_PAD / 2), snap(ya - 0.08), 0.0, snap(ya + 0.08))
+            self.rect(top, bc.L_CONT, WL_PAD_X, ya, bc.CO, bc.CO)
+            self.rect(top, bc.L_METAL1, WL_PAD_X, ya, bc.CO + 2 * bc.CO_ENC_M1, bc.CO + 2 * bc.CO_ENC_M1)
+        self.wl_lane = lane
+        self.wl_track = track
 
     # ---- array ------------------------------------------------------------
     def bitcell(self) -> kdb.Cell:
@@ -337,6 +556,7 @@ class Gen:
                 else:
                     self.place(cell, pair, col * w, 0)
         y = -dbu(2.0)
+        self.place_of["bit_slice"] = {}
         for inst in self.nl["bit_slice"].insts:
             if inst.ref in ("bl_pair",) or inst.ref in ("sg13_lv_nmos", "sg13_lv_pmos"):
                 continue
@@ -346,8 +566,10 @@ class Gen:
             dy = y - bb.top
             assert dx % GRID == 0 and dy % GRID == 0
             self.place(cell, ch, dx, dy)
+            self.place_of["bit_slice"][inst.name] = (dx, dy)
             y = y - bb.height() - dbu(PACK_GAP)
         assert arr_h > 0
+        self.route_bitlines(cell)
         return cell
 
     # ---- macro ------------------------------------------------------------
@@ -366,7 +588,7 @@ class Gen:
 
         # left block: address latch, control, row decoder, right-aligned to the array
         by = 0
-        right = -dbu(BLOCK_GAP)
+        right = -dbu(WL_FANOUT_GAP)
         for ref in ("addr_latch", "control", "row_decoder"):
             ch = self.build(ref)
             bb = ch.bbox()
@@ -374,6 +596,7 @@ class Gen:
             dy = by - bb.bottom
             assert dx % GRID == 0 and dy % GRID == 0
             self.place(top, ch, dx, dy)
+            self.place_of.setdefault(TOP, {})[ref] = (dx, dy)
             by += bb.height() + dbu(BLOCK_GAP)
 
         # bottom block: data latch and output latch under the column path
@@ -394,6 +617,8 @@ class Gen:
             self.text(top, bc.L_METAL1_LBL, f"BLB{c}", fx(bc.xc("pad_blb")), 0.5 * bc.H_CELL)
         self.text(top, bc.L_METAL1_LBL, "VSS", bc.xc("pad_c"), 0.5 * (bc.Y_PTIE[1] + bc.Y_N[0]))
         self.text(top, bc.L_METAL1_LBL, "VDD", bc.xc("pad_c"), 0.5 * (bc.Y_P[1] + bc.Y_NTIE[0]))
+
+        self.route_wordlines(top)
 
         # pins on the content bounding box
         bb = top.bbox()
