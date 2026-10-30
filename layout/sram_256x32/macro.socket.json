@@ -1,0 +1,1416 @@
+{
+  "schema": "klt.socket/1",
+  "name": "sg13g2-sram macro",
+  "outline": {
+    "x0": -128.64000000000001,
+    "y0": -104.29,
+    "x1": 183.92000000000002,
+    "y1": 461.515
+  },
+  "pins": [
+    {
+      "name": "D[0]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 1.62,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[0]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 4.12,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[1]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 7.36,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[1]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 9.86,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[2]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 13.1,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[2]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 15.6,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[3]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 18.84,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[3]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 21.34,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[4]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 24.58,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[4]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 27.08,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[5]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 30.32,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[5]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 32.82,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[6]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 36.06,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[6]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 38.56,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[7]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 41.8,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[7]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 44.3,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[8]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 47.54,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[8]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 50.04,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[9]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 53.28,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[9]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 55.78,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[10]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 59.02,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[10]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 61.52,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[11]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 64.76,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[11]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 67.26,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[12]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 70.5,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[12]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 73.0,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[13]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 76.24,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[13]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 78.74,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[14]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 81.98,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[14]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 84.48,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[15]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 87.72,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[15]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 90.22,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[16]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 93.46,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[16]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 95.96,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[17]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 99.2,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[17]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 101.7,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[18]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 104.94,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[18]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 107.44,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[19]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 110.68,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[19]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 113.18,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[20]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 116.42,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[20]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 118.92,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[21]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 122.16,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[21]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 124.66,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[22]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 127.9,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[22]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 130.4,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[23]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 133.64,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[23]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 136.14,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[24]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 139.38,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[24]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 141.88,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[25]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 145.12,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[25]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 147.62,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[26]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 150.86,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[26]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 153.36,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[27]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 156.6,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[27]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 159.1,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[28]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 162.34,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[28]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 164.84,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[29]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 168.08,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[29]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 170.58,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[30]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 173.82,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[30]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 176.32,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "D[31]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 179.56,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "Q[31]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": 182.06,
+      "y": -104.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "OUTPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[7]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -103.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[6]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -102.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[5]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -101.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[4]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -100.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[3]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -99.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[2]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -98.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[1]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -97.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "A[0]",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -96.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "CEN",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -95.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "CLK",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -94.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "CLOCK"
+    },
+    {
+      "name": "GWEN",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -93.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "WEN",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -92.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INPUT",
+      "use": "SIGNAL"
+    },
+    {
+      "name": "VDD",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -91.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INOUT",
+      "use": "POWER"
+    },
+    {
+      "name": "VSS",
+      "layer": [
+        10,
+        25
+      ],
+      "metal_layer": [
+        10,
+        0
+      ],
+      "x": -128.39,
+      "y": -90.04,
+      "tolerance_um": 0.01,
+      "width_um": 0.5,
+      "height_um": 0.5,
+      "direction": "INOUT",
+      "use": "GROUND"
+    }
+  ]
+}

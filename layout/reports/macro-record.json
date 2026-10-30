@@ -1,0 +1,52 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+  "record_command": "./layout/reports/generate-macro.sh",
+  "gds": {
+    "layout/sram_256x32/macro.gds": "c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3"
+  },
+  "lef": {
+    "layout/sram_256x32/macro.lef": "b1f5e365cf3179f79e01a9af6a6e29861e1b2381947c96999f83efaec6f53264"
+  },
+  "socket": {
+    "layout/sram_256x32/macro.socket.json": "3ed31b5a152a1a9f42503fb5144eee4b74419b37f3c932dc4717cdc9dc428ce3"
+  },
+  "top_cell": "macro",
+  "organization": "128 rows x 64 columns (mux 2), 32 bit_slice",
+  "bitcell_instances_flattened": 8192,
+  "bl_pair_bitcell_instances": 128,
+  "bit_slice_instances": 7,
+  "macro_size_um": {
+    "x": 312.56,
+    "y": 565.805
+  },
+  "macro_area_um2": 176848.0,
+  "array_area_um2": 84757.3,
+  "reference_area_um2": 49488.5,
+  "reference": "shipped sg13g2_sram 256x32 macro, 416.64 x 118.78 um (spec/bitcell-decision.md)",
+  "area_ratio_vs_reference": 3.57,
+  "socket_check": {
+    "status": "pass"
+  },
+  "lef_pin_geometry_sources": [
+    "drawn"
+  ],
+  "lef_obs_mode": "coarse",
+  "edge_and_corner_dummies": "none drawn (ties are in-cell)",
+  "not_drawn": [
+    "periphery signal routing",
+    "array-to-column-path routing",
+    "periphery well/substrate taps",
+    "pin routing"
+  ],
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    }
+  },
+  "klt_version": "klt 0.8.1.dev756+g73edb5d655c3"
+}
