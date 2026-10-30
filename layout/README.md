@@ -112,12 +112,20 @@ area and the klt/deck identity are in `layout/reports/macro-record.json`.
 
 ### What this macro is not (read before citing it)
 
-It is placed and labelled, **not routed**. There is no signal wiring in the
-periphery, between the array and the column path, the decoder or the pins; no
-well or substrate taps outside the bitcell; no body connections. The LEF pins are
-real drawn Metal2 but connect to nothing, so the macro has no extractable
-connectivity and is not LVS-able. Item 2 as the checklist defines it (a committed
-stream, reproducibly generated) is attested; routing is the work that #29 (DRC),
-#30 (LVS) and #31 (power ERC) cannot proceed past, and needs its own issue. Unrun
-here: DRC of the macro (the periphery devices use bitcell-derived rule constants
-and are unchecked), the PDK-native DRC, and `klt array-check`.
+Issue #88 is landing in steps; this is the state after step 1 (taps). Every
+periphery transistor now carries a body tie (n+ Activ in the PMOS well; p+ Activ
+in pSD for NMOS) with a Metal1 pad labelled with the netlist bulk net. The ties
+are **not wired to a rail**, and there is still **no signal routing**: none in the
+periphery, none between the array and the column path or decoder, no wordline
+routing, no supply rails, and the LEF pins connect to nothing. `klt extract`
+recognises all 51,948 devices (34,118 nfet / 17,830 pfet, equal to the netlist's
+flattened count) but the nets are not the netlist's, so the macro is not
+LVS-able. Result: `layout/reports/macro-record-taps.json` (the #87 record
+`macro-record.json` is unchanged). Area 333.560 x 573.045 um = 191,144.9 um2,
+**3.86x** the reference.
+
+Known: the macro DRC (`klt drc --deck sg13g2`) reports `nwell.space.1` only, 522 on
+the #87 layout and 563 with the taps (the 41 added are the same rule, in the packed
+periphery); full macro DRC is #29. Remaining for #88, in order: supply rails and
+tie-to-rail, array-to-column-path and wordline routing, periphery signal nets and
+pin connection. Unrun here: PDK-native DRC and `klt array-check`.
