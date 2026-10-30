@@ -54,3 +54,21 @@ klt lvs "{\"layout\":{\"netlist\":\"$WORK/tile.spice\",\"top\":\"sg13g2_sram_bit
 
 hr "5. generator tests (determinism, W/L read-back, LVS teeth)"
 (cd layout/bitcell && uv run --with pytest --with klayout pytest -q test_bitcell.py)
+
+hr "6. macro: regenerate (the committed GDS, socket and LEF must not change)"
+D=layout/sram_256x32
+cp $D/macro.gds "$WORK/macro.gds.committed"
+cp $D/macro.socket.json "$WORK/macro.socket.json.committed"
+$PY $D/generate.py
+klt lef-abstract $D/macro.gds --socket $D/macro.socket.json --macro-name macro \
+  --cell-library sg13g2_stdcell --pdk ihp-sg13g2 --obs-mode coarse -o "$WORK/macro.lef" > /dev/null
+if cmp -s "$WORK/macro.gds.committed" $D/macro.gds && cmp -s "$WORK/macro.socket.json.committed" $D/macro.socket.json \
+   && cmp -s "$WORK/macro.lef" $D/macro.lef; then
+  echo "PASS: regenerated macro GDS, socket and LEF are identical to the committed files"
+else
+  echo "FAIL: regenerated macro outputs differ from the committed files"; exit 1
+fi
+
+hr "7. macro: socket-check and generator tests (8192 bitcells, LEF pins = netlist ports)"
+klt socket-check --socket $D/macro.socket.json $D/macro.gds
+(cd $D && uv run --with pytest --with klayout pytest -q test_macro.py)

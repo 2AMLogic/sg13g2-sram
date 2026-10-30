@@ -1,7 +1,7 @@
 # layout
 
-Bitcell layout for the SG13G2 6T SRAM (issue #27, T1 checklist item 2, bitcell
-step). Array, periphery and macro views are #28 and later.
+Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
+(issue #28), both T1 checklist item 2. Macro DRC, LVS and power delivery are #29-#31.
 
 ## Entry points
 
@@ -11,6 +11,9 @@ step). Array, periphery and macro views are #28 and later.
 | Regenerate, then DRC / extract / LVS / tests | `./layout/verify.sh` |
 | Re-mint the evidence reports | `./layout/reports/generate.sh` |
 | Generator tests | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
+
+| Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
+| Re-mint the macro record, socket and LEF | `./layout/reports/generate-macro.sh` |
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
@@ -83,3 +86,38 @@ The cell does not use the marker. See `layout/reports/sram-rule-survey.md`.
 Files in `layout/reports/` are not edited to change a result. A re-run after a
 layout or klt change is committed as a new result with the reason in the
 commit message.
+
+## Macro (`layout/sram_256x32/`, issue #28)
+
+`generate.py` builds top cell `macro` (128 rows x 64 columns, mux 2; the directory
+name follows the 256 x 32 capacity) from `design/macro/macro.spice`. Outputs:
+`macro.gds`, `macro.socket.json` (the descriptor `klt lef-abstract` consumes) and
+`macro.lef` (`--obs-mode coarse`, PDK `ihp-sg13g2`). Hashes, flattened counts,
+area and the klt/deck identity are in `layout/reports/macro-record.json`.
+
+- **Array**: the bitcell of `layout/bitcell/generate.py`, as cell `bitcell`
+  (unlabelled; same geometry as `sg13g2_sram_bitcell_6t`). 8192 instances via
+  `bl_pair` (128) x 64 columns in 32 `bit_slice`. Odd rows mirror in Y, odd
+  columns in X. No edge or corner dummies: ties are in-cell.
+- **Periphery**: every other subcircuit is a cell of the netlist's name made of real
+  transistors at the netlist's W/L (Activ, GatPoly, Cont, Metal1, NWell, pSD), net
+  names as Metal1 labels. Column-path cells sit under their bit-line pair at the
+  slice pitch; the decoder, control and address latch sit left of the array; the
+  data and output latches sit below the column path.
+- **Pins**: 0.5 um Metal2 squares on the boundary (D/Q on the bottom edge, A, CEN,
+  CLK, GWEN, WEN, VDD, VSS on the left), labelled on Metal2 text. `klt socket-check`
+  passes; every LEF pin reports `geometry_source: drawn`.
+- **Area**: 312.56 x 565.805 um = 176,848 um2, **3.57x** the shipped macro's
+  49,488.5 um2 (recorded, no threshold). The bitcells alone are 84,757 um2.
+
+### What this macro is not (read before citing it)
+
+It is placed and labelled, **not routed**. There is no signal wiring in the
+periphery, between the array and the column path, the decoder or the pins; no
+well or substrate taps outside the bitcell; no body connections. The LEF pins are
+real drawn Metal2 but connect to nothing, so the macro has no extractable
+connectivity and is not LVS-able. Item 2 as the checklist defines it (a committed
+stream, reproducibly generated) is attested; routing is the work that #29 (DRC),
+#30 (LVS) and #31 (power ERC) cannot proceed past, and needs its own issue. Unrun
+here: DRC of the macro (the periphery devices use bitcell-derived rule constants
+and are unchecked), the PDK-native DRC, and `klt array-check`.
