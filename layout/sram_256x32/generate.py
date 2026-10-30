@@ -30,12 +30,28 @@ What is drawn
 * **Macro pins**: Metal2 squares on the macro boundary, each labelled on
   Metal2 text (10/25), named as in ``.subckt macro``.
 
+Leaf-cell signal nets (issue #104)
+---------------------------------
+``MazeRouter`` is the net-aware router the periphery nets are drawn with: a two-layer (Metal2 vertical-
+preferred, Metal3 horizontal-preferred, joined by Via2) maze on a 0.05 um lattice. Wires are M2.a wide, a
+net keeps M2.b / M3.b to every other net's shape (and V2.b between vias), and nets cross on different layers.
+``flat_nets`` resolves the hierarchical nets of ``design/macro/macro.spice`` to flat nets per instance path
+(supply, bit-line and wordline nets flagged as excluded). Every net with two or more D/G/S terminals inside
+``inv``, ``inv_x4``, ``dlatch``, ``nand2/3/4``, ``nor2``, ``precharge``, ``column_mux``, ``sense_amp`` and
+``write_driver`` is joined: Via1 on the terminal's Metal1, then the router. The routes stay inside the cell
+bounding box. The column-path cells are routed after the bit-line jogs and lanes, which are obstacles to them;
+the other cells are packed ``LEAF_PACK_GAP`` apart to leave room. ``leaf_report`` lists, per cell, the nets
+routed, the nets with one terminal, the nets excluded by rule and the nets the router could not join.
+
 What is NOT drawn (disclosed, not hidden)
 -----------------------------------------
-No signal routing inside the periphery and none to the pins (#95). The ``VDD``/``VSS``
-pin squares are not connected to the rails. The array interface (wordlines, bit lines) is
-routed; the macro is placed, tapped and supplied, not fully signal-connected. LVS (#30) and
-power delivery checks (#31) are the checks that must be run once routing exists.
+No signal routing between cells and none to the pins (#95): the decoder, latch and control cells' own nets
+(children 2, 3), the fan-out between blocks (4) and the pins (5). The ``VDD``/``VSS`` pin squares are not
+connected to the rails, and the supply D/S terminals of the devices are not joined to the ties. One leaf-cell
+net is undrawn: ``column_mux`` ``BLBM``, whose terminals are separated by the bit-line jogs (Metal2) and
+lanes (Metal3) with too few Metal3 crossings left (``leaf_report["column_mux"]["failed"]``). The array
+interface (wordlines, bit lines) is routed; the macro is placed, tapped and supplied, not fully
+signal-connected. LVS (#30) and power delivery checks (#31) are the checks that must be run once routing exists.
 
 Supply rails (issues #92, #102)
 -------------------------------
@@ -51,7 +67,9 @@ Metal1-Metal3 or Via1-Via3 there; only Metal4 crosses it.
 * **Periphery**: each device's tie Metal1 pad carries a Via1 and a Metal2 pad. A Metal2 stub,
   clear of the signal Metal2/Metal3, runs from it to a Via2/Metal3 pad/Via3 on the nearest Metal4
   lane of its net inside the same floorplan region (lanes every ``RAIL_LANE_PITCH``, VDD/VSS
-  interleaved); lanes reach the trunk through a Via4.
+  interleaved); lanes reach the trunk through a Via4. Where the Metal2 around a tie is taken by the leaf-cell
+  nets, the stub leaves on Metal3 from a Via2 on the tie's pad, or is maze-routed (``tie_maze``) to a Via3 on
+  the lane; ``tie_wiring`` records which. Nothing below Metal4 enters the wordline gap.
 """
 
 from __future__ import annotations
@@ -117,6 +135,8 @@ ROWS = 128
 COLS = 64
 SLICES = 32
 PACK_GAP = 0.65  # um between packed cells (> NW.b 0.62; wells are inside the bbox)
+DECODER_CLEAR = 1.0  # um between the address latch / control and the wordline gap: room for their body-tie stubs (issue #104)
+LEAF_PACK_GAP = 1.2  # um between the devices of a signal-routed leaf cell: room for its Metal2/Metal3 nets (issue #104)
 BLOCK_GAP = 3.0  # um between floorplan blocks
 SLICE_MARGIN = 0.4  # um kept clear on each side of a slice's column path
 PIN = 0.5  # um, macro pin square on Metal2
@@ -144,6 +164,16 @@ BL_VIA_Y = -0.15  # y of the Via1 stack under each bit-line stripe
 WL_FANOUT_GAP = round(2 * LANE_MARGIN + (ROWS - 1) * LANE_PITCH, 3)  # decoder-to-array gap
 STUB_W = M2_W  # Metal2 stub from a tie to its lane
 
+# ---- signal router (issue #104) ----
+STEP = 50  # dbu: routing lattice pitch (0.05 um); wires are M2_W wide, centred on lattice nodes
+WRONG_WAY = 4  # cost of a lattice step against a layer's preferred direction (Metal2 vertical, Metal3 horizontal)
+MAX_ROUTE_TRIES = 12  # orderings tried per cell before a net is reported undrawn
+VIA_COST = 16  # lattice steps a Via2 is worth (0.8 um): hopping layers for a short run is never worth it, so vias stay V2.b apart
+LEAF_ROUTED = ("inv", "inv_x4", "dlatch", "nand2", "nand3", "nand4", "nor2",
+               "precharge", "column_mux", "sense_amp", "write_driver")
+COLPATH_CELLS = ("precharge", "column_mux", "sense_amp", "write_driver")
+SUPPLY_NETS = ("VDD", "VSS")
+
 
 def dbu(v: float) -> int:
     return int(round(v / DBU))
@@ -152,6 +182,9 @@ def dbu(v: float) -> int:
 def snap(v: float) -> float:
     """Round to the 0.005 um manufacturing grid."""
     return round(v / (GRID * DBU)) * (GRID * DBU)
+
+
+KEEP = dbu(M2_SPACE + M2_W / 2)  # centre-line keep-out around another net's Metal2/Metal3 shape (M2.b / M3.b)
 
 
 # ---------------------------------------------------------------------------
@@ -207,6 +240,210 @@ def micron(s: str) -> float:
 
 
 # ---------------------------------------------------------------------------
+# Flat-net resolution
+# ---------------------------------------------------------------------------
+_BL_NET = re.compile(r"^BLB?\d*$")
+_WL_NET = re.compile(r"^WL\[\d+\]$")
+DEVICE_REFS = ("sg13_lv_nmos", "sg13_lv_pmos")
+
+
+def excluded_net(name: str) -> str | None:
+    """Why a net is not signal-routed here: supply, bit line or wordline (routed by #92, #94)."""
+    if name in SUPPLY_NETS:
+        return "supply"
+    if _BL_NET.match(name):
+        return "bit line"
+    if _WL_NET.match(name):
+        return "wordline"
+    return None
+
+
+def flat_nets(nl: dict[str, Subckt], top: str = TOP) -> dict[str, dict]:
+    """Resolve the hierarchical nets of ``top`` to flat nets, one per instance path.
+
+    Returns ``{name: {"aliases": [...], "terminals": [(path, device, term)], "excluded": reason|None}}``
+    where ``name`` is the alias nearest the top (``XS[3]/N1`` for a net internal to an instance) and a terminal is
+    ``(instance path, device name, "D"/"G"/"S"/"B")``. A net is excluded when any alias is a supply,
+    bit-line or wordline name. ``bitcell`` is a drawn leaf of the array and is not descended into."""
+    parent: dict[tuple, tuple] = {}
+
+    def find(a: tuple) -> tuple:
+        parent.setdefault(a, a)
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    def union(a: tuple, b: tuple) -> None:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[max(ra, rb)] = min(ra, rb)
+
+    terms: list[tuple[tuple, tuple[str, str, str]]] = []
+
+    def walk(sub: str, path: tuple) -> None:
+        for inst in nl[sub].insts:
+            ipath = path + (inst.name,)
+            if inst.ref in DEVICE_REFS:
+                for t, n in zip("DGSB", inst.nets[:4]):
+                    terms.append(((path, n), ("/".join(ipath[:-1]), inst.name, t)))
+                    find((path, n))
+            elif inst.ref in nl and inst.ref != "bitcell":
+                for port, n in zip(nl[inst.ref].ports, inst.nets):
+                    union((ipath, port), (path, n))
+                walk(inst.ref, ipath)
+
+    walk(top, ())
+    groups: dict[tuple, list[tuple]] = {}
+    for node in list(parent):
+        groups.setdefault(find(node), []).append(node)
+    members: dict[tuple, list] = {}
+    for node, term in terms:
+        members.setdefault(find(node), []).append(term)
+    out: dict[str, dict] = {}
+    for root, nodes in groups.items():
+        nodes.sort(key=lambda pn: (len(pn[0]), pn[0], pn[1]))
+        aliases = ["/".join(p + (n,)) for p, n in nodes]
+        why = next((r for r in (excluded_net(n) for _, n in nodes) if r), None)
+        out[aliases[0]] = {"aliases": aliases, "terminals": sorted(members.get(root, [])), "excluded": why}
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Net-aware router: Metal2 / Metal3 maze on a 0.05 um lattice
+# ---------------------------------------------------------------------------
+class MazeRouter:
+    """Two-layer (layer 0 = Metal2, 1 = Metal3, joined by Via2) maze router.
+
+    Wires are ``M2_W`` wide and centred on lattice nodes ``STEP`` apart. Every committed shape marks the nodes
+    within ``KEEP`` of it as that net's (``owner`` = net id); a node claimed by two nets is blocked for both
+    (-1), so a wire of another net never comes within the M2.b / M3.b spacing, and two nets cross only by using
+    different layers. Vias keep a Chebyshev distance of ``KEEP`` from one another. Terminals are Metal2 pads."""
+
+    def __init__(self, left: int, bottom: int, right: int, top: int) -> None:
+        h = dbu(M2_W / 2)
+        self.i0, self.i1 = -(-(left + h) // STEP), (right - h) // STEP
+        self.j0, self.j1 = -(-(bottom + h) // STEP), (top - h) // STEP
+        self.nx, self.ny = self.i1 - self.i0 + 1, self.j1 - self.j0 + 1
+        self.owner = [[[0] * self.ny for _ in range(self.nx)] for _ in range(2)]
+        self.via_near: set[tuple[int, int]] = set()
+        self.shapes: dict[int, list[tuple]] = {}  # net id -> [("wire", layer, a, b) | ("via", node)]
+
+    def node(self, x: float, y: float) -> tuple[int, int]:
+        return round(dbu(x) / STEP), round(dbu(y) / STEP)
+
+    def inside(self, i: int, j: int) -> bool:
+        return self.i0 <= i <= self.i1 and self.j0 <= j <= self.j1
+
+    def _mark(self, layer: int, x0: int, y0: int, x1: int, y1: int, net: int) -> None:
+        """Claim every node whose centre-line would sit within KEEP of the dbu rectangle."""
+        lo_i, hi_i = (x0 - KEEP) // STEP + 1, -(-(x1 + KEEP) // STEP) - 1
+        lo_j, hi_j = (y0 - KEEP) // STEP + 1, -(-(y1 + KEEP) // STEP) - 1
+        own = self.owner[layer]
+        for i in range(max(lo_i, self.i0), min(hi_i, self.i1) + 1):
+            col = own[i - self.i0]
+            for j in range(max(lo_j, self.j0), min(hi_j, self.j1) + 1):
+                o = col[j - self.j0]
+                col[j - self.j0] = net if (o == 0 or o == net) and net > 0 else -1
+
+    def block(self, layer: int, x0: float, y0: float, x1: float, y1: float) -> None:
+        """A hard obstacle (um box) on one layer, for every net."""
+        self._mark(layer, dbu(x0), dbu(y0), dbu(x1), dbu(y1), -1)
+
+    def pad(self, layer: int, node: tuple[int, int], net: int) -> None:
+        h = dbu(M2_W / 2)
+        i, j = node
+        self._mark(layer, i * STEP - h, j * STEP - h, i * STEP + h, j * STEP + h, net)
+
+    def _free(self, layer: int, i: int, j: int, net: int) -> bool:
+        return self.inside(i, j) and self.owner[layer][i - self.i0][j - self.j0] in (0, net)
+
+    def connect(self, net: int, tree: set[tuple[int, int, int]], goals: set[tuple[int, int, int]]):
+        """Cheapest path from any (layer, i, j) of ``tree`` to a goal (layer, i, j); None if there is none."""
+        import heapq
+
+        dist: dict[tuple, int] = {}
+        prev: dict[tuple, tuple] = {}
+        heap = [(0, *n) for n in sorted(tree)]
+        for n in tree:
+            dist[n] = 0
+        heapq.heapify(heap)
+        owner, i0, i1, j0, j1 = self.owner, self.i0, self.i1, self.j0, self.j1
+        via_near = self.via_near
+        big = 1 << 30
+        while heap:
+            d, l, i, j = heapq.heappop(heap)
+            if d > dist.get((l, i, j), big):
+                continue
+            if (l, i, j) in goals:
+                path = [(l, i, j)]
+                while path[-1] in prev:
+                    path.append(prev[path[-1]])
+                return path[::-1]
+            ch, cv = (WRONG_WAY, 1) if l == 0 else (1, WRONG_WAY)  # Metal2 prefers vertical, Metal3 horizontal
+            own = owner[l]
+            nxt = []
+            for c, i2, j2 in ((ch, i + 1, j), (ch, i - 1, j), (cv, i, j + 1), (cv, i, j - 1)):
+                if i0 <= i2 <= i1 and j0 <= j2 <= j1:
+                    o = own[i2 - i0][j2 - j0]
+                    if o == 0 or o == net:
+                        nxt.append((c, l, i2, j2))
+            if (i, j) not in via_near:
+                o = owner[1 - l][i - i0][j - j0]
+                if o == 0 or o == net:
+                    nxt.append((VIA_COST, 1 - l, i, j))
+            for c, l2, i2, j2 in nxt:
+                n2 = (l2, i2, j2)
+                if d + c < dist.get(n2, big):
+                    dist[n2] = d + c
+                    prev[n2] = (l, i, j)
+                    heapq.heappush(heap, (d + c, l2, i2, j2))
+        return None
+
+    def commit(self, net: int, path: list[tuple[int, int, int]]) -> None:
+        h = dbu(M2_W / 2)
+        out = self.shapes.setdefault(net, [])
+        for (l, i, j), (l2, i2, j2) in zip(path, path[1:]):
+            if l != l2:
+                out.append(("via", (i, j)))
+                near = dbu(V2 + V2_SPACE) // STEP  # Chebyshev reach of a Via2 on the lattice
+                for di in range(-near, near + 1):
+                    for dj in range(-near, near + 1):
+                        self.via_near.add((i + di, j + dj))
+                self.pad(1 - l, (i, j), net)
+            else:
+                last = out[-1] if out else None
+                if (last and last[0] == "wire" and last[1] == l and last[3] == (i, j)
+                        and (last[2][0] == i) == (i == i2) and (last[2][1] == j) == (j == j2)):
+                    out[-1] = ("wire", l, last[2], (i2, j2))  # extend a straight run
+                else:
+                    out.append(("wire", l, (i, j), (i2, j2)))
+                self._mark(l, min(i, i2) * STEP - h, min(j, j2) * STEP - h, max(i, i2) * STEP + h, max(j, j2) * STEP + h, net)
+
+    def route_net(self, net: int, terminals: list[tuple[int, int]]) -> bool:
+        """Join the terminals (Metal2 pads, already claimed with ``pad``) into one tree."""
+        if len(terminals) < 2:
+            return True
+        tree = {(0, *terminals[0])}
+        todo = set(terminals[1:])
+        todo -= {t for t in todo if (0, *t) in tree}
+        while todo:
+            path = self.connect(net, tree, {(0, *t) for t in todo})
+            if path is None:
+                return False
+            self.commit(net, path)
+            tree |= set(path)
+            todo.discard(path[-1][1:])
+        return True
+
+
+def route_orders(names: list[str], size: dict[str, int]) -> list[list[str]]:
+    """Net orderings to try: short nets first, long first, then reversed alphabetical."""
+    by = sorted(names, key=lambda n: (size[n], n))
+    return [by, by[::-1], sorted(names, reverse=True)]
+
+
+# ---------------------------------------------------------------------------
 # Layout helpers
 # ---------------------------------------------------------------------------
 class Gen:
@@ -222,6 +459,10 @@ class Gen:
         # also keep their D/G/S terminal points (um, in the parent's frame)
         self.place_of: dict[str, dict[str, tuple[int, int]]] = {}
         self.dev_pts: dict[str, dict[str, dict[str, tuple[float, float]]]] = {}
+        # leaf-cell signal routing (issue #104): what was drawn and what was not, per cell
+        self.leaf_report: dict[str, dict] = {}
+        self.leaf_terms: dict[str, dict[str, list[tuple[float, float]]]] = {}  # cell -> net -> M1 landing points
+        self.leaf_vias: dict[str, list[dict]] = {}
 
     def li(self, lp: tuple[int, int]) -> int:
         return self.layout.layer(*lp)
@@ -303,10 +544,10 @@ class Gen:
         return c, pts
 
     # ---- packing ----------------------------------------------------------
-    def pack(self, items: list[kdb.Cell], max_w: float) -> tuple[list[tuple[kdb.Cell, int, int]], int, int]:
+    def pack(self, items: list[kdb.Cell], max_w: float, pack_gap: float = PACK_GAP) -> tuple[list[tuple[kdb.Cell, int, int]], int, int]:
         """Shelf-pack cells by bbox. Returns [(cell, dx, dy)] placing each
         bbox's lower-left at the shelf position, plus the packed width/height."""
-        gap, mw = dbu(PACK_GAP), dbu(max_w)
+        gap, mw = dbu(pack_gap), dbu(max_w)
         out: list[tuple[kdb.Cell, int, int]] = []
         x = y = row_h = used = 0
         for c in items:
@@ -348,7 +589,7 @@ class Gen:
         area = sum(c.bbox().width() * c.bbox().height() for c in items) * DBU * DBU
         widest = max(c.bbox().width() for c in items) * DBU
         mw = max_w if max_w is not None else max(widest, math.sqrt(area) * 1.6)
-        placed, _, _ = self.pack(items, mw)
+        placed, _, _ = self.pack(items, mw, LEAF_PACK_GAP if name in LEAF_ROUTED and name not in COLPATH_CELLS else PACK_GAP)
         self.place_of[name] = {}
         self.dev_pts[name] = {}
         for (inst, ch, pts), (_, dx, dy) in zip(meta, placed):
@@ -360,6 +601,10 @@ class Gen:
                 for term, net in zip("DGSB", inst.nets[:4]):
                     px, py = pts[term]
                     self.text(cell, bc.L_METAL1_LBL, net, px + dx * DBU, py + dy * DBU)
+        if name in COLPATH_CELLS:
+            self.route_leaf(name, cell, phase="pads")  # their nets are routed after the bit-line jogs (``bit_slice``)
+        elif name in LEAF_ROUTED:
+            self.route_leaf(name, cell)
         return cell
 
     def build(self, name: str) -> kdb.Cell:
@@ -395,6 +640,120 @@ class Gen:
                         if r is not None:
                             return (r[0] + off[0] * DBU, r[1] + off[1] * DBU)
         return None
+
+    # ---- leaf-cell signal routing (issue #104) ------------------------------
+    def draw_shapes(self, cell: kdb.Cell, shapes: list[tuple]) -> tuple[dict[int, kdb.Region], list[dict]]:
+        """Draw a ``MazeRouter`` net's wires (Metal2 / Metal3) and Via2s into ``cell``; returns the net's regions per
+        layer and its vias."""
+        drawn = {0: kdb.Region(), 1: kdb.Region()}
+        vias: list[dict] = []
+        for sh in shapes:
+            if sh[0] == "wire":
+                _, l, a, b = sh
+                self.seg(cell, L_METAL2 if l == 0 else L_METAL3, M2_W,
+                         a[0] * STEP * DBU, a[1] * STEP * DBU, b[0] * STEP * DBU, b[1] * STEP * DBU)
+                drawn[l].insert(kdb.Box(dbu(min(a[0], b[0]) * STEP * DBU - M2_W / 2), dbu(min(a[1], b[1]) * STEP * DBU - M2_W / 2),
+                                        dbu(max(a[0], b[0]) * STEP * DBU + M2_W / 2), dbu(max(a[1], b[1]) * STEP * DBU + M2_W / 2)))
+            else:
+                x, y = sh[1][0] * STEP * DBU, sh[1][1] * STEP * DBU
+                self.via_pad(cell, L_VIA2, x, y)
+                self.rect(cell, L_METAL2, x, y, M2_W, M2_W)
+                self.rect(cell, L_METAL3, x, y, M3_W, M3_W)
+                vias.append({"x": round(x, 3), "y": round(y, 3)})
+        return drawn, vias
+
+    def route_leaf(self, name: str, cell: kdb.Cell, extra: list[tuple[int, kdb.Box]] = (), phase: str = "all") -> None:
+        """Draw the intra-cell signal nets of a leaf cell on Metal2/Metal3 (Via1 landings on the Metal1 terminals).
+
+        A net is drawn when it has two or more D/G/S terminals in the cell; supply nets and the bit-line nets
+        (routed at slice level) are not signal-routed here, and a net with one terminal has nothing to join.
+        Whatever is not drawn is listed in ``leaf_report``. The routes stay inside the cell's bounding box, so
+        placement and every other cell are unchanged. ``phase`` "pads" only draws the terminal landings (so the
+        slice's bit-line jogs, which are drawn next, keep clear of them), "wires" the nets between them."""
+        pts = self.dev_pts[name]
+        by_net: dict[str, list[tuple[str, str, tuple[float, float]]]] = {}
+        for inst in self.nl[name].insts:
+            if inst.name in pts:
+                for t, n in zip("DGS", inst.nets[:3]):
+                    by_net.setdefault(n, []).append((inst.name, t, pts[inst.name][t]))
+        bb = cell.bbox()
+        mz = MazeRouter(bb.left, bb.bottom, bb.right, bb.top)
+        report = {"routed": {}, "single_terminal": [], "excluded": {}, "failed": []}
+        names = sorted(n for n, v in by_net.items() if not excluded_net(n) and len(v) >= 2)
+        for n, v in sorted(by_net.items()):
+            why = excluded_net(n)
+            if why:
+                report["excluded"][n] = {"reason": why, "terminals": len(v)}
+            elif len(v) < 2:
+                report["single_terminal"].append(n)
+        ids = {n: k + 1 for k, n in enumerate(names)}
+        node = {n: [mz.node(x, y) for _, _, (x, y) in by_net[n]] for n in names}
+        # fixed obstacles: body-tie Metal2 pads, bit-line terminals (their Metal2 comes at slice level) and,
+        # in the column path, the slice's bit-line Metal3 lanes
+        hp = VIA_PAD / 2
+        for inst in self.nl[name].insts:
+            if inst.name in pts:
+                tx, ty = pts[inst.name]["B"]
+                mz.block(0, tx - hp, ty - hp, tx + hp, ty + hp)
+                mz.block(1, tx - hp, ty - hp, tx + hp, ty + hp)  # room for a Via2 + Metal3 pad on the tie (rails)
+        for n, v in by_net.items():
+            if excluded_net(n) == "bit line":
+                for _, _, (x, y) in v:
+                    mz.block(0, x - M2_W / 2, y - M2_W / 2, x + M2_W / 2, y + M2_W / 2)
+        for layer, eb in extra:  # Metal2 jogs and Metal3 lanes the parent already drew over the cell (bit lines)
+            mz.block(layer, eb.left * DBU, eb.bottom * DBU, eb.right * DBU, eb.top * DBU)
+        if phase == "pads":
+            for n in names:
+                for t in sorted(set(node[n])):
+                    self.m1_via1(cell, t[0] * STEP * DBU, t[1] * STEP * DBU)
+            return
+        size = {n: max(1, sum(abs(a[0] - b[0]) + abs(a[1] - b[1]) for a in node[n] for b in node[n])) for n in names}
+        base = mz
+        best = None
+        tried: list[list[str]] = []
+        orders = route_orders(names, size) if names else [[]]
+        while orders and len(tried) < MAX_ROUTE_TRIES:
+            order = orders.pop(0)
+            if order in tried:
+                continue
+            tried.append(order)
+            mz = MazeRouter(bb.left, bb.bottom, bb.right, bb.top)
+            mz.owner = [[col[:] for col in lay] for lay in base.owner]
+            for n in names:
+                for t in node[n]:
+                    mz.pad(0, t, ids[n])
+            failed = [n for n in order if not mz.route_net(ids[n], sorted(set(node[n])))]
+            if best is None or len(failed) < len(best[1]):
+                best = (mz, failed)
+            if not failed:
+                break
+            # rip up and reroute: the nets that did not fit go first next time
+            orders.append(failed + [n for n in order if n not in failed])
+            orders.append([n for n in order if n not in failed] + failed[::-1])
+        mz, failed = best if best else (mz, [])
+        for n in names:
+            if phase == "all":
+                for t in sorted(set(node[n])):
+                    self.m1_via1(cell, t[0] * STEP * DBU, t[1] * STEP * DBU)
+            if n in failed:
+                report["failed"].append(n)
+                continue
+            report["routed"][n] = len(by_net[n])
+            drawn, vias = self.draw_shapes(cell, mz.shapes.get(ids[n], []))
+            for t in sorted(set(node[n])):
+                drawn[0].insert(kdb.Box(dbu(t[0] * STEP * DBU - M2_W / 2), dbu(t[1] * STEP * DBU - M2_W / 2),
+                                        dbu(t[0] * STEP * DBU + M2_W / 2), dbu(t[1] * STEP * DBU + M2_W / 2)))
+            self.leaf_vias.setdefault(name, []).extend({"net": n, **v} for v in vias)
+            # two parts of one net that run closer than the layer's spacing (a wire folding back beside itself) are
+            # joined: the gap is filled, so the pair is one shape instead of a spacing violation
+            for l, lp in ((0, L_METAL2), (1, L_METAL3)):
+                rg = drawn[l].merged()
+                gaps = rg.space_check(dbu(M2_SPACE)) + rg.notch_check(dbu(M2_SPACE))
+                for ep in gaps.each():
+                    cell.shapes(self.li(lp)).insert(ep.bbox())
+        self.leaf_terms[name] = {n: [(t[0] * STEP * DBU, t[1] * STEP * DBU) for t in sorted(set(node[n]))]
+                                 for n in names if n not in failed}
+        self.leaf_report[name] = report
 
     def rect(self, cell: kdb.Cell, lp, cx: float, cy: float, w: float, h: float) -> None:
         self.box(cell, lp, snap(cx - w / 2), snap(cy - h / 2), snap(cx + w / 2), snap(cy + h / 2))
@@ -446,6 +805,12 @@ class Gen:
         for t in self.ties(cell):
             h = dbu(VIA_PAD / 2)
             supply.insert(kdb.Box(dbu(t["x"]) - h, dbu(t["y"]) - h, dbu(t["x"]) + h, dbu(t["y"]) + h))
+        # the column-path cells' terminal landings (issue #104) are obstacles for every bit-line jog
+        for inst in self.nl["bit_slice"].insts:
+            off = self.place_of["bit_slice"].get(inst.name)
+            if off is not None and inst.ref in COLPATH_CELLS:
+                sub = kdb.Region(self.cells[inst.ref].begin_shapes_rec(self.li(L_METAL2)))
+                supply += sub.transformed(kdb.Trans(off[0], off[1]))
         placed: dict[str, kdb.Region] = {}
         for net, (xs, terms) in sl.items():
             placed[net] = pad_region(xs, BL_VIA_Y)
@@ -644,6 +1009,18 @@ class Gen:
         self.colpath_bottom = y + dbu(PACK_GAP)
         assert arr_h > 0
         self.route_bitlines(cell)
+        # the column-path cells route around the jogs (a cell is shared by the slice's instances of it)
+        jogs = [kdb.Region(cell.shapes(self.li(lp))) for lp in (L_METAL2, L_METAL3)]  # Metal2 jogs, Metal3 lanes
+        for ref in COLPATH_CELLS:
+            extra = []
+            for inst in self.nl["bit_slice"].insts:
+                off = self.place_of["bit_slice"].get(inst.name)
+                if inst.ref == ref and off is not None:
+                    cb = self.cells[ref].bbox().moved(off[0], off[1]).enlarged(dbu(1.0), dbu(1.0))
+                    for layer, rg in enumerate(jogs):
+                        for poly in (rg & kdb.Region(cb)).each():
+                            extra.append((layer, poly.bbox().moved(-off[0], -off[1])))
+            self.route_leaf(ref, self.cells[ref], extra, phase="wires")
         return cell
 
     # ---- macro ------------------------------------------------------------
@@ -667,7 +1044,7 @@ class Gen:
         for ref in ("addr_latch", "control", "row_decoder"):
             ch = self.build(ref)
             bb = ch.bbox()
-            dx = right - bb.right
+            dx = right - (dbu(DECODER_CLEAR) if ref != "row_decoder" else 0) - bb.right
             dy = by - bb.bottom
             assert dx % GRID == 0 and dy % GRID == 0
             self.place(top, ch, dx, dy)
@@ -883,6 +1260,8 @@ class Gen:
                                 continue
                             parts = [kdb.DBox(x - hw, lo - hp, x + hw, hi + hp),
                                      kdb.DBox(min(x, xs) - hp, ly - hw, max(x, xs) + hp, ly + hw)]
+                        if any(pt.right > -WL_FANOUT_GAP and pt.left < 0 for pt in parts + [kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]):
+                            continue  # nothing below Metal4 in the wordline gap
                         if all(clear(net, pt) for pt in parts):
                             chosen = (ly, xs, parts)
                             break
@@ -891,6 +1270,44 @@ class Gen:
                 if chosen:
                     break
             if chosen is None:
+                # the Metal2 around the tie is taken by cell routing (issue #104): leave on Metal3 instead, from a
+                # Via2 on the tie's own Metal2 pad to a Via3 on the lane
+                chosen3 = None
+                for ly in sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]:
+                    lo, hi = min(y, ly), max(y, ly)
+                    for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
+                        if dx and (abs(dx) < hp + M3_SPACE + STUB_W / 2 + 0.01 or abs(ly - y) < hp + M3_SPACE + STUB_W / 2 + 0.01):
+                            continue  # a sideways run keeps M3.b to its own pads (otherwise a sliver between them)
+                        xs = round(x + dx, 3)
+                        if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in via2_at.get((ri, net, ly), ())):
+                            continue
+                        parts = [kdb.DBox(x - hp, y - hp, x + hp, y + hp), kdb.DBox(xs - hw, lo - hw, xs + hw, hi + hw),
+                                 kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]
+                        if dx:
+                            parts.append(kdb.DBox(min(x, xs) - hw, y - hw, max(x, xs) + hw, y + hw))
+                        if any(pt.right > -WL_FANOUT_GAP and pt.left < 0 for pt in parts):
+                            continue  # nothing below Metal4 in the wordline gap
+                        if all(clear3(pt) for pt in parts):
+                            chosen3 = (ly, xs, parts)
+                            break
+                    if chosen3:
+                        break
+                if chosen3:
+                    ly, xs, parts = chosen3
+                    for pt in parts:
+                        self.box(rc, L_METAL3, pt.left, pt.bottom, pt.right, pt.top)
+                        put(obst3, pt, pt)
+                    via(None, L_VIA2, L_METAL3, x, y)
+                    via(None, L_VIA3, L_METAL4, xs, ly)
+                    via2_at.setdefault((ri, net, ly), []).append(xs)
+                    used.setdefault((ri, net), set()).add(ly)
+                    self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
+                                            "stub": "Metal3"})
+                    continue
+                if self.tie_maze(net, x, y, ri, rb_x=(regions[ri].left * DBU, regions[ri].right * DBU), lanes=lanes[(ri, net)],
+                                 obst=obst, obst3=obst3, cells_of=cells_of, via2_at=via2_at, clear3=clear3, rc=rc,
+                                 add_obst=add_obst, put=put, used=used):
+                    continue
                 raise AssertionError(f"no clear Metal2 stub for {net} tie at ({x}, {y}); lanes {sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]}, region {ri}")
             ly, xs, parts = chosen
             for pt in parts:
@@ -902,7 +1319,8 @@ class Gen:
             put(obst3, pad3, pad3)
             via2_at.setdefault((ri, net, ly), []).append(xs)
             used.setdefault((ri, net), set()).add(ly)
-            self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri})
+            self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
+                                    "stub": "Metal2"})
         # lanes that serve at least one tie run on Metal4 out to the trunk of their net
         for (ri, net), ys in sorted(used.items()):
             rb = regions[ri]
@@ -918,6 +1336,74 @@ class Gen:
             self.box(rc, L_METAL5, tx - TRUNK_W / 2, min(ys) - hp, tx + TRUNK_W / 2, max(ys) + hp)
             self.text(rc, (67, 25), net, tx, min(ys))
 
+    def tie_maze(self, net: str, x: float, y: float, ri: int, rb_x: tuple[float, float], lanes: list[float], obst: dict,
+                 obst3: dict, cells_of, via2_at: dict, clear3, rc: kdb.Cell, add_obst, put, used: dict) -> bool:
+        """Last resort for a tie whose straight stubs are blocked (issue #104): maze-route it on Metal2/Metal3 from its
+        Metal2 pad to a Via3 on one of its net's Metal4 lanes, around everything already drawn."""
+        win = kdb.DBox(x - 8.0, y - 5.0, x + 8.0, y + 5.0)
+        mz = MazeRouter(dbu(win.left), dbu(win.bottom), dbu(win.right), dbu(win.top))
+        seen: set[int] = set()
+        for c in cells_of(win):
+            for it in obst.get(c, ()):
+                n, b = it
+                if id(it) in seen or (n == net and abs(b.center().x - x) < 1e-3 and abs(b.center().y - y) < 1e-3):
+                    continue
+                seen.add(id(it))
+                mz.block(0, b.left, b.bottom, b.right, b.top)
+            for b in obst3.get(c, ()):
+                if id(b) not in seen:
+                    seen.add(id(b))
+                    mz.block(1, b.left, b.bottom, b.right, b.top)
+        for layer in (0, 1):  # nothing below Metal4 in the wordline gap: a wire edge may reach its boundary, not enter
+            mz.block(layer, -WL_FANOUT_GAP + KEEP * DBU - M2_W / 2, win.bottom, 0.0, win.top)
+        start = mz.node(x, y)
+        mz.pad(0, start, 1)
+        hp = VIA_PAD / 2
+        goals = set()
+        for ly in lanes:
+            for i in range(mz.i0, mz.i1 + 1):
+                gx, gy = i * STEP * DBU, round(ly / (STEP * DBU)) * STEP * DBU
+                if abs(gy - ly) > 0.055 or gx < rb_x[0] + 0.3 or (gx + hp > -WL_FANOUT_GAP and gx - hp < 0):
+                    continue
+                if any(abs(gx - ox) < VIA_PAD + M3_SPACE for ox in via2_at.get((ri, net, ly), ())):
+                    continue
+                if mz.inside(i, round(ly / (STEP * DBU))) and clear3(kdb.DBox(gx - M3_W / 2, gy - M3_W / 2, gx + M3_W / 2, gy + M3_W / 2)):
+                    goals.add((1, i, round(ly / (STEP * DBU))))
+        if not goals:
+            return False
+        path = mz.connect(1, {(0, *start)}, goals)
+        if path is None:
+            return False
+        mz.commit(1, path)
+        ly = min(lanes, key=lambda v: abs(v - path[-1][2] * STEP * DBU))
+        # the Metal2 pad of the tie to the path start (lattice nodes are 0.05 apart, the pad is on the 0.005 grid)
+        self.seg(rc, L_METAL2, M2_W, x, y, start[0] * STEP * DBU, start[1] * STEP * DBU)
+        for sh in mz.shapes.get(1, []):
+            if sh[0] == "wire":
+                _, l, a, b = sh
+                lp = L_METAL2 if l == 0 else L_METAL3
+                self.seg(rc, lp, M2_W, a[0] * STEP * DBU, a[1] * STEP * DBU, b[0] * STEP * DBU, b[1] * STEP * DBU)
+                bx = kdb.DBox(min(a[0], b[0]) * STEP * DBU - M2_W / 2, min(a[1], b[1]) * STEP * DBU - M2_W / 2,
+                              max(a[0], b[0]) * STEP * DBU + M2_W / 2, max(a[1], b[1]) * STEP * DBU + M2_W / 2)
+                if l == 0:
+                    add_obst(net, bx)
+                else:
+                    put(obst3, bx, bx)
+            else:
+                vx, vy = sh[1][0] * STEP * DBU, sh[1][1] * STEP * DBU
+                self.via_pad(rc, L_VIA2, vx, vy)
+                for lp in (L_METAL2, L_METAL3):
+                    self.rect(rc, lp, vx, vy, M2_W, M2_W)
+        gx, gy = path[-1][1] * STEP * DBU, path[-1][2] * STEP * DBU
+        self.via_pad(rc, L_VIA3, gx, gy)
+        self.rect(rc, L_METAL3, gx, gy, M3_W, M3_W)
+        pad3 = kdb.DBox(gx - hp, gy - hp, gx + hp, gy + hp)
+        put(obst3, pad3, pad3)
+        via2_at.setdefault((ri, net, ly), []).append(round(gx, 3))
+        used.setdefault((ri, net), set()).add(ly)
+        self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": round(gx, 3), "region": ri, "stub": "maze"})
+        return True
+
     def pins(self, top: kdb.Cell, bb: kdb.Box, ports: list[str], arr_w: int) -> list[dict]:
         out: list[dict] = []
         sl_w = 2 * bc.W_CELL
@@ -929,12 +1415,12 @@ class Gen:
                         "direction": direction, "use": use})
 
         left, bottom = bb.left * DBU, bb.bottom * DBU
-        # bottom edge: D[i], Q[i] either side of slice i's centre, just outside the content so the
-        # periphery's Metal2 (issue #92) keeps its spacing to them
+        # bottom edge: D[i], Q[i] either side of slice i's centre, M2.b outside the content so the
+        # periphery's Metal2 (issues #92, #104) keeps its spacing to them
         for i in range(SLICES):
             xc = (i + 0.5) * sl_w
-            add(f"D[{i}]", round(xc - 1.5, 3), round(bottom - PIN, 3), "INPUT", "SIGNAL")
-            add(f"Q[{i}]", round(xc + 1.0, 3), round(bottom - PIN, 3), "OUTPUT", "SIGNAL")
+            add(f"D[{i}]", round(xc - 1.5, 3), round(bottom - PIN - M2_SPACE, 3), "INPUT", "SIGNAL")
+            add(f"Q[{i}]", round(xc + 1.0, 3), round(bottom - PIN - M2_SPACE, 3), "OUTPUT", "SIGNAL")
         # left edge: control, address, supplies
         left_pins = [(f"A[{i}]", "INPUT", "SIGNAL") for i in range(7, -1, -1)]
         left_pins += [("CEN", "INPUT", "SIGNAL"), ("CLK", "INPUT", "CLOCK"), ("GWEN", "INPUT", "SIGNAL"),
