@@ -3,6 +3,17 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-10-30
+
+- **PR #96**: feat: add per-device body ties to the macro periphery
+- **Issue #93** (closed): layout: macro supply rails and tie-to-rail connection
+- **PR #83**: docs: verify SRAM comp row against primary Liberty/LEF/datasheet
+- **Issue #76** (closed): spec: verify comp data against primary Liberty/LEF
+- **PR #87**: feat: add SG13G2 macro layout generator, GDS, LEF and item 2 attestation
+- **Issue #28** (closed): T1 item 2 (layout): 256x32 macro layout generator, GDS and LEF
+- **PR #86**: feat: add SG13G2 6T bitcell generator with 2x2 tile and DRC/LVS evidence
+- **Issue #27** (closed): T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check
+
 ### 2026-10-28
 
 - **PR #65**: refactor: share one run_klt helper across the sim run scripts

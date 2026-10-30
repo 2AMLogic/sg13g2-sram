@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Mint the macro evidence record (issue #28): regenerate the macro GDS, socket
-# descriptor and LEF, then write layout/reports/macro-record.json. Run from
+# Mint the macro evidence record (issue #28; taps step of #88): regenerate the macro GDS, socket
+# descriptor and LEF, then write layout/reports/macro-record-taps.json (macro-record.json is the #87
+# result and is not rewritten). Run from
 # anywhere:   ./layout/reports/generate-macro.sh
 #
 # Records are append-only evidence: a re-run after a layout or klt change is a
@@ -10,6 +11,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 D=layout/sram_256x32
+# macro-record.json describes the unrouted macro of #28; the generator now draws the
+# array-interface routing (#94), so a re-run would overwrite that record with other
+# hashes. The current macro is recorded by generate-macro-routed.sh.
+if [[ -s layout/reports/macro-record.json ]]; then
+  echo "refusing to overwrite layout/reports/macro-record.json (append-only evidence);" >&2
+  echo "use ./layout/reports/generate-macro-routed.sh for the current macro" >&2
+  exit 1
+fi
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
@@ -18,8 +27,9 @@ klt socket-check --socket $D/macro.socket.json $D/macro.gds --format json > "$WO
 klt lef-abstract $D/macro.gds --socket $D/macro.socket.json --macro-name macro \
   --cell-library sg13g2_stdcell --pdk ihp-sg13g2 --obs-mode coarse -o $D/macro.lef --format json > "$WORK/lef.json"
 klt cells --format json $D/macro.gds > "$WORK/cells.json"
+klt extract --deck sg13g2 $D/macro.gds -o "$WORK/extracted.spice" --format json > "$WORK/extract.json"
 
-python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record.json
+python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record-taps.json
 import hashlib, json, subprocess, sys
 w = sys.argv[1]
 D = "layout/sram_256x32"
@@ -27,6 +37,7 @@ sha = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
 cells = {c["name"]: c for c in json.load(open(f"{w}/cells.json"))["cells"]}
 lef = json.load(open(f"{w}/lef.json"))
 sock = json.load(open(f"{w}/socket.json"))
+ext = json.load(open(f"{w}/extract.json"))
 deck = json.loads(subprocess.run(["klt", "deck", "info", "--deck", "sg13g2", "--format", "json"],
                                  capture_output=True, text=True, check=True).stdout)["decks"][0]
 sizes = json.load(open(f"{D}/macro.socket.json"))["outline"]
@@ -55,13 +66,14 @@ print(json.dumps({
     "lef_pin_geometry_sources": sorted({p.get("geometry_source") for p in lef.get("pins", [])}),
     "lef_obs_mode": "coarse",
     "edge_and_corner_dummies": "none drawn (ties are in-cell)",
-    "not_drawn": ["periphery signal routing", "array-to-column-path routing", "periphery well/substrate taps", "pin routing"],
+    "extract": {k: ext.get(k) for k in ("status", "device_count", "device_counts", "net_count", "pin_count")},
+    "netlist_flattened_device_count": 51948,
+    "netlist_flattened_device_counts": {"nfet": 34118, "pfet": 17830},
+    "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net; not yet wired to a rail",
+    "not_drawn": ["supply rails and tie-to-rail connection", "periphery signal routing", "array-to-column-path and wordline routing", "pin routing"],
     "deck": {"name": "sg13g2", "content_hash": deck["content_hash"], "released": deck["released"],
              "release": deck.get("release")},
     "klt_version": subprocess.run(["klt", "--version"], capture_output=True, text=True).stdout.strip(),
 }, indent=2))
 PYEOF
-# DRC of the full macro (issue #29): a new report, committed as new evidence.
-klt drc --deck sg13g2 --top macro --format json $D/macro.gds -o layout/reports/drc-macro.json > /dev/null
-echo "DRC report written to layout/reports/drc-macro.json"
-echo "record written to layout/reports/macro-record.json"
+echo "record written to layout/reports/macro-record-taps.json"

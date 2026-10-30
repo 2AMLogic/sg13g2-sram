@@ -44,6 +44,9 @@
       "8/0",
       "10/0",
       "14/0",
+      "19/0",
+      "29/0",
+      "30/0",
       "31/0"
     ],
     "layers_in_stream_without_rules": [
@@ -62,10 +65,14 @@
       "gatpoly.separation.activ.1",
       "gatpoly.space.1",
       "gatpoly.width.1",
+      "metal1.enclosing.via1.1",
       "metal1.space.1",
       "metal1.width.1",
+      "metal2.enclosing.via2.1",
       "metal2.space.1",
       "metal2.width.1",
+      "metal3.space.1",
+      "metal3.width.1",
       "nwell.enclosing.pactiv.1",
       "nwell.enclosing.pactiv.dig.1",
       "nwell.enclosing.pactiv.hv.1",
@@ -76,14 +83,14 @@
       "nwell.width.1",
       "psd.area.1",
       "psd.space.1",
-      "psd.width.1"
+      "psd.width.1",
+      "via1.space.1",
+      "via1.width.1",
+      "via2.space.1",
+      "via2.width.1"
     ],
     "rules_skipped": [
-      "metal1.enclosing.via1.1",
-      "metal2.enclosing.via2.1",
       "metal3.enclosing.via3.1",
-      "metal3.space.1",
-      "metal3.width.1",
       "metal4.enclosing.via4.1",
       "metal4.space.1",
       "metal4.width.1",
@@ -109,10 +116,6 @@
       "topvia1.width.1",
       "topvia2.space.1",
       "topvia2.width.1",
-      "via1.space.1",
-      "via1.width.1",
-      "via2.space.1",
-      "via2.width.1",
       "via3.space.1",
       "via3.width.1",
       "via4.space.1",
@@ -176,10 +179,14 @@
       "gatpoly.separation.activ.1",
       "gatpoly.space.1",
       "gatpoly.width.1",
+      "metal1.enclosing.via1.1",
       "metal1.space.1",
       "metal1.width.1",
+      "metal2.enclosing.via2.1",
       "metal2.space.1",
       "metal2.width.1",
+      "metal3.space.1",
+      "metal3.width.1",
       "nwell.enclosing.pactiv.1",
       "nwell.enclosing.pactiv.dig.1",
       "nwell.enclosing.pactiv.hv.1",
@@ -190,28 +197,16 @@
       "nwell.width.1",
       "psd.area.1",
       "psd.space.1",
-      "psd.width.1"
+      "psd.width.1",
+      "via1.space.1",
+      "via1.width.1",
+      "via2.space.1",
+      "via2.width.1"
     ],
     "skipped": [],
     "inapplicable": [
       {
-        "id": "metal1.enclosing.via1.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
-        "id": "metal2.enclosing.via2.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
         "id": "metal3.enclosing.via3.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
-        "id": "metal3.space.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
-        "id": "metal3.width.1",
         "reason": "no_applicable_geometry"
       },
       {
@@ -315,22 +310,6 @@
         "reason": "no_applicable_geometry"
       },
       {
-        "id": "via1.space.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
-        "id": "via1.width.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
-        "id": "via2.space.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
-        "id": "via2.width.1",
-        "reason": "no_applicable_geometry"
-      },
-      {
         "id": "via3.space.1",
         "reason": "no_applicable_geometry"
       },
@@ -352,9 +331,9 @@
     "nothing_checked_reasons": []
   },
   "provenance": {
-    "klt_version": "0.8.1.dev758+g8ca3f4951d15",
-    "klt_git_commit": "8ca3f4951d15a358c261b4f1df509882a33a9a52",
-    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@8ca3f4951d15a358c261b4f1df509882a33a9a52",
+    "klt_version": "0.8.1.dev778+gb68545dc66b4",
+    "klt_git_commit": "b68545dc66b48daa16a58b12764ec15c7fdc105a",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@b68545dc66b48daa16a58b12764ec15c7fdc105a",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
@@ -363,7 +342,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
+      "content_hash": "sha256:7135c537719b870ceafa3f1c5ef59333962ed9b60f2ae3d7679da0b7a960edfb",
       "role": "layout"
     },
     "klayout_version_mismatch": false

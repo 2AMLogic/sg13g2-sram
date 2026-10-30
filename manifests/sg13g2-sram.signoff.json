@@ -70,7 +70,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
+        "content_hash": "sha256:7135c537719b870ceafa3f1c5ef59333962ed9b60f2ae3d7679da0b7a960edfb",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -79,7 +79,7 @@
             "path": "layout/sram_256x32/macro.gds",
             "scope": "repo"
           },
-          "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
+          "content_hash": "sha256:7135c537719b870ceafa3f1c5ef59333962ed9b60f2ae3d7679da0b7a960edfb",
           "input_verified": true,
           "summary": "T1 item 2 (Layout): 3/3 attestation checks passed (klt signoff --attest)",
           "source": "layout/sram_256x32/macro.gds",
@@ -91,7 +91,7 @@
           },
           "regeneration": {
             "generator": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-            "regenerated_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
+            "regenerated_hash": "sha256:7135c537719b870ceafa3f1c5ef59333962ed9b60f2ae3d7679da0b7a960edfb",
             "executed_by_klt": false
           }
         }
@@ -112,7 +112,7 @@
         "command": null,
         "kind": "drc",
         "check_status": "clean",
-        "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
+        "content_hash": "sha256:7135c537719b870ceafa3f1c5ef59333962ed9b60f2ae3d7679da0b7a960edfb",
         "input_verified": true,
         "exit_status": 0,
         "coverage": {
@@ -123,11 +123,7 @@
             "189/4"
           ],
           "rules_skipped": [
-            "metal1.enclosing.via1.1",
-            "metal2.enclosing.via2.1",
             "metal3.enclosing.via3.1",
-            "metal3.space.1",
-            "metal3.width.1",
             "metal4.enclosing.via4.1",
             "metal4.space.1",
             "metal4.width.1",
@@ -153,10 +149,6 @@
             "topvia1.width.1",
             "topvia2.space.1",
             "topvia2.width.1",
-            "via1.space.1",
-            "via1.width.1",
-            "via2.space.1",
-            "via2.width.1",
             "via3.space.1",
             "via3.width.1",
             "via4.space.1",
