@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-10-30
 
+- **PR #110**: chore: remove generate-macro.sh, which always refuses to run
+- **Issue #100** (closed): Remove layout/reports/generate-macro.sh: always refuses to run
 - **PR #99**: feat: wire periphery ties and bitcell risers to VDD/VSS rails
 - **Issue #92** (closed): layout: macro supply rails and tie-to-rail connection
 - **PR #91**: fix: clear macro NWell spacing and add full-array DRC evidence for item 3
