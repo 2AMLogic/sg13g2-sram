@@ -173,16 +173,21 @@ Coverage, quoted from the report's `coverage` block:
 - `layers_in_stream_without_rules`: `5/1`, `8/25`, `10/25`, `189/4`
 - `deck_scope`: `Act`, `Cnt`, `Gat`, `M1`, `M2`, `M3`, `M4`, `M5`, `MIM`, `NW`,
   `TM1`, `TM2`, `TV1`, `TV2`, `V1`, `V2`, `V3`, `V4`, `pSD`
-- `rules_skipped` (38): `metal1.enclosing.via1.1`, `metal2.enclosing.via2.1`,
-  `metal3.enclosing.via3.1`, `metal3/4/5.space.1`, `metal3/4/5.width.1`,
-  `metal4.enclosing.via4.1`, `metal5.enclosing.mim.1`,
-  `metal5.enclosing.topvia1.1`, `mim.enclosing.topvia1.1`,
-  `nwell.enclosing.nactiv{,.dig,.hv}.1`, `nwell.space.nactiv{,.dig,.hv}.1`,
-  `topmetal1.enclosing.topvia{1,2}.1`, `topmetal1.{space,width}.1`,
-  `topmetal2.enclosing.topvia2.1`, `topmetal2.{space,width}.1`,
-  `topvia{1,2}.{space,width}.1`, `via{1,2,3,4}.{space,width}.1`. The full list is
-  in the report.
+- `rules_skipped` (30): `metal3.enclosing.via3.1`, `metal4.enclosing.via4.1`,
+  `metal4.space.1`, `metal4.width.1`, `metal5.enclosing.mim.1`,
+  `metal5.enclosing.topvia1.1`, `metal5.space.1`, `metal5.width.1`,
+  `mim.enclosing.topvia1.1`, `nwell.enclosing.nactiv.1`,
+  `nwell.enclosing.nactiv.dig.1`, `nwell.enclosing.nactiv.hv.1`,
+  `nwell.space.nactiv.1`, `nwell.space.nactiv.dig.1`, `nwell.space.nactiv.hv.1`,
+  `topmetal1.enclosing.topvia1.1`, `topmetal1.enclosing.topvia2.1`,
+  `topmetal1.space.1`, `topmetal1.width.1`, `topmetal2.enclosing.topvia2.1`,
+  `topmetal2.space.1`, `topmetal2.width.1`, `topvia1.space.1`, `topvia1.width.1`,
+  `topvia2.space.1`, `topvia2.width.1`, `via3.space.1`, `via3.width.1`,
+  `via4.space.1`, `via4.width.1`.
 
-Unchecked as a result: all rules on Metal2 and above and on every via layer, the
-NWell-to-N+ Activ rules, and every density, antenna and latch-up rule (the deck
-carries none). Periphery devices use bitcell-derived rule constants.
+The other 32 rules were checked (`rules_checked`), including Metal1-Metal3
+width/space, Via1/Via2 width/space/enclosure and the NWell-to-P+ Activ rules.
+Unchecked as a result: Metal4 and Metal5, TopMetal1/2, MIM, Via3/Via4, TopVia1/2,
+the Metal3 enclosure of Via3, the NWell-to-N+ Activ rules, and every density,
+antenna and latch-up rule (the deck carries none). Periphery devices use
+bitcell-derived rule constants.
