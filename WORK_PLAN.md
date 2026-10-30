@@ -23,7 +23,7 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
-- **#92**: layout: macro supply rails and tie-to-rail connection
+- **#104**: layout: signal router core, flat-net resolution and leaf-cell nets
 
 ## Ready
 
@@ -35,7 +35,6 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#29**: T1 item 3 (DRC clean): klt drc on the full macro with coverage disclosed
 - **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
 - **#69**: spec: confirm the 1 ns write-pulse window
@@ -45,7 +44,8 @@ Issues currently being built (`loom:building`).
 - **#73**: spec: no access-time target value
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified
-- **#92**: layout: macro supply rails and tie-to-rail connection
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
+- **#104**: layout: signal router core, flat-net resolution and leaf-cell nets
 
 ## PRs Awaiting Review
 
@@ -55,7 +55,6 @@ PRs waiting on Judge (`loom:review-requested`).
 - **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
 - **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
 - **#81**: docs(spec): pin the write-margin definition in a decision record
-- **#91**: fix: clear macro NWell spacing and add full-array DRC evidence for item 3
 
 ## Approved (Awaiting Merge)
 
@@ -69,7 +68,6 @@ PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 Issues carrying `loom:curated`.
 
-- **#29**: T1 item 3 (DRC clean): klt drc on the full macro with coverage disclosed *(curated)*
 - **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist *(curated)*
 - **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 *(curated)*
 - **#68**: spec: margins row has no Monte Carlo evidence *(curated)*
@@ -81,8 +79,9 @@ Issues carrying `loom:curated`.
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
-- **#92**: layout: macro supply rails and tie-to-rail connection *(curated)*
-- **#95**: layout: macro periphery signal nets and pin connection *(curated)*
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97) *(curated)*
+- **#104**: layout: signal router core, flat-net resolution and leaf-cell nets *(curated)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -102,7 +101,7 @@ _None._
 | Important | 2 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 11 |
-| PRs awaiting review | 5 |
+| PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 3 |
 | Curated | 14 |
 | Architect / Hermit proposals | 2 |
