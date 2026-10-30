@@ -193,6 +193,11 @@ wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply 
 Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: periphery signal
 routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
+The latest record (issue #106, `layout/reports/macro-record-latchnets.json`, minted by
+`layout/reports/generate-macro-latchnets.sh`) adds the nets between the leaf cells of `addr_latch`,
+`data_latch`, `out_latch` and `control` (27 nets, none undrawn; supply excluded); the macro DRC is still
+clean. Decoder cells, fan-out between blocks and pins are not drawn.
+
 The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
 put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the
 generator (`PACK_GAP` 0.65 um); no rule was waived and the deck was not trimmed.

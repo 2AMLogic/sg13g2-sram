@@ -459,3 +459,96 @@ def test_leaf_cell_trace_has_teeth_via2():
     _erase_at(layout.cell(name), g.L_VIA2, v["x"], v["y"])
     ids = _leaf_nets(layout, gen, name)
     assert len(set(ids[v["net"]])) > 1, (name, v)
+
+
+# ---- nets between the leaf cells of the latch and control cells (issue #106) ---------
+_HIER = {}
+
+
+def _hier_build():
+    if not _HIER:
+        _HIER["layout"], _HIER["gen"], _ = g.build()
+    return _HIER["layout"], _HIER["gen"]
+
+
+def _flat_net(lay, name):
+    """Flat connectivity of ``name`` (the cluster ids of a hierarchical extraction are local to each cell)."""
+    flat = lay.dup()
+    flat.cell(name).flatten(True)
+    return _extract_cell(flat, flat.cell(name))
+
+
+def _hier_points(gen, name):
+    """{label: [(x, y) Metal1 point in ``name``'s frame]}: every landing of a routed leaf-cell net, labelled with the net of
+    ``name`` it belongs to (the net its instance port is wired to, or ``instance/net`` for a net internal to the leaf)."""
+    pts: dict[str, list[tuple[float, float]]] = {}
+    for inst in gen.nl[name].insts:
+        if inst.ref not in gen.nl or inst.ref in g.DEVICE_REFS:
+            continue
+        dx, dy = (v * g.DBU for v in gen.place_of[name][inst.name])
+        port_net = dict(zip(gen.nl[inst.ref].ports, inst.nets))
+        for n, ps in gen.leaf_terms[inst.ref].items():
+            label = port_net.get(n, f"{inst.name}/{n}")
+            pts.setdefault(label, []).extend((x + dx, y + dy) for x, y in ps)
+    for n, ps in gen.hier_terms[name].items():
+        pts.setdefault(n, []).extend(ps)
+    return pts
+
+
+def test_hier_cell_nets_are_one_net_each_and_never_short():
+    layout, gen = _hier_build()
+    assert set(gen.hier_report) == set(g.HIER_ROUTED)
+    for name in g.HIER_ROUTED:
+        net = _flat_net(layout, name)
+        pts = _hier_points(gen, name)
+        ids = {label: {net(x, y) for x, y in ps} for label, ps in pts.items()}
+        for label, cl in ids.items():
+            assert None not in cl and len(cl) == 1, (name, label, cl)
+        reps = [next(iter(cl)) for cl in ids.values()]
+        assert len(set(reps)) == len(reps), (name, "two nets share a cluster")
+        for n in gen.hier_report[name]["routed"]:
+            assert n in ids, (name, n)
+        # every drawn net joins one terminal per instance port
+        assert gen.hier_report[name]["routed"], name
+
+
+def test_hier_cell_undrawn_nets_are_listed():
+    _, gen = _hier_build()
+    for name in g.HIER_ROUTED:
+        rep = gen.hier_report[name]
+        nets = {n for inst in gen.nl[name].insts if inst.ref in gen.nl and inst.ref not in g.DEVICE_REFS for n in inst.nets}
+        listed = set(rep["routed"]) | set(rep["failed"]) | set(rep["single_terminal"]) | set(rep["excluded"])
+        assert listed == nets, (name, nets ^ listed)
+
+
+def _hier_split(name, erase_lp, pick):
+    """Cluster ids per label after erasing, in a copy of the layout, the shape ``pick(gen, layout)`` -> (x, y) names."""
+    layout, gen = _hier_build()
+    lay = layout.dup()
+    cell = lay.cell(name)
+    pts = _hier_points(gen, name)
+    net = _flat_net(lay, name)
+    assert all(len({net(x, y) for x, y in ps}) == 1 for ps in pts.values())
+    x, y = pick(gen, layout)
+    _erase_at(cell, erase_lp, x, y)
+    net = _flat_net(lay, name)
+    return {label: {net(x, y) for x, y in ps} for label, ps in pts.items()}
+
+
+def test_hier_cell_trace_has_teeth_via2():
+    def pick(gen, layout):
+        sh = next(iter(layout.cell("control").shapes(layout.layer(*g.L_VIA2)).each()))
+        return sh.dbox.center().x, sh.dbox.center().y
+
+    after = _hier_split("control", g.L_VIA2, pick)
+    assert any(len(c) > 1 for c in after.values())
+
+
+def test_hier_cell_trace_has_teeth_wire():
+    def pick(gen, layout):
+        cell = layout.cell("control")
+        sh = max(cell.shapes(layout.layer(*g.L_METAL3)).each(), key=lambda s: s.dbox.width())
+        return sh.dbox.center().x, sh.dbox.center().y
+
+    after = _hier_split("control", g.L_METAL3, pick)
+    assert any(len(c) > 1 for c in after.values())

@@ -77,22 +77,22 @@ hr "8. macro: DRC of the full array (klt drc --deck sg13g2; coverage gaps are in
 klt drc --deck sg13g2 --top macro $D/macro.gds
 klt drc --check layout/reports/drc-macro.json
 
-hr "9. macro: the leaf-net record matches the committed layout; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
+hr "9. macro: the latest record matches the committed layout; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
 python3 - <<'PYEOF'
 import hashlib, json, sys
-rec = json.load(open("layout/reports/macro-record-leafnets.json"))
+rec = json.load(open("layout/reports/macro-record-latchnets.json"))
 for key in ("gds", "lef", "socket"):
     for path, want in rec[key].items():
         got = hashlib.sha256(open(path, "rb").read()).hexdigest()
         if got != want:
-            sys.exit(f"FAIL: {path} differs from macro-record-leafnets.json")
+            sys.exit(f"FAIL: {path} differs from macro-record-latchnets.json")
 c = rec["rails_connectivity"]
 ok = (c["ties_on_own_rail"] == c["ties_expected"] and c["ties_floating"] == 0 and c["ties_on_other_rail"] == 0
       and c["vdd_vss_short_polygons"] == 0
       and all(v["on_rail"] == v["expected"] and v["on_other_rail"] == 0 for v in c["bitcell_risers"].values()))
 if not ok:
-    sys.exit("FAIL: macro-record-leafnets.json reports a floating tie, a stray rail or a short")
+    sys.exit("FAIL: macro-record-latchnets.json reports a floating tie, a stray rail or a short")
 if rec["rails_vs_wordline_gap"]["total"] != 0:
-    sys.exit("FAIL: macro-record-leafnets.json reports a rail shape below Metal4 in the wordline gap")
+    sys.exit("FAIL: macro-record-latchnets.json reports a rail shape below Metal4 in the wordline gap")
 print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
 PYEOF
