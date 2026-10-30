@@ -14,6 +14,18 @@ Subcommands (all inputs are `klt sim` report envelopes, plain or .json.gz):
   write <report> <label>
       Write margin per corner from the flip flags of the 33 bit-line levels.
 
+Monte Carlo (sim/bitcell/run_bitcell_mc.sh; reports from `klt sim` with `monte_carlo`):
+  mc-request <base.json> <out.json> <process> <vdd> <temp_c> <n> <seed> [--netlist PATH]
+      One corner point as a mismatch Monte Carlo request (`<process>_mismatch` section).
+      n = 0 gives the deterministic request instead (plain `<process>` section, no sampling).
+  mc-snm <report> <label>      per-sample hold/read SNM and the instance-asymmetry check.
+  mc-write <report> <label>    per-sample write margin (single-cell bench_write_mc.cir).
+  mc-yield-set <mc-snm.json> <mc-write.json> <out.json>
+      A `klt yield` sample-set document: strictly positive lower limit (0 V, exclusive).
+  mc-negctl <ref mc-snm.json> <negctl mc-snm.json>
+      Exit 0 iff the negative-control read SNM sits clearly below the reference's.
+  mc-same <a.json> <b.json>    exit 0 iff two sample files hold identical values.
+
 SNM is the inscribed-square side (square_snm, the Seevinck construction klt's own
 `snm` measurement uses). snm_extract.py's vertical-gap value is recorded beside it
 as `*_snm_vgap_v`; it over-reads the square. A cell with no butterfly eye falls
@@ -132,10 +144,38 @@ def _write_csv(path: Path, x: list[float], y: list[float]) -> None:
     path.write_text("".join(f"{a:.9g} {b:.9g}\n" for a, b in zip(x, y)))
 
 
+_SNM_NODES = {
+    "hold": ("v(qha)", "v(qbha)", "v(qbhb)", "v(qhb)"),
+    "read": ("v(qra)", "v(qbra)", "v(qbrb)", "v(qrb)"),
+}
+
+
+def _snm_entry(cols: dict[str, list[float]], cdir: Path | None = None, tag: str = "") -> dict:
+    """Hold/read SNM (and the vgap value) from one DC report's columns; the curves
+    go to <cdir>/<tag>.<kind>.curve{1,2}.csv when cdir is given. `*_asym_v` is the
+    largest difference between the two identical instances' responses at the same
+    forced voltage: 0 when the instances are identical, > 0 when mismatch is live."""
+    entry: dict = {}
+    for kind, (qa, qba, qbb, qb) in _SNM_NODES.items():
+        # curve 1: Q -> QB (instance a forces Q); curve 2: QB -> Q (instance b forces QB)
+        if cdir is not None:
+            _write_csv(cdir / f"{tag}.{kind}.curve1.csv", cols[qa], cols[qba])
+            _write_csv(cdir / f"{tag}.{kind}.curve2.csv", cols[qbb], cols[qb])
+        p1 = sorted(zip(cols[qa], cols[qba]))
+        p2 = sorted(zip(cols[qbb], cols[qb]))
+        sq, vgap = signed_snm(p1, p2)
+        entry[f"{kind}_snm_v"] = sq
+        # snm_extract.py vertical-gap value: over-reads, kept for traceability
+        entry[f"{kind}_snm_vgap_v"] = vgap
+        entry[f"{kind}_asym_v"] = max(abs(a - b) for a, b in zip(cols[qba], cols[qb]))
+    return entry
+
+
 def cmd_snm(report: str, art_root: str, curves_dir: str, label: str) -> dict:
     rep = load_report(report)
-    cdir = Path(curves_dir)
-    cdir.mkdir(parents=True, exist_ok=True)
+    cdir = Path(curves_dir) if curves_dir else None
+    if cdir:
+        cdir.mkdir(parents=True, exist_ok=True)
     out = {"label": label, "kind": "simulated", "corners": []}
     for c in rep["corners"]:
         cid = c["corner_id"]
@@ -146,20 +186,7 @@ def cmd_snm(report: str, art_root: str, curves_dir: str, label: str) -> dict:
             out["corners"].append(entry)
             continue
         cols = _columns(wave)
-        tag = cid.replace("/", "_")
-        for kind, (qa, qba, qbb, qb) in {
-            "hold": ("v(qha)", "v(qbha)", "v(qbhb)", "v(qhb)"),
-            "read": ("v(qra)", "v(qbra)", "v(qbrb)", "v(qrb)"),
-        }.items():
-            # curve 1: Q -> QB (instance a forces Q); curve 2: QB -> Q (instance b forces QB)
-            _write_csv(cdir / f"{tag}.{kind}.curve1.csv", cols[qa], cols[qba])
-            _write_csv(cdir / f"{tag}.{kind}.curve2.csv", cols[qbb], cols[qb])
-            p1 = sorted(zip(cols[qa], cols[qba]))
-            p2 = sorted(zip(cols[qbb], cols[qb]))
-            sq, vgap = signed_snm(p1, p2)
-            entry[f"{kind}_snm_v"] = sq
-            # snm_extract.py vertical-gap value: over-reads, kept for traceability
-            entry[f"{kind}_snm_vgap_v"] = vgap
+        entry.update(_snm_entry(cols, cdir, cid.replace("/", "_")))
         out["corners"].append(entry)
     return out
 
@@ -191,6 +218,93 @@ def cmd_write(report: str, label: str) -> dict:
     return out
 
 
+# --- Monte Carlo -----------------------------------------------------------------------------
+# Spec (spec/sram.md, Statistical treatment): the margins are statistical rows with a "strictly
+# positive" lower limit and no numeric target_yield (none is introduced here).
+MC_LIMITS = {"min": 0.0, "exclusive_min": True}
+MC_MEASUREMENTS = (("hold_snm_v", "hold_snm_v"), ("read_snm_v", "read_snm_v"), ("write_margin_v", "write_margin_v"))
+NEGCTL_SIGMA = 3.0
+
+
+def cmd_mc_request(base: str, dst: str, process: str, vdd: float, temp: float, n: int, seed: int,
+                   netlist: str | None) -> None:
+    r = json.load(open(base))
+    section = process.removesuffix("_mismatch") + ("_mismatch" if n else "")
+    r["corners"] = {"process": [section], "supply_v": {"vdd": [vdd]}, "temperature_c": [temp]}
+    r.pop("monte_carlo", None)
+    if n:
+        r["monte_carlo"] = {"n": n, "seed": seed, "vary": "mismatch"}
+    if netlist:
+        r["netlist"] = netlist
+    json.dump(r, open(dst, "w"), indent=2)
+    open(dst, "a").write("\n")
+
+
+def _mc_wrap(res: dict, report: str) -> dict:
+    """Attach the sample index and seeds from the klt report to each per-sample entry."""
+    rep = load_report(report)
+    info = {c["corner_id"]: c.get("monte_carlo") or {} for c in rep["corners"]}
+    mc = rep.get("environment", {}).get("monte_carlo", {})
+    res["monte_carlo"] = {k: mc.get(k) for k in ("n", "seed", "vary")}
+    res["monte_carlo"]["family_mismatch"] = mc.get("family_mismatch")
+    res["samples"] = res.pop("corners")
+    for e in res["samples"]:
+        e["sample_index"] = info.get(e["corner_id"], {}).get("sample_index")
+        e["mismatch_seed"] = info.get(e["corner_id"], {}).get("mismatch_seed")
+    res["samples"].sort(key=lambda e: (e["sample_index"] is None, e["sample_index"]))
+    return res
+
+
+def cmd_mc_snm(report: str, label: str) -> dict:
+    return _mc_wrap(cmd_snm(report, "", "", label), report)
+
+
+def cmd_mc_write(report: str, label: str) -> dict:
+    return _mc_wrap(cmd_write(report, label), report)
+
+
+def _stats(vals: list[float]) -> tuple[float, float]:
+    mean = sum(vals) / len(vals)
+    sd = (sum((v - mean) ** 2 for v in vals) / (len(vals) - 1)) ** 0.5 if len(vals) > 1 else 0.0
+    return mean, sd
+
+
+def _values(samples: list[dict], key: str) -> list[float]:
+    return [e[key] for e in samples if e.get(key) is not None]
+
+
+def negctl_detected(ref: list[float], neg: list[float]) -> bool:
+    """True iff the negative control's mean sits more than NEGCTL_SIGMA times the larger of the
+    two sample standard deviations below the reference's mean ("clearly below"), so overlapping
+    distributions do not pass."""
+    if len(ref) < 2 or len(neg) < 2:
+        return False
+    (mr, sr), (mn, sn) = _stats(ref), _stats(neg)
+    return mr - mn > NEGCTL_SIGMA * max(sr, sn, 1e-12)
+
+
+def yield_set(snm: dict, write: dict | None) -> dict:
+    """A `klt yield` sample-set document. A sample with no value (no butterfly eye, or no flip even
+    with the bit line at 0 V) is counted as a failure through `failed_unmeasurable`, never dropped."""
+    meas = []
+    for name, key in MC_MEASUREMENTS:
+        src = write if name == "write_margin_v" else snm
+        if src is None:
+            continue
+        rows = [e for e in src["samples"] if "error" not in e]
+        vals = _values(rows, key)
+        meas.append({"name": name, "unit": "V", "samples": vals, "failed_unmeasurable": len(rows) - len(vals),
+                     "errored": len(src["samples"]) - len(rows), "limits": dict(MC_LIMITS)})
+    return {"measurements": meas}
+
+
+def same_samples(a: dict, b: dict) -> bool:
+    keys = ("hold_snm_v", "read_snm_v", "write_margin_v")
+    ra = [tuple(e.get(k) for k in keys) for e in a["samples"]]
+    rb = [tuple(e.get(k) for k in keys) for e in b["samples"]]
+    return bool(ra) and ra == rb
+
+
 def main() -> int:
     a = sys.argv[1:]
     if not a:
@@ -204,6 +318,26 @@ def main() -> int:
         print(json.dumps(cmd_snm(a[1], a[2], a[3], a[4]), indent=2))
     elif a[0] == "write":
         print(json.dumps(cmd_write(a[1], a[2]), indent=2))
+    elif a[0] == "mc-request":
+        cmd_mc_request(a[1], a[2], a[3], float(a[4]), float(a[5]), int(a[6]), int(a[7]),
+                       a[9] if len(a) > 9 and a[8] == "--netlist" else None)
+    elif a[0] == "mc-snm":
+        print(json.dumps(cmd_mc_snm(a[1], a[2]), separators=(",", ":")))
+    elif a[0] == "mc-write":
+        print(json.dumps(cmd_mc_write(a[1], a[2]), separators=(",", ":")))
+    elif a[0] == "mc-yield-set":
+        w = json.load(open(a[2])) if a[2] != "-" else None
+        json.dump(yield_set(json.load(open(a[1])), w), open(a[3], "w"), indent=2)
+        open(a[3], "a").write("\n")
+    elif a[0] == "mc-negctl":
+        r, n = json.load(open(a[1])), json.load(open(a[2]))
+        ok = negctl_detected(_values(r["samples"], "read_snm_v"), _values(n["samples"], "read_snm_v"))
+        print("detected" if ok else "NOT detected")
+        return 0 if ok else 1
+    elif a[0] == "mc-same":
+        ok = same_samples(json.load(open(a[1])), json.load(open(a[2])))
+        print("identical" if ok else "DIFFERENT")
+        return 0 if ok else 1
     else:
         print(__doc__, file=sys.stderr)
         return 2
