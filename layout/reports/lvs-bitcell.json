@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "engine": "klayout",
+  "layout": {
+    "path": "layout/reports/bitcell-extracted.spice",
+    "scope": "repo"
+  },
+  "reference": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-27/design/bitcell/bitcell.spice",
+  "top": "SG13G2_SRAM_BITCELL_6T",
+  "reference_top": "BITCELL",
+  "reference_conversion": {
+    "form": "subckt-call",
+    "deck": null,
+    "device_map": null
+  },
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": false,
+    "combine_devices_per_circuit": null,
+    "combine_devices_max_attempts": 5,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null,
+    "compare_parameters": null,
+    "power_connectivity": null,
+    "anchor_top_level_pins": null,
+    "strict_top_level_pin_count": false,
+    "compare_mos_flavour": false,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ],
+    "finfet_bulk": null
+  },
+  "hints_applied": null,
+  "constant_nets_applied": null,
+  "status": "match",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'subckt-call', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "excluded_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "unchecked",
+    "reason": "no request.layout.deck was given (the pre-extracted request.layout.netlist form), so nothing establishes this layout's substrate/well-tap convention and no synthesized body net can be told apart from a real one -- this run verified nothing about the device bodies either way",
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
+  "device_parameter_coverage": [],
+  "mismatch_count": 0,
+  "error_count": 0,
+  "category_counts": {},
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 7,
+      "reference": 7,
+      "matched": 7
+    },
+    "devices": {
+      "layout": 6,
+      "reference": 6,
+      "matched": 6
+    },
+    "pins": {
+      "layout": 7,
+      "reference": 7,
+      "matched": 7
+    }
+  },
+  "device_classes": null,
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.12",
+    "netgen_binary": null,
+    "layout_sha256": "87c82f51a19af35ec2d45d5c10725e2d489addaeecd1020e9a46ee10c71b0df6",
+    "reference_sha256": "1fdf13f2753259b1c751a19f21fed5b57487d71883ad935a604b957a0c959fda",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.8.1.dev738+gd73dc11df57f",
+    "klt_git_commit": "d73dc11df57f28f235fd08120041d05a5d624222",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@d73dc11df57f28f235fd08120041d05a5d624222",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "content_hash": "sha256:87c82f51a19af35ec2d45d5c10725e2d489addaeecd1020e9a46ee10c71b0df6",
+      "role": "netlist"
+    },
+    "klayout_version_mismatch": false
+  },
+  "mismatches": [],
+  "net_correspondence": [
+    {
+      "layout": "BL",
+      "reference": "BL",
+      "pin": true
+    },
+    {
+      "layout": "BLB",
+      "reference": "BLB",
+      "pin": true
+    },
+    {
+      "layout": "Q",
+      "reference": "Q",
+      "pin": true
+    },
+    {
+      "layout": "QB",
+      "reference": "QB",
+      "pin": true
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    },
+    {
+      "layout": "WL",
+      "reference": "WL",
+      "pin": true
+    }
+  ]
+}
