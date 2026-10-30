@@ -139,12 +139,14 @@ is the new record (`macro-record.json` is unchanged).
 
 ### What this macro is not (read before citing it)
 
-It is **partly routed**. The array interface (wordlines, bit lines) is wired; there is still no
-signal wiring inside the periphery (a net with several device terminals in one cell, such as
-`BL` on both precharge PMOS drains, is reached at one of them) and none to the macro pins; no
-supply rails (#92), no well or substrate taps outside the bitcell, no body connections. The LEF
-pins are drawn Metal2 but are not connected to the logic, so the macro is not LVS-able yet. The
-wordline label on GatPoly text (5/1) sits mid-cell, off the poly row, and is not read by
-`klt extract`; the wordline nets take their names from the driver labels. Routing the rest is
-#92 and #95; #29 (DRC), #30 (LVS) and #31 (power ERC) cannot proceed past them. Unrun here: the
-PDK-native DRC, `klt array-check`, and DRC of the periphery against rules the curated deck lacks.
+It is **partly routed**. The array interface (wordlines, bit lines) is wired, and every
+periphery transistor now carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
+with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`). The
+ties are **not wired to a rail**. There is still no signal wiring inside the periphery (a net
+with several device terminals in one cell, such as `BL` on both precharge PMOS drains, is reached
+at one of them) and none to the macro pins; no supply rails (#92). The LEF pins are drawn Metal2
+but are not connected to the logic, so the macro is not LVS-able yet. The wordline label on
+GatPoly text (5/1) sits mid-cell, off the poly row, and is not read by `klt extract`; the
+wordline nets take their names from the driver labels. Routing the rest is #92 and #95; #29
+(DRC), #30 (LVS) and #31 (power ERC) cannot proceed past them. Unrun here: the PDK-native DRC,
+`klt array-check`, and DRC of the periphery against rules the curated deck lacks.
