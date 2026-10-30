@@ -3,7 +3,7 @@
   "kind": "analog",
   "evidence": {
     "1": {"file": "attest/item1.envelope.json", "content_hash": "sha256:22729c8aea6a4cc503f7c6ed964c146a0f975a4e4ee3ca508ff7d8dd9428cb61"},
-    "2": {"file": "attest/item2.envelope.json", "content_hash": "sha256:33c963621913482a613487e4a20ec2fd17d59747aeb46a3efaaa70cd16dc4c77"},
+    "2": {"file": "attest/item2.envelope.json", "content_hash": "sha256:b516950a6689e6f2c66a5845e8368cd6b22965556382e6f20cdafbabf4f1a275"},
     "9": {"file": "attest/item9.envelope.json", "content_hash": "sha256:905bbb69f90a48e22daa0f21bfe8c6f3e0a626d16faff63202b818d2eb666672"},
     "10": {"file": "attest/item10.envelope.json", "content_hash": "sha256:c832c41b5efc0695a644af8245a849fc590fbe41cdc7e0c4d7b057825cb8aa09"}
   }
