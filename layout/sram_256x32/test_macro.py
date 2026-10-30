@@ -1,5 +1,6 @@
-"""Macro generator tests: determinism, array count, pin set vs the netlist, and
-net-tracing of the array-interface routing (wordlines, bit lines).
+"""Macro generator tests: determinism, array count, pin set vs the netlist,
+net-tracing of the array-interface routing (wordlines, bit lines) and of the
+leaf-cell signal routing (flat-net resolution, router, per-cell connectivity).
 
     cd layout/sram_256x32 && uv run --with pytest --with klayout pytest -q test_macro.py
 """
@@ -268,3 +269,193 @@ def test_gap_clearance_check_has_teeth():
     layout, gen, top = g.build()
     gen.box(layout.cell("rails"), g.L_VIA2, -10.0, 20.0, -9.81, 20.19)
     assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1
+
+
+# ---- flat-net resolution (issue #104) -------------------------------------------
+def _device_count(nl, name):
+    n = 0
+    for inst in nl[name].insts:
+        if inst.ref in g.DEVICE_REFS:
+            n += 1
+        elif inst.ref in nl and inst.ref != "bitcell":
+            n += _device_count(nl, inst.ref)
+    return n
+
+
+def test_flat_nets_partition_every_device_terminal():
+    nl = g.parse_netlist(g.NETLIST)
+    flat = g.flat_nets(nl)
+    terms = [t for v in flat.values() for t in v["terminals"]]
+    assert len(terms) == len(set(terms)) == 4 * _device_count(nl, g.TOP) == 4 * 2796
+
+
+def test_flat_nets_resolve_across_the_hierarchy():
+    flat = g.flat_nets(g.parse_netlist(g.NETLIST))
+    pre = flat["PRE_B"]  # control output -> the precharge gates of all 32 slices
+    assert not pre["excluded"]
+    slices = {t[0].split("/")[0] for t in pre["terminals"] if t[0].startswith("XS[")}
+    assert len(slices) == 32
+    assert sum(1 for t in pre["terminals"] if t[0].startswith("XS[") and t[2] == "G") == 32 * 2 * 3
+    assert any(t[0].startswith("XCTL") for t in pre["terminals"])
+    # the latched address bit AL[0] reaches both the address latch and the control
+    al0 = {t[0].split("/")[0] for t in flat["AL[0]"]["terminals"]}
+    assert {"XAL", "XCTL"} <= al0
+    # a net internal to an instance is named by its path
+    assert any(k.startswith("XAL/") and k.endswith("/N1") for k in flat)
+
+
+def test_flat_nets_exclude_supply_bit_lines_and_wordlines():
+    flat = g.flat_nets(g.parse_netlist(g.NETLIST))
+    why = {k: v["excluded"] for k, v in flat.items()}
+    assert why["VDD"] == why["VSS"] == "supply"
+    assert why["WL[0]"] == why["WL[127]"] == "wordline"
+    bl = [k for k in flat if g.excluded_net(k.rsplit("/", 1)[-1]) == "bit line"]
+    assert bl and all(why[k] == "bit line" for k in bl)
+    assert not why["PRE_B"] and not why["D[0]"] and not why["DOUT[3]"]
+
+
+# ---- the router (issue #104) ----------------------------------------------------
+def _scratch_extract(layout, cell, points):
+    """Net ids of ``points`` ({name: (layer, x, y)}) over Metal2-Via2-Metal3 of ``cell`` (Metal1/Via1 landings aside)."""
+    names = dict(m2=g.L_METAL2, v2=g.L_VIA2, m3=g.L_METAL3)
+    l2n = kdb.LayoutToNetlist(kdb.RecursiveShapeIterator(layout, cell, []))
+    ly = {n: l2n.make_layer(layout.layer(*lp), n) for n, lp in names.items()}
+    l2n.connect(ly["m2"], ly["v2"])
+    l2n.connect(ly["v2"], ly["m3"])
+    for n in ly:
+        l2n.connect(ly[n])
+    l2n.extract_netlist()
+    out = {}
+    for k, (layer, x, y) in points.items():
+        n = l2n.probe_net(ly[layer], kdb.DPoint(x, y))
+        out[k] = None if n is None else n.cluster_id
+    return out
+
+
+def _draw_nets(nets, box=3000):
+    """Route ``{name: [lattice nodes]}`` on an empty MazeRouter and draw it; returns (layout cell, routed ok, shapes)."""
+    gen = g.Gen()
+    cell = gen.layout.create_cell("scratch")
+    mz = g.MazeRouter(0, 0, box, box)
+    ids = {n: k + 1 for k, n in enumerate(nets)}
+    for n, ts in nets.items():
+        for t in ts:
+            mz.pad(0, t, ids[n])
+    ok = {n: mz.route_net(ids[n], ts) for n, ts in nets.items()}
+    regions = {}
+    for n in nets:
+        drawn, _ = gen.draw_shapes(cell, mz.shapes.get(ids[n], []))
+        for t in nets[n]:
+            gen.rect(cell, g.L_METAL2, t[0] * g.STEP * g.DBU, t[1] * g.STEP * g.DBU, g.M2_W, g.M2_W)
+        regions[n] = drawn
+    return gen, cell, ok, regions
+
+
+def test_router_crosses_two_nets_without_a_short():
+    a, b = [(4, 30), (56, 30)], [(30, 4), (30, 56)]  # an X: the two nets must cross
+    gen, cell, ok, regions = _draw_nets({"A": a, "B": b})
+    assert ok == {"A": True, "B": True}
+    # they do cross in plan view (one on each layer) ...
+    assert not ((regions["A"][1] & regions["B"][0]).is_empty() and (regions["A"][0] & regions["B"][1]).is_empty())
+    # ... and extraction keeps them apart while joining each one's two ends
+    pts = {f"{n}{k}": ("m2", t[0] * g.STEP * g.DBU, t[1] * g.STEP * g.DBU) for n, ts in (("A", a), ("B", b)) for k, t in enumerate(ts)}
+    ids = _scratch_extract(gen.layout, cell, pts)
+    assert ids["A0"] == ids["A1"] is not None and ids["B0"] == ids["B1"] is not None
+    assert ids["A0"] != ids["B0"]
+
+
+def test_router_single_terminal_net_needs_no_wire_and_unroutable_is_reported():
+    mz = g.MazeRouter(0, 0, 3000, 3000)
+    assert mz.route_net(1, [(10, 10)]) and not mz.shapes.get(1)
+    # a terminal boxed in by another net's hard obstacles cannot be joined: reported, not hidden
+    mz = g.MazeRouter(0, 0, 3000, 3000)
+    mz.block(0, 0.5, 0.5, 1.5, 1.5)
+    mz.block(1, 0.5, 0.5, 1.5, 1.5)
+    mz.pad(0, (20, 20), 1)
+    mz.pad(0, (50, 50), 1)
+    assert not mz.route_net(1, [(20, 20), (50, 50)])
+
+
+def test_router_keeps_spacing_between_nets():
+    gen, cell, ok, regions = _draw_nets({"A": [(4, 30), (56, 30)], "B": [(4, 40), (56, 40)], "C": [(10, 4), (10, 56)]})
+    assert all(ok.values())
+    for l in (0, 1):
+        # nets are separate polygons at least M2.b / M3.b apart
+        for x, y in (("A", "B"), ("A", "C"), ("B", "C")):
+            assert regions[x][l].merged().separation_check(regions[y][l].merged(), g.dbu(g.M2_SPACE)).count() == 0, (x, y, l)
+
+
+# ---- leaf-cell nets on the generated layout (issue #104) ----------------------------
+def _extract_cell(layout, cell):
+    """Hierarchical connectivity of one leaf cell: Cont-Metal1-Via1-Metal2-Via2-Metal3."""
+    names = dict(cont=g.bc.L_CONT, m1=g.bc.L_METAL1, v1=g.L_VIA1, m2=g.L_METAL2, v2=g.L_VIA2, m3=g.L_METAL3)
+    l2n = kdb.LayoutToNetlist(kdb.RecursiveShapeIterator(layout, cell, []))
+    ly = {n: l2n.make_layer(layout.layer(*lp), n) for n, lp in names.items()}
+    for a, b in (("cont", "m1"), ("m1", "v1"), ("v1", "m2"), ("m2", "v2"), ("v2", "m3")):
+        l2n.connect(ly[a], ly[b])
+    for n in ly:
+        l2n.connect(ly[n])
+    l2n.extract_netlist()
+
+    def net(x, y):
+        n = l2n.probe_net(ly["m1"], kdb.DPoint(x, y))
+        return None if n is None else n.cluster_id
+
+    return net
+
+
+def _leaf_nets(layout, gen, name):
+    """{net: [cluster id of each of its terminals]} for the nets drawn in leaf cell ``name``."""
+    net = _extract_cell(layout, layout.cell(name))
+    return {n: [net(x, y) for x, y in pts] for n, pts in gen.leaf_terms[name].items()}
+
+
+def test_leaf_cell_nets_are_one_net_each_and_never_short():
+    layout, gen, _ = g.build()
+    assert set(gen.leaf_report) == set(g.LEAF_ROUTED)
+    n_checked = 0
+    for name in g.LEAF_ROUTED:
+        ids = _leaf_nets(layout, gen, name)
+        assert ids, name
+        for n, cl in ids.items():
+            assert None not in cl and len(set(cl)) == 1, (name, n, cl)
+        reps = [cl[0] for cl in ids.values()]
+        assert len(set(reps)) == len(reps), (name, "two netlist nets share a cluster")
+        n_checked += len(ids)
+    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 47
+
+
+def test_leaf_cell_undrawn_nets_are_listed():
+    _, gen, _ = g.build()
+    # every net of every leaf cell is either drawn, listed as undrawn, or excluded/single-terminal by rule
+    for name in g.LEAF_ROUTED:
+        rep = gen.leaf_report[name]
+        nets = {n for inst in gen.nl[name].insts if inst.ref in g.DEVICE_REFS for n in inst.nets[:3]}
+        listed = set(rep["routed"]) | set(rep["failed"]) | set(rep["single_terminal"]) | set(rep["excluded"])
+        assert listed == nets, (name, nets ^ listed)
+    # the known gap: the column mux's BLBM is not joined (the bit-line jogs leave no Metal3 crossing)
+    undrawn = {(name, n) for name in g.LEAF_ROUTED for n in gen.leaf_report[name]["failed"]}
+    assert undrawn == {("column_mux", "BLBM")}, undrawn
+    assert gen.leaf_report["inv"]["routed"] == {"A": 2, "Y": 2}
+    assert gen.leaf_report["precharge"]["excluded"]["BL"]["reason"] == "bit line"
+
+
+def test_leaf_cell_trace_has_teeth_via1_landing():
+    def probe(mutate):
+        layout, gen, _ = g.build()
+        if mutate:
+            x, y = gen.leaf_terms["nand2"]["Y"][0]
+            _erase_at(layout.cell("nand2"), g.L_VIA1, x, y)
+        return _leaf_nets(layout, gen, "nand2")
+
+    assert len(set(probe(False)["Y"])) == 1
+    cut = probe(True)
+    assert len(set(cut["Y"])) > 1 and len(set(cut["A"])) == 1
+
+
+def test_leaf_cell_trace_has_teeth_via2():
+    layout, gen, _ = g.build()
+    name, v = next((n, vs[0]) for n, vs in sorted(gen.leaf_vias.items()) if vs)
+    _erase_at(layout.cell(name), g.L_VIA2, v["x"], v["y"])
+    ids = _leaf_nets(layout, gen, name)
+    assert len(set(ids[v["net"]])) > 1, (name, v)
