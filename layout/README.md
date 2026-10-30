@@ -112,20 +112,33 @@ area and the klt/deck identity are in `layout/reports/macro-record.json`.
 
 ### What this macro is not (read before citing it)
 
-Issue #88 is landing in steps; this is the state after step 1 (taps). Every
-periphery transistor now carries a body tie (n+ Activ in the PMOS well; p+ Activ
-in pSD for NMOS) with a Metal1 pad labelled with the netlist bulk net. The ties
-are **not wired to a rail**, and there is still **no signal routing**: none in the
-periphery, none between the array and the column path or decoder, no wordline
-routing, no supply rails, and the LEF pins connect to nothing. `klt extract`
-recognises all 51,948 devices (34,118 nfet / 17,830 pfet, equal to the netlist's
-flattened count) but the nets are not the netlist's, so the macro is not
-LVS-able. Result: `layout/reports/macro-record-taps.json` (the #87 record
-`macro-record.json` is unchanged). Area 333.560 x 573.045 um = 191,144.9 um2,
-**3.86x** the reference.
+Issue #88 is landing in steps; this is the state after step 2 (supply rails, #92),
+following step 1 (taps, #96). Every periphery transistor carries a body tie (n+
+Activ in the PMOS well; p+ Activ in pSD for NMOS) and every tie, and every bitcell
+VDD/VSS riser, is now wired to a VDD or VSS rail: Via1 and a Metal2 pad on each
+tie, a Metal2 stub to a Metal3 lane (4 um pitch, VDD/VSS interleaved, one set per
+floorplan region), and the lanes to two Metal4 trunks (VDD x = -2.3, VSS x = -1.1)
+in the corridor left of the array; in the array a Metal1 pad and Via1 on the risers
+and a Metal2 strap at every row seam (even VSS, odd VDD; the mirror abutment merges
+the risers there) run to the same trunks through Via2, Metal3 and Via3. The
+`VDD`/`VSS` **pin squares are not connected to the rails** (that is #95), and there
+is still **no signal routing**: none in the periphery, none between the array and
+the column path or decoder, no wordline routing, and the LEF signal pins connect to
+nothing. Evidence (`layout/reports/macro-record-rails.json`, `./layout/verify.sh`
+step 8): 2796 of 2796 periphery ties and 8192 + 8192 bitcell risers reach their own
+rail, none the other, no VDD-VSS short in a flat Metal1-Metal4 connectivity
+analysis, and `klt extract --deck sg13g2` now reports two bulk nets, VSS for all
+34,118 nfet and VDD for all 17,830 pfet (before the rails every device had its own
+bulk net). The nets are still not the netlist's signal nets, so the macro is not
+LVS-able. The #87 (`macro-record.json`) and #96 (`macro-record-taps.json`) records
+are unchanged. The Via1 sits directly over the tie Cont; the curated deck does not
+test stacking and the PDK-native deck was not run. The D/Q pins moved 0.5 um outward
+so periphery Metal2 keeps its spacing to them. Area 333.560 x 573.615 um =
+191,335.0 um2, **3.87x** the reference. Rail widths carry no current or
+electromigration analysis.
 
 Known: the macro DRC (`klt drc --deck sg13g2`) reports `nwell.space.1` only, 522 on
 the #87 layout and 563 with the taps (the 41 added are the same rule, in the packed
-periphery); full macro DRC is #29. Remaining for #88, in order: supply rails and
-tie-to-rail, array-to-column-path and wordline routing, periphery signal nets and
-pin connection. Unrun here: PDK-native DRC and `klt array-check`.
+periphery) and still 563 with the rails (no Metal2-Metal4 or via rule fires); full
+macro DRC is #29. Remaining for #88, in order: array-to-column-path and wordline
+routing, periphery signal nets and pin connection. Unrun here: PDK-native DRC and `klt array-check`.

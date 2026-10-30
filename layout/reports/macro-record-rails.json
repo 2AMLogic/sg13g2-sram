@@ -1,0 +1,124 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+  "record_command": "./layout/reports/generate-macro.sh",
+  "gds": {
+    "layout/sram_256x32/macro.gds": "b516950a6689e6f2c66a5845e8368cd6b22965556382e6f20cdafbabf4f1a275"
+  },
+  "lef": {
+    "layout/sram_256x32/macro.lef": "36d61c280b3ad8c49aead1076efcf079b3166be7153226b4869898de79fa1dec"
+  },
+  "socket": {
+    "layout/sram_256x32/macro.socket.json": "c57be5cf92049a3c853c4a9d65301ed6def42e0f88916148dbf1dc60160beaff"
+  },
+  "top_cell": "macro",
+  "organization": "128 rows x 64 columns (mux 2), 32 bit_slice",
+  "bitcell_instances_flattened": 8192,
+  "bl_pair_bitcell_instances": 128,
+  "bit_slice_instances": 7,
+  "macro_size_um": {
+    "x": 333.56,
+    "y": 573.615
+  },
+  "macro_area_um2": 191335.0,
+  "array_area_um2": 84757.3,
+  "reference_area_um2": 49488.5,
+  "reference": "shipped sg13g2_sram 256x32 macro, 416.64 x 118.78 um (spec/bitcell-decision.md)",
+  "area_ratio_vs_reference": 3.87,
+  "socket_check": {
+    "status": "pass"
+  },
+  "lef_pin_geometry_sources": [
+    "drawn"
+  ],
+  "lef_obs_mode": "coarse",
+  "edge_and_corner_dummies": "none drawn (ties are in-cell)",
+  "extract": {
+    "status": "extracted",
+    "device_count": 51948,
+    "device_counts": {
+      "nfet": 34118,
+      "pfet": 17830
+    },
+    "net_count": 25108,
+    "pin_count": 8596
+  },
+  "netlist_flattened_device_count": 51948,
+  "netlist_flattened_device_counts": {
+    "nfet": 34118,
+    "pfet": 17830
+  },
+  "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net (record: macro-record-taps.json)",
+  "rails_step": "Via1 + Metal2 pad on every tie; Metal2 stub to a Metal3 lane (4 um pitch, VDD/VSS interleaved) per floorplan region; lanes to two Metal4 trunks (VDD x=-2.3, VSS x=-1.1) in the corridor left of the array. Array: Metal1 pad + Via1 on the risers and a Metal2 strap at every row seam (even VSS, odd VDD) to the trunks via Via2/Metal3/Via3",
+  "rails_connectivity": {
+    "ties_expected": 2796,
+    "ties_on_own_rail": 2796,
+    "ties_on_other_rail": 0,
+    "ties_floating": 0,
+    "floating_ties": [],
+    "vdd_vss_short_polygons": 0,
+    "bitcell_risers": {
+      "VDD": {
+        "expected": 8192,
+        "on_rail": 8192,
+        "on_other_rail": 0
+      },
+      "VSS": {
+        "expected": 8192,
+        "on_rail": 8192,
+        "on_other_rail": 0
+      }
+    },
+    "polygons_on_rail": {
+      "VDD": {
+        "m1": 5542,
+        "v1": 5542,
+        "m2": 1300,
+        "v2": 1300,
+        "m3": 125,
+        "v3": 125,
+        "m4": 1
+      },
+      "VSS": {
+        "m1": 5510,
+        "v1": 5510,
+        "m2": 1311,
+        "v2": 1311,
+        "m3": 123,
+        "v3": 123,
+        "m4": 1
+      }
+    }
+  },
+  "extract_bulk_nets": {
+    "distinct_bulk_nets": 2,
+    "top": [
+      [
+        "VSS$620",
+        34118
+      ],
+      [
+        "VDD",
+        17830
+      ]
+    ]
+  },
+  "bottom_pins": "D[i]/Q[i] moved 0.5 um outward (just outside the content) so periphery Metal2 keeps spacing to them; macro grew by 0.5 um in y",
+  "vdd_vss_pin_squares": "not connected to the rails here (issue #95)",
+  "not_drawn": [
+    "VDD/VSS pin connection to the rails",
+    "periphery signal routing",
+    "array-to-column-path and wordline routing",
+    "signal pin routing"
+  ],
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    }
+  },
+  "klt_version": "klt 0.8.1.dev758+g8ca3f4951d15"
+}

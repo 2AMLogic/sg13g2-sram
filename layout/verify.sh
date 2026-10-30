@@ -72,3 +72,21 @@ fi
 hr "7. macro: socket-check and generator tests (8192 bitcells, LEF pins = netlist ports)"
 klt socket-check --socket $D/macro.socket.json $D/macro.gds
 (cd $D && uv run --with pytest --with klayout pytest -q test_macro.py)
+
+hr "8. macro: the rails record matches the committed layout and every tie and riser reaches a rail"
+python3 - <<'PYEOF'
+import hashlib, json, sys
+rec = json.load(open("layout/reports/macro-record-rails.json"))
+for key in ("gds", "lef", "socket"):
+    for path, want in rec[key].items():
+        got = hashlib.sha256(open(path, "rb").read()).hexdigest()
+        if got != want:
+            sys.exit(f"FAIL: {path} differs from macro-record-rails.json")
+c = rec["rails_connectivity"]
+ok = (c["ties_on_own_rail"] == c["ties_expected"] and c["ties_floating"] == 0 and c["ties_on_other_rail"] == 0
+      and c["vdd_vss_short_polygons"] == 0
+      and all(v["on_rail"] == v["expected"] and v["on_other_rail"] == 0 for v in c["bitcell_risers"].values()))
+if not ok:
+    sys.exit("FAIL: macro-record-rails.json reports a floating tie, a stray rail or a short")
+print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail")
+PYEOF

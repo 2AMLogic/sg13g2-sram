@@ -97,3 +97,40 @@ def test_tie_labels_name_the_netlist_bulk():
             for s in c.shapes(layout.layer(*g.bc.L_METAL1_LBL)).each():
                 texts.add(s.text_string)
     assert {"VSS", "VDD"} <= texts
+
+
+def _analysis(mutate=None):
+    import rails_check
+
+    layout, gen, top = g.build()
+    if mutate:
+        mutate(layout, gen)
+    return rails_check.analyse(layout, top, gen), gen
+
+
+def test_every_tie_and_riser_reaches_its_rail():
+    res, gen = _analysis()
+    assert res["ties_expected"] == len(gen.tie_wiring) > 2000
+    assert res["ties_on_own_rail"] == res["ties_expected"], res["floating_ties"]
+    assert res["ties_on_other_rail"] == 0 and res["ties_floating"] == 0
+    assert res["vdd_vss_short_polygons"] == 0
+    for net in ("VDD", "VSS"):
+        assert res["bitcell_risers"][net]["on_rail"] == g.ROWS * g.COLS, net
+        assert res["bitcell_risers"][net]["on_other_rail"] == 0, net
+
+
+def test_removing_a_tie_via_floats_that_tie():
+    """Teeth: delete the Via2 of one tie's stub; that tie (at least) must stop reaching its rail."""
+    def cut(layout, gen):
+        w = gen.tie_wiring[0]
+        rails = layout.cell("rails")
+        li = layout.layer(*g.L_VIA2)
+        hit = [s for s in rails.shapes(li).each()
+               if abs(s.bbox().center().x * g.DBU - w["lane_x"]) < 0.01 and abs(s.bbox().center().y * g.DBU - w["lane_y"]) < 0.01]
+        assert hit, "tie's Via2 not found"
+        for s in hit:
+            rails.shapes(li).erase(s)
+
+    res, _ = _analysis(cut)
+    assert res["ties_floating"] >= 1
+    assert res["ties_on_own_rail"] < res["ties_expected"]

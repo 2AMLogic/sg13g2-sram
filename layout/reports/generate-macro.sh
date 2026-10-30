@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Mint the macro evidence record (issue #28; taps step of #88): regenerate the macro GDS, socket
-# descriptor and LEF, then write layout/reports/macro-record-taps.json (macro-record.json is the #87
-# result and is not rewritten). Run from
+# Mint the macro evidence record (issue #28; rails step of #88, issue #92): regenerate the macro GDS,
+# socket descriptor and LEF, then write layout/reports/macro-record-rails.json (macro-record.json is the
+# #87 result and macro-record-taps.json the #96 result; neither is rewritten). Run from
 # anywhere:   ./layout/reports/generate-macro.sh
 #
 # Records are append-only evidence: a re-run after a layout or klt change is a
@@ -21,7 +21,8 @@ klt lef-abstract $D/macro.gds --socket $D/macro.socket.json --macro-name macro \
 klt cells --format json $D/macro.gds > "$WORK/cells.json"
 klt extract --deck sg13g2 $D/macro.gds -o "$WORK/extracted.spice" --format json > "$WORK/extract.json"
 
-python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record-taps.json
+(cd $D && uv run --with klayout python3 -I -c 'import json,sys; sys.path.insert(0, "."); import generate as g, rails_check as rc; l,gen,top=g.build(); print(json.dumps(rc.analyse(l,top,gen)))' > "$WORK/rails.json")
+python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record-rails.json
 import hashlib, json, subprocess, sys
 w = sys.argv[1]
 D = "layout/sram_256x32"
@@ -32,6 +33,12 @@ sock = json.load(open(f"{w}/socket.json"))
 ext = json.load(open(f"{w}/extract.json"))
 deck = json.loads(subprocess.run(["klt", "deck", "info", "--deck", "sg13g2", "--format", "json"],
                                  capture_output=True, text=True, check=True).stdout)["decks"][0]
+bulk = {}
+for ln in open(f"{w}/extracted.spice"):
+    t = ln.split()
+    if t and t[0][0] in "Mm" and len(t) > 5:
+        bulk[t[4]] = bulk.get(t[4], 0) + 1
+bulk = {"distinct_bulk_nets": len(bulk), "top": sorted(bulk.items(), key=lambda kv: -kv[1])[:6]}
 sizes = json.load(open(f"{D}/macro.socket.json"))["outline"]
 width, height = sizes["x1"] - sizes["x0"], sizes["y1"] - sizes["y0"]
 area = round(width * height, 1)
@@ -61,11 +68,16 @@ print(json.dumps({
     "extract": {k: ext.get(k) for k in ("status", "device_count", "device_counts", "net_count", "pin_count")},
     "netlist_flattened_device_count": 51948,
     "netlist_flattened_device_counts": {"nfet": 34118, "pfet": 17830},
-    "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net; not yet wired to a rail",
-    "not_drawn": ["supply rails and tie-to-rail connection", "periphery signal routing", "array-to-column-path and wordline routing", "pin routing"],
+    "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net (record: macro-record-taps.json)",
+    "rails_step": "Via1 + Metal2 pad on every tie; Metal2 stub to a Metal3 lane (4 um pitch, VDD/VSS interleaved) per floorplan region; lanes to two Metal4 trunks (VDD x=-2.3, VSS x=-1.1) in the corridor left of the array. Array: Metal1 pad + Via1 on the risers and a Metal2 strap at every row seam (even VSS, odd VDD) to the trunks via Via2/Metal3/Via3",
+    "rails_connectivity": json.load(open(f"{w}/rails.json")),
+    "extract_bulk_nets": bulk,
+    "bottom_pins": "D[i]/Q[i] moved 0.5 um outward (just outside the content) so periphery Metal2 keeps spacing to them; macro grew by 0.5 um in y",
+    "vdd_vss_pin_squares": "not connected to the rails here (issue #95)",
+    "not_drawn": ["VDD/VSS pin connection to the rails", "periphery signal routing", "array-to-column-path and wordline routing", "signal pin routing"],
     "deck": {"name": "sg13g2", "content_hash": deck["content_hash"], "released": deck["released"],
              "release": deck.get("release")},
     "klt_version": subprocess.run(["klt", "--version"], capture_output=True, text=True).stdout.strip(),
 }, indent=2))
 PYEOF
-echo "record written to layout/reports/macro-record-taps.json"
+echo "record written to layout/reports/macro-record-rails.json"
