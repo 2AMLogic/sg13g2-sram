@@ -8,7 +8,9 @@ Only the region between the markers is machine-generated.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
+- **#82**: docs(spec): propose physical organization and wire-RC check
+- **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
 ## Very Important
 
@@ -20,7 +22,8 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check
+- **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
+- **#92**: layout: macro supply rails and tie-to-rail connection
 
 ## Ready
 
@@ -32,35 +35,61 @@ _None._
 
 Issues currently being built (`loom:building`).
 
+- **#29**: T1 item 3 (DRC clean): klt drc on the full macro with coverage disclosed
+- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
+- **#69**: spec: confirm the 1 ns write-pulse window
+- **#70**: spec: no wire-RC check or physical organization
+- **#71**: spec: write-margin definition under-specified
+- **#72**: spec: internal inconsistencies in sram.md text
+- **#73**: spec: no access-time target value
+- **#74**: spec: no area target, min-clock-pulse, power or retention rows
+- **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified
+- **#92**: layout: macro supply rails and tie-to-rail connection
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#77**: docs(spec): record two-key review outcome for sram.md
+- **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
+- **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
+- **#81**: docs(spec): pin the write-margin definition in a decision record
+- **#91**: fix: clear macro NWell spacing and add full-array DRC evidence for item 3
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
+- **#82**: docs(spec): propose physical organization and wire-RC check
+- **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check *(curated)*
+- **#29**: T1 item 3 (DRC clean): klt drc on the full macro with coverage disclosed *(curated)*
+- **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist *(curated)*
+- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 *(curated)*
+- **#68**: spec: margins row has no Monte Carlo evidence *(curated)*
+- **#69**: spec: confirm the 1 ns write-pulse window *(curated)*
+- **#70**: spec: no wire-RC check or physical organization *(curated)*
+- **#71**: spec: write-margin definition under-specified *(curated)*
+- **#72**: spec: internal inconsistencies in sram.md text *(curated)*
+- **#73**: spec: no access-time target value *(curated)*
+- **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
+- **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified *(curated)*
+- **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
+- **#92**: layout: macro supply rails and tie-to-rail connection *(curated)*
+- **#95**: layout: macro periphery signal nets and pin connection *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-
-
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module *(hermit)*
+- **#100**: Remove layout/reports/generate-macro.sh: always refuses to run *(hermit)*
 
 ## Epics
-
-
 
 _None._
 
@@ -68,14 +97,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 3 |
 | Very important | 0 |
-| Important | 1 |
+| Important | 2 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
-| PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 1 |
-| Architect / Hermit proposals | 1 |
+| In Progress (`loom:building`) | 11 |
+| PRs awaiting review | 5 |
+| Approved PRs awaiting merge | 3 |
+| Curated | 14 |
+| Architect / Hermit proposals | 2 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
