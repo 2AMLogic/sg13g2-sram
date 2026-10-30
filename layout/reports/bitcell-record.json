@@ -1,0 +1,43 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/bitcell/generate.py",
+  "verify_command": "./layout/verify.sh",
+  "gds": {
+    "layout/bitcell/sg13g2_sram_bitcell_6t.gds": "8ee91cbc44ed393c0730b89c8e8e639859629302a21d9313cb32c46f2198046a",
+    "layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds": "47bd8c76698e37e9e5c540c173cad8128f9b789112457b20029a3a5123d7cc1d"
+  },
+  "pitch_um": {
+    "x": 2.87,
+    "y": 3.605
+  },
+  "area_um2": 10.346,
+  "reference_area_um2": 3.5,
+  "reference": "BITKIT_CELL_SUB 1.76 x 1.99 um (spec/bitcell-decision.md)",
+  "area_ratio_vs_reference": 2.96,
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    },
+    "unmodeled_rules": [
+      "LU.a",
+      "LU.c",
+      "LU.c1",
+      "LU.d",
+      "LU.d1",
+      "Pad.a1",
+      "Pad.aR",
+      "Pad.bR",
+      "Pad.d",
+      "Pad.d1R",
+      "Pad.dR",
+      "Pad.gR",
+      "Pad.jR",
+      "Pad.kR"
+    ]
+  },
+  "klt_version": "klt 0.8.1.dev738+gd73dc11df57f"
+}

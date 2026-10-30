@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 2,
+  "summary": "T1 item 2 (Layout): 3/3 attestation checks passed (klt signoff --attest)",
+  "source": "layout/sram_256x32/macro.gds",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 3,
+    "passed_count": 3,
+    "checks": [
+      {
+        "check": "stream_readable",
+        "role": "layout",
+        "passed": true,
+        "content_hash": "sha256:c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3"
+      },
+      {
+        "check": "top_cell_non_empty",
+        "role": "layout",
+        "passed": true,
+        "top_cells": [
+          "macro"
+        ]
+      },
+      {
+        "check": "dbu_on_grid",
+        "role": "layout",
+        "passed": true,
+        "dbu": 0.001
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.8.1.dev70+gce6583fe1e8f",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "layout/sram_256x32/macro.gds",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3"
+    },
+    "regeneration": {
+      "generator": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+      "regenerated_hash": "sha256:c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+* extracted by klt extract --deck sg13g2
+
+* cell sg13g2_sram_bitcell_6t
+* pin BL
+* pin BLB
+* pin Q
+* pin QB
+* pin VDD
+* pin VSS
+* pin WL
+.SUBCKT sg13g2_sram_bitcell_6t BL BLB Q QB VDD VSS WL
+* device instance $1 r0 *1 0.55,1.17 nfet
+M$1 Q WL BL VSS nfet L=0.13U W=0.3U AS=0.114P AD=0.069P PS=1.36U PD=0.76U
+* device instance $2 r0 *1 1.14,1.17 nfet
+M$2 VSS QB Q VSS nfet L=0.13U W=0.3U AS=0.069P AD=0.069P PS=0.76U PD=0.76U
+* device instance $3 r0 *1 1.73,1.17 nfet
+M$3 QB Q VSS VSS nfet L=0.13U W=0.3U AS=0.069P AD=0.069P PS=0.76U PD=0.76U
+* device instance $4 r0 *1 2.32,1.17 nfet
+M$4 BLB WL QB VSS nfet L=0.13U W=0.3U AS=0.069P AD=0.114P PS=0.76U PD=1.36U
+* device instance $5 r0 *1 1.14,2.495 pfet
+M$5 VDD QB Q VDD pfet L=0.13U W=0.15U AS=0.102P AD=0.057P PS=1.36U PD=0.76U
+* device instance $6 r0 *1 1.73,2.495 pfet
+M$6 QB Q VDD VDD pfet L=0.13U W=0.15U AS=0.057P AD=0.102P PS=0.76U PD=1.36U
+.ENDS sg13g2_sram_bitcell_6t
