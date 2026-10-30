@@ -15,7 +15,7 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
 | Re-mint the routed-macro record, socket and LEF (~2 min, runs `klt extract`) | `./layout/reports/generate-macro-routed.sh` |
 
-`generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and now refuses to overwrite it.
+`layout/reports/generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and `macro-record-taps.json`, and was removed once it could only refuse to overwrite them. Both records still name it as `record_command`; recover the script with `git show cbf61db:layout/reports/generate-macro.sh`.
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
