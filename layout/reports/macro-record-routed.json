@@ -3,21 +3,21 @@
   "record_command": "./layout/reports/generate-macro-routed.sh",
   "supersedes_nothing": "macro-record.json (unrouted, #28) is kept as it was",
   "gds": {
-    "layout/sram_256x32/macro.gds": "b8e3fdf449370701cb92e72747f290f3c096754270ec8b44c471c7126d6d29e2"
+    "layout/sram_256x32/macro.gds": "7135c537719b870ceafa3f1c5ef59333962ed9b60f2ae3d7679da0b7a960edfb"
   },
   "lef": {
-    "layout/sram_256x32/macro.lef": "9e30bad35d2520218e029d0123e5b98ed525fd11b2f9915888deb046588edf94"
+    "layout/sram_256x32/macro.lef": "97bdcd65614f3c5c32fa6daa461d5d579ede83c65f4aa0011605911ca276eebb"
   },
   "socket": {
-    "layout/sram_256x32/macro.socket.json": "8c0f5b205190e9b60b8a39a2baba553877f776e965fdd3dbd89faf08b3d813c2"
+    "layout/sram_256x32/macro.socket.json": "362c4c26a8a9d58c6e666db9a3adf8c944a89d8dfc37dfd4aec9862fb941ff91"
   },
   "top_cell": "macro",
   "macro_size_um": {
-    "x": 385.9,
-    "y": 573.045
+    "x": 414.9,
+    "y": 587.795
   },
-  "macro_area_um2": 221138.1,
-  "area_ratio_vs_reference": 4.47,
+  "macro_area_um2": 243876.1,
+  "area_ratio_vs_reference": 4.93,
   "area_change_vs_unrouted": {
     "unrouted_area_um2": 176848.0,
     "wordline_fanout_gap_um": 55.34,
@@ -55,13 +55,11 @@
     "note": "comparison against design/macro/macro.spice is LVS (#30), not made here"
   },
   "drc": {
-    "status": "violations",
-    "violation_count": 563,
-    "rule_counts": {
-      "nwell.space.1": 563
-    },
-    "unrouted_macro_violation_count": 522,
-    "note": "same 522 nwell.space.1 as the unrouted macro; no Metal2/Metal3/Via violations"
+    "status": "clean",
+    "violation_count": 0,
+    "rule_counts": {},
+    "pre_fix_violation_count": 522,
+    "note": "522 nwell.space.1 at PACK_GAP 0.5 um (NW.b 0.62 um) before the PACK_GAP 0.65 um fix (#29); clean after"
   },
   "socket_check": {
     "status": "pass"
@@ -82,5 +80,5 @@
       "package_version": "0.8.0"
     }
   },
-  "klt_version": "klt 0.8.1.dev774+g0c5e1675358e"
+  "klt_version": "klt 0.8.1.dev778+gb68545dc66b4"
 }

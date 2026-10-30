@@ -72,3 +72,7 @@ fi
 hr "7. macro: socket-check and generator tests (8192 bitcells, LEF pins = netlist ports)"
 klt socket-check --socket $D/macro.socket.json $D/macro.gds
 (cd $D && uv run --with pytest --with klayout pytest -q test_macro.py)
+
+hr "8. macro: DRC of the full array (klt drc --deck sg13g2; coverage gaps are in the report)"
+klt drc --deck sg13g2 --top macro $D/macro.gds
+klt drc --check layout/reports/drc-macro.json
