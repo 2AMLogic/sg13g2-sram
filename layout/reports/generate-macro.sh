@@ -10,6 +10,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 D=layout/sram_256x32
+# macro-record.json describes the unrouted macro of #28; the generator now draws the
+# array-interface routing (#94), so a re-run would overwrite that record with other
+# hashes. The current macro is recorded by generate-macro-routed.sh.
+if [[ -s layout/reports/macro-record.json ]]; then
+  echo "refusing to overwrite layout/reports/macro-record.json (append-only evidence);" >&2
+  echo "use ./layout/reports/generate-macro-routed.sh for the current macro" >&2
+  exit 1
+fi
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
