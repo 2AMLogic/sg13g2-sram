@@ -206,3 +206,65 @@ def test_tie_labels_name_the_netlist_bulk():
             for s in c.shapes(layout.layer(*g.bc.L_METAL1_LBL)).each():
                 texts.add(s.text_string)
     assert {"VSS", "VDD"} <= texts
+
+
+def _analysis(mutate=None):
+    import rails_check
+
+    layout, gen, top = g.build()
+    if mutate:
+        mutate(layout, gen)
+    return rails_check.analyse(layout, top, gen), gen
+
+
+def test_every_tie_and_riser_reaches_its_rail():
+    res, gen = _analysis()
+    assert res["ties_expected"] == len(gen.tie_wiring) > 2000
+    assert res["ties_on_own_rail"] == res["ties_expected"], res["floating_ties"]
+    assert res["ties_on_other_rail"] == 0 and res["ties_floating"] == 0
+    assert res["vdd_vss_short_polygons"] == 0
+    for net in ("VDD", "VSS"):
+        assert res["bitcell_risers"][net]["on_rail"] == g.ROWS * g.COLS, net
+        assert res["bitcell_risers"][net]["on_other_rail"] == 0, net
+
+
+def test_removing_a_tie_via_floats_that_tie():
+    """Teeth: delete the Via2 of one tie's stub; that tie (at least) must stop reaching its rail."""
+    def cut(layout, gen):
+        w = gen.tie_wiring[0]
+        rails = layout.cell("rails")
+        li = layout.layer(*g.L_VIA2)
+        hit = [s for s in rails.shapes(li).each()
+               if abs(s.bbox().center().x * g.DBU - w["lane_x"]) < 0.01 and abs(s.bbox().center().y * g.DBU - w["lane_y"]) < 0.01]
+        assert hit, "tie's Via2 not found"
+        for s in hit:
+            rails.shapes(li).erase(s)
+
+    res, _ = _analysis(cut)
+    assert res["ties_floating"] >= 1
+    assert res["ties_on_own_rail"] < res["ties_expected"]
+
+
+def test_rail_pitch_does_not_alias_the_wordline_lane_pitch():
+    assert g.LANE_PITCH == 0.42 and g.RAIL_LANE_PITCH != g.LANE_PITCH
+    assert g.WL_FANOUT_GAP == round(2 * g.LANE_MARGIN + (g.ROWS - 1) * 0.42, 3)
+
+
+def test_no_rail_shape_below_metal4_in_the_wordline_gap():
+    import rails_check
+
+    layout, gen, top = g.build()
+    res = rails_check.wordline_gap_clearance(layout, top, gen)
+    assert res["total"] == 0, res
+    # the lanes do cross the gap, on Metal4 only
+    gap = g.WL_FANOUT_GAP
+    m4 = layout.cell("rails").dbbox_per_layer(layout.layer(*g.L_METAL4))
+    assert m4.left < -gap and m4.right > 0
+
+
+def test_gap_clearance_check_has_teeth():
+    import rails_check
+
+    layout, gen, top = g.build()
+    gen.box(layout.cell("rails"), g.L_VIA2, -10.0, 20.0, -9.81, 20.19)
+    assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1

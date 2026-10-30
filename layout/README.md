@@ -139,27 +139,59 @@ is the new record (`macro-record.json` is unchanged).
 
 ### What this macro is not (read before citing it)
 
-It is **partly routed**. The array interface (wordlines, bit lines) is wired, and every
-periphery transistor now carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
-with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`). The
-ties are **not wired to a rail**. There is still no signal wiring inside the periphery (a net
-with several device terminals in one cell, such as `BL` on both precharge PMOS drains, is reached
-at one of them) and none to the macro pins; no supply rails (#92). The LEF pins are drawn Metal2
-but are not connected to the logic, so the macro is not LVS-able yet. The wordline label on
-GatPoly text (5/1) sits mid-cell, off the poly row, and is not read by `klt extract`; the
-wordline nets take their names from the driver labels. Routing the rest is #92 and #95; #29
-(DRC), #30 (LVS) and #31 (power ERC) cannot proceed past them. Unrun here: the PDK-native DRC,
-`klt array-check`, and DRC of the periphery against rules the curated deck lacks.
+It is **partly routed**. The array interface (wordlines, bit lines) is wired; every
+periphery transistor carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
+with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`); and
+every tie and every bitcell VDD/VSS riser reaches a VDD or VSS rail (#88 step 2, #92, re-planned
+in #102; `macro-record-rails.json`). The `VDD`/`VSS` pin squares are **not connected to the
+rails** and there is still no signal wiring inside the periphery (a net with several device
+terminals in one cell, such as `BL` on both precharge PMOS drains, is reached at one of them)
+and none to the macro pins. The LEF pins are drawn Metal2 but are not connected to the logic, so
+the macro is not LVS-able yet. The wordline label on GatPoly text (5/1) sits mid-cell, off the
+poly row, and is not read by `klt extract`; the wordline nets take their names from the driver
+labels. Routing the rest is #95; #30 (LVS) and #31 (power ERC) cannot proceed past it. Unrun
+here: the PDK-native DRC, `klt array-check`, and DRC of the periphery against rules the curated
+deck lacks.
+
+#### Supply rails (issue #92, re-planned in #102)
+
+The decoder-to-array gap is the 55.34 um wordline fan-out (`WL_FANOUT_GAP`): 128 Metal2 lanes
+at `LANE_PITCH` 0.42 um and the Metal3 runs at each wordline y. The rails therefore do not use
+it, and `RAIL_LANE_PITCH` (4 um, the rail lane pitch) is named apart from `LANE_PITCH`.
+
+- **Periphery ties**: Via1 and a Metal2 pad on each tie; a Metal2 stub (placed clear of the
+  signal Metal2 and of the tie pads, read from the layout) to a Via2/Metal3 pad/Via3 landing on a
+  **Metal4 lane** (4 um pitch, VDD/VSS interleaved, one set per floorplan region). The Metal3 pad
+  is the only Metal3 a rail adds, and it is placed 0.21 um clear of the signal Metal3.
+- **Trunks**: two Metal5 stripes right of the array (VSS inner, VDD outer). Lanes reach them
+  through Via4; the lanes cross the wordline gap on Metal4 only.
+- **Array**: Metal1 pad and Via1 on the risers, a Metal2 strap at every row seam (even VSS, odd
+  VDD; the mirror abutment merges the risers there) that continues right of the array to its
+  trunk through Via2/Metal3/Via3/Metal4/Via4. Seam 0 sits on the bit-line Via1/Via2 stacks below
+  the array, so it is a pad per column plus a Metal4 strap instead of a full-width Metal2 strap.
+- **Interaction with the routing**: the tie Metal2 pads are obstacles for the bit-line jogs and
+  the wordline terminal stubs (a stub jogs right when a pad sits beside it); without that, 231
+  periphery ties had a bit-line Metal2 wire through their pad.
+- **Check** (`rails_check.py`, `test_macro.py`, `./layout/verify.sh` step 9): 2796 of 2796 ties and
+  8192 + 8192 risers on their own rail, none on the other, no VDD-VSS short in a flat
+  Metal1-Metal5 connectivity analysis; zero rail shapes on Metal1-Metal3 or Via1-Via3 inside the
+  wordline gap (a test inserts one Via2 and asserts the check then fires); the 128 wordline and
+  128 bit-line nets stay distinct. `klt drc --deck sg13g2` is clean with Metal4/Metal5/Via3/Via4
+  rules now checked (they had no geometry before).
+- **Not covered**: no current or electromigration analysis of the rail widths; the Via1 sits
+  directly over the tie Cont and the curated deck does not test stacking; extraction-level
+  netlist comparison is #30. Area 417.960 x 588.365 um = 245,913.0 um2, **4.97x** the reference
+  (trunks widen x by 3.08 um; the D/Q pins sit 0.5 um outside the content).
 
 ### Macro DRC (issue #29, T1 item 3)
 
 `klt drc --deck sg13g2 --top macro layout/sram_256x32/macro.gds` ->
 `layout/reports/drc-macro.json`: `status: clean`, `violation_count: 0`, deck
 `sg13g2` hash `sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15`
-(released), input hash `sha256:7135c537…b0edfb`, the **partly routed** macro (array interface
-wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties). **This is a clean DRC of what is
-drawn**: periphery signal routing, supply rails and pin routing are not drawn (see above), so no rule
-is exercised on them.
+(released), input hash `sha256:76b3a60b…86715e`, the **partly routed** macro (array interface
+wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply rails on
+Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: periphery signal
+routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
 The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
 put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the
@@ -167,27 +199,26 @@ generator (`PACK_GAP` 0.65 um); no rule was waived and the deck was not trimmed.
 The GDS, LEF, socket, `macro-record-routed.json` and item 2 envelope were regenerated
 (`macro-record.json`, the unrouted #28 record, is append-only and unchanged).
 The routed array interface was added by #94 on `main`; re-running the DRC on it at 0.65 um is clean.
+The supply rails (#102) were first drawn with four `metal2.width.1` violations (a stub overlapping
+its tie pad by 0.045 um left a sliver); the stub now keeps `M2.b` clear of its own pad or merges with
+it, and the rerun is clean. `macro-record-routed.json` records the macro before the rails and is not rewritten.
 
 Coverage, quoted from the report's `coverage` block:
 
-- `layers_in_stream_without_rules`: `5/1`, `8/25`, `10/25`, `189/4`
+- `layers_in_stream_without_rules`: `5/1`, `8/25`, `10/25`, `67/25`, `189/4`
 - `deck_scope`: `Act`, `Cnt`, `Gat`, `M1`, `M2`, `M3`, `M4`, `M5`, `MIM`, `NW`,
   `TM1`, `TM2`, `TV1`, `TV2`, `V1`, `V2`, `V3`, `V4`, `pSD`
-- `rules_skipped` (30): `metal3.enclosing.via3.1`, `metal4.enclosing.via4.1`,
-  `metal4.space.1`, `metal4.width.1`, `metal5.enclosing.mim.1`,
-  `metal5.enclosing.topvia1.1`, `metal5.space.1`, `metal5.width.1`,
-  `mim.enclosing.topvia1.1`, `nwell.enclosing.nactiv.1`,
-  `nwell.enclosing.nactiv.dig.1`, `nwell.enclosing.nactiv.hv.1`,
-  `nwell.space.nactiv.1`, `nwell.space.nactiv.dig.1`, `nwell.space.nactiv.hv.1`,
-  `topmetal1.enclosing.topvia1.1`, `topmetal1.enclosing.topvia2.1`,
-  `topmetal1.space.1`, `topmetal1.width.1`, `topmetal2.enclosing.topvia2.1`,
-  `topmetal2.space.1`, `topmetal2.width.1`, `topvia1.space.1`, `topvia1.width.1`,
-  `topvia2.space.1`, `topvia2.width.1`, `via3.space.1`, `via3.width.1`,
-  `via4.space.1`, `via4.width.1`.
+- `rules_skipped` (20, all `no_applicable_geometry` under `inapplicable`):
+  `metal5.enclosing.mim.1`, `metal5.enclosing.topvia1.1`, `mim.enclosing.topvia1.1`,
+  `nwell.enclosing.nactiv.1`, `nwell.enclosing.nactiv.dig.1`,
+  `nwell.enclosing.nactiv.hv.1`, `nwell.space.nactiv.1`, `nwell.space.nactiv.dig.1`,
+  `nwell.space.nactiv.hv.1`, `topmetal1.enclosing.topvia1.1`,
+  `topmetal1.enclosing.topvia2.1`, `topmetal1.space.1`, `topmetal1.width.1`,
+  `topmetal2.enclosing.topvia2.1`, `topmetal2.space.1`, `topmetal2.width.1`,
+  `topvia1.space.1`, `topvia1.width.1`, `topvia2.space.1`, `topvia2.width.1`.
 
-The other 32 rules were checked (`rules_checked`), including Metal1-Metal3
-width/space, Via1/Via2 width/space/enclosure and the NWell-to-P+ Activ rules.
-Unchecked as a result: Metal4 and Metal5, TopMetal1/2, MIM, Via3/Via4, TopVia1/2,
-the Metal3 enclosure of Via3, the NWell-to-N+ Activ rules, and every density,
-antenna and latch-up rule (the deck carries none). Periphery devices use
-bitcell-derived rule constants.
+The other 42 rules were checked (`rules_checked`), including Metal1-Metal5
+width/space, Via1-Via4 width/space, Via/Metal enclosure up to Via4 and the NWell-to-P+ Activ
+rules. Unchecked as a result: TopMetal1/2, MIM, TopVia1/2, the NWell-to-N+ Activ rules (no
+geometry), and every density, antenna and latch-up rule (the deck carries none; `unmodeled_rules`
+lists LU.* and Pad.*). Periphery devices use bitcell-derived rule constants.
