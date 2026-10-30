@@ -24,14 +24,13 @@ _None._
 
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
 - **#105**: layout: route decoder cell internals
-- **#106**: layout: route latch and control block internals
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 
 ## In Progress
 
@@ -46,9 +45,8 @@ Issues currently being built (`loom:building`).
 - **#73**: spec: no access-time target value
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified
-- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 - **#105**: layout: route decoder cell internals
-- **#106**: layout: route latch and control block internals
+- **#119**: Rebase decoder-net routing (PR #116) onto main's leaf-cell router
 
 ## PRs Awaiting Review
 
@@ -84,12 +82,13 @@ Issues carrying `loom:curated`.
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
 - **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97) *(curated)*
 - **#105**: layout: route decoder cell internals *(curated)*
-- **#106**: layout: route latch and control block internals *(curated)*
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
+- **#119**: Rebase decoder-net routing (PR #116) onto main's leaf-cell router *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module *(hermit)*
+- **#117**: Remove superseded macro-record scripts generate-macro-routed.sh and generate-macro-rails.sh *(hermit)*
 
 ## Epics
 
@@ -101,12 +100,12 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 3 |
 | Very important | 0 |
-| Important | 4 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 12 |
+| Important | 3 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 11 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 3 |
 | Curated | 15 |
-| Architect / Hermit proposals | 1 |
+| Architect / Hermit proposals | 2 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
