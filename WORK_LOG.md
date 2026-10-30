@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-10-30
 
+- **PR #115**: feat: route latch and control nets between leaf cells
+- **Issue #106** (closed): layout: route latch and control block internals
 - **PR #112**: feat: net-aware Metal2/Metal3 router and leaf-cell signal nets with flat-net resolution
 - **Issue #104** (closed): layout: signal router core, flat-net resolution and leaf-cell nets
 - **PR #110**: chore: remove generate-macro.sh, which always refuses to run
