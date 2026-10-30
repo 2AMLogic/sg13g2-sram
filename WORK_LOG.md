@@ -5,6 +5,10 @@ triage agent. Newest first.
 
 ### 2026-10-30
 
+- **PR #99**: feat: wire periphery ties and bitcell risers to VDD/VSS rails
+- **Issue #92** (closed): layout: macro supply rails and tie-to-rail connection
+- **PR #91**: fix: clear macro NWell spacing and add full-array DRC evidence for item 3
+- **Issue #29** (closed): T1 item 3 (DRC clean): klt drc on the full macro with coverage disclosed
 - **PR #97**: feat: route macro wordlines and bit lines between array and periphery
 - **Issue #94** (closed): layout: macro array-to-column-path and wordline routing
 - **PR #96**: feat: add per-device body ties to the macro periphery
