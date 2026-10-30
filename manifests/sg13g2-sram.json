@@ -3,8 +3,8 @@
   "kind": "analog",
   "evidence": {
     "1": {"file": "attest/item1.envelope.json", "content_hash": "sha256:22729c8aea6a4cc503f7c6ed964c146a0f975a4e4ee3ca508ff7d8dd9428cb61"},
-    "2": {"file": "attest/item2.envelope.json", "content_hash": "sha256:f69aadb5b20c91391643e8ec3966d35b520050498e562d9b12ce2c769ee35815"},
-    "3": {"file": "layout/reports/drc-macro.json", "content_hash": "sha256:f69aadb5b20c91391643e8ec3966d35b520050498e562d9b12ce2c769ee35815"},
+    "2": {"file": "attest/item2.envelope.json", "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747"},
+    "3": {"file": "layout/reports/drc-macro.json", "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747"},
     "9": {"file": "attest/item9.envelope.json", "content_hash": "sha256:905bbb69f90a48e22daa0f21bfe8c6f3e0a626d16faff63202b818d2eb666672"},
     "10": {"file": "attest/item10.envelope.json", "content_hash": "sha256:c832c41b5efc0695a644af8245a849fc590fbe41cdc7e0c4d7b057825cb8aa09"}
   }
