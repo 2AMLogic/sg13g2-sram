@@ -77,7 +77,7 @@ LAYER_NAMES[L_METAL2_LBL] = "Metal2_text"
 ROWS = 128
 COLS = 64
 SLICES = 32
-PACK_GAP = 0.5  # um between packed cells (>= NW.b; wells are inside the bbox)
+PACK_GAP = 0.65  # um between packed cells (> NW.b 0.62; wells are inside the bbox)
 BLOCK_GAP = 3.0  # um between floorplan blocks
 SLICE_MARGIN = 0.4  # um kept clear on each side of a slice's column path
 PIN = 0.5  # um, macro pin square on Metal2

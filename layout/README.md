@@ -1,7 +1,7 @@
 # layout
 
 Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
-(issue #28), both T1 checklist item 2. Macro DRC, LVS and power delivery are #29-#31.
+(issue #28), both T1 checklist item 2. Macro DRC (#29) is in the section below; LVS and power delivery are #30-#31.
 
 ## Entry points
 
@@ -107,7 +107,7 @@ area and the klt/deck identity are in `layout/reports/macro-record.json`.
 - **Pins**: 0.5 um Metal2 squares on the boundary (D/Q on the bottom edge, A, CEN,
   CLK, GWEN, WEN, VDD, VSS on the left), labelled on Metal2 text. `klt socket-check`
   passes; every LEF pin reports `geometry_source: drawn`.
-- **Area**: 312.56 x 565.805 um = 176,848 um2, **3.57x** the shipped macro's
+- **Area**: 314.59 x 561.855 um = 176,754 um2, **3.57x** the shipped macro's
   49,488.5 um2 (recorded, no threshold). The bitcells alone are 84,757 um2.
 
 ### What this macro is not (read before citing it)
@@ -117,7 +117,38 @@ periphery, between the array and the column path, the decoder or the pins; no
 well or substrate taps outside the bitcell; no body connections. The LEF pins are
 real drawn Metal2 but connect to nothing, so the macro has no extractable
 connectivity and is not LVS-able. Item 2 as the checklist defines it (a committed
-stream, reproducibly generated) is attested; routing is the work that #29 (DRC),
-#30 (LVS) and #31 (power ERC) cannot proceed past, and needs its own issue. Unrun
-here: DRC of the macro (the periphery devices use bitcell-derived rule constants
-and are unchecked), the PDK-native DRC, and `klt array-check`.
+stream, reproducibly generated) is attested; routing is the work that #30 (LVS)
+and #31 (power ERC) cannot proceed past, and needs its own issue. Unrun here: the
+PDK-native DRC and `klt array-check`.
+
+### Macro DRC (issue #29, T1 item 3)
+
+`klt drc --deck sg13g2 --top macro layout/sram_256x32/macro.gds` ->
+`layout/reports/drc-macro.json`: `status: clean`, `violation_count: 0`, deck
+`sg13g2` hash `sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15`
+(released), input hash `sha256:2f4af3a4…ccb283`. **This is a clean DRC of what is
+drawn**: the macro is not routed (see above), so no routing rule has been exercised.
+
+The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
+put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the
+generator (`PACK_GAP` 0.65 um); no rule was waived and the deck was not trimmed.
+The GDS, LEF, socket, `macro-record.json` and item 2 envelope were regenerated.
+
+Coverage, quoted from the report's `coverage` block:
+
+- `layers_in_stream_without_rules`: `5/1`, `8/25`, `10/25`, `189/4`
+- `deck_scope`: `Act`, `Cnt`, `Gat`, `M1`, `M2`, `M3`, `M4`, `M5`, `MIM`, `NW`,
+  `TM1`, `TM2`, `TV1`, `TV2`, `V1`, `V2`, `V3`, `V4`, `pSD`
+- `rules_skipped` (38): `metal1.enclosing.via1.1`, `metal2.enclosing.via2.1`,
+  `metal3.enclosing.via3.1`, `metal3/4/5.space.1`, `metal3/4/5.width.1`,
+  `metal4.enclosing.via4.1`, `metal5.enclosing.mim.1`,
+  `metal5.enclosing.topvia1.1`, `mim.enclosing.topvia1.1`,
+  `nwell.enclosing.nactiv{,.dig,.hv}.1`, `nwell.space.nactiv{,.dig,.hv}.1`,
+  `topmetal1.enclosing.topvia{1,2}.1`, `topmetal1.{space,width}.1`,
+  `topmetal2.enclosing.topvia2.1`, `topmetal2.{space,width}.1`,
+  `topvia{1,2}.{space,width}.1`, `via{1,2,3,4}.{space,width}.1`. The full list is
+  in the report.
+
+Unchecked as a result: all rules on Metal2 and above and on every via layer, the
+NWell-to-N+ Activ rules, and every density, antenna and latch-up rule (the deck
+carries none). Periphery devices use bitcell-derived rule constants.

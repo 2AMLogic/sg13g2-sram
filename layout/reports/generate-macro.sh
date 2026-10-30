@@ -61,4 +61,7 @@ print(json.dumps({
     "klt_version": subprocess.run(["klt", "--version"], capture_output=True, text=True).stdout.strip(),
 }, indent=2))
 PYEOF
+# DRC of the full macro (issue #29): a new report, committed as new evidence.
+klt drc --deck sg13g2 --top macro --format json $D/macro.gds -o layout/reports/drc-macro.json > /dev/null
+echo "DRC report written to layout/reports/drc-macro.json"
 echo "record written to layout/reports/macro-record.json"

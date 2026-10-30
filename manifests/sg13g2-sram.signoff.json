@@ -5,7 +5,7 @@
   "tier": null,
   "t1_item_count": 11,
   "build_t1_item_count": 11,
-  "t1_met_count": 4,
+  "t1_met_count": 5,
   "source_doc": "docs/design-evidence-tiers.md",
   "source_doc_content_hash": "sha256:a26b90262320d0fbd32b3f549a02b6300832706041797a559d8bf6bdb62efdc7",
   "build": {
@@ -70,7 +70,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3",
+        "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -79,7 +79,7 @@
             "path": "layout/sram_256x32/macro.gds",
             "scope": "repo"
           },
-          "content_hash": "sha256:c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3",
+          "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
           "input_verified": true,
           "summary": "T1 item 2 (Layout): 3/3 attestation checks passed (klt signoff --attest)",
           "source": "layout/sram_256x32/macro.gds",
@@ -91,7 +91,7 @@
           },
           "regeneration": {
             "generator": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-            "regenerated_hash": "sha256:c303f5b8a0021b99540cd59b07632c20f3b1098d369363d9e13b6e3ffd6456c3",
+            "regenerated_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
             "executed_by_klt": false
           }
         }
@@ -104,10 +104,87 @@
       "partition": null,
       "text": "latest `klt drc` JSON report: `status: clean`, fresh, with the deck identified (content hash). Known deck coverage gaps (rule-free layers, skipped rules) must be enumerated in the claim, not hidden behind \"clean\" \u2014 a clean verdict from a deck with undisclosed holes is a false claim. The report already states its own gaps, so the disclosure is those fields quoted from the cited envelope's `coverage` block (`docs/cli/drc.md`), not prose written from memory: `coverage.layers_in_stream_without_rules` (layers drawn in this stream that the deck has no rule for), `coverage.rules_skipped` (rules the deck carries but this run did not evaluate), and `coverage.deck_scope` (which chapters of the foundry DRM the deck transcribes at all). A claim that leaves a non-empty `layers_in_stream_without_rules` or `rules_skipped` unstated, or that never states the `deck_scope` its \"clean\" was measured inside, has not satisfied this item however clean the `status` is. **This disclosure is claimant-enforced, not tool-enforced**: `klt signoff` grades item 3 on `status: \"clean\"` alone \u2014 a deck with rule-free drawn layers or skipped rules grades `met` exactly like a fully-covering one. Since #2002 it does *report* all three fields (item 3's citation carries a `coverage` block quoting them verbatim, `docs/cli/signoff.md` \u2192 \"DRC coverage is reported, not graded\"), so a reviewer no longer has to re-open the DRC envelope to find them \u2014 but reporting is not enforcing: nothing compares them against what the claim actually disclosed, so a `met` verdict from `klt signoff` is still not evidence that the gaps were disclosed. A reviewer must read the reported `coverage` against the claim themselves.",
       "notes": [],
-      "status": "unmet",
-      "reason": "no_evidence",
+      "status": "met",
+      "reason": null,
       "graded_by_build": true,
-      "citation": null
+      "citation": {
+        "file": "layout/reports/drc-macro.json",
+        "command": null,
+        "kind": "drc",
+        "check_status": "clean",
+        "content_hash": "sha256:2f4af3a4a9748a9757ef473c00b7039dead91bbcb07ed0edcbc43769cdccb283",
+        "input_verified": true,
+        "exit_status": 0,
+        "coverage": {
+          "layers_in_stream_without_rules": [
+            "5/1",
+            "8/25",
+            "10/25",
+            "189/4"
+          ],
+          "rules_skipped": [
+            "metal1.enclosing.via1.1",
+            "metal2.enclosing.via2.1",
+            "metal3.enclosing.via3.1",
+            "metal3.space.1",
+            "metal3.width.1",
+            "metal4.enclosing.via4.1",
+            "metal4.space.1",
+            "metal4.width.1",
+            "metal5.enclosing.mim.1",
+            "metal5.enclosing.topvia1.1",
+            "metal5.space.1",
+            "metal5.width.1",
+            "mim.enclosing.topvia1.1",
+            "nwell.enclosing.nactiv.1",
+            "nwell.enclosing.nactiv.dig.1",
+            "nwell.enclosing.nactiv.hv.1",
+            "nwell.space.nactiv.1",
+            "nwell.space.nactiv.dig.1",
+            "nwell.space.nactiv.hv.1",
+            "topmetal1.enclosing.topvia1.1",
+            "topmetal1.enclosing.topvia2.1",
+            "topmetal1.space.1",
+            "topmetal1.width.1",
+            "topmetal2.enclosing.topvia2.1",
+            "topmetal2.space.1",
+            "topmetal2.width.1",
+            "topvia1.space.1",
+            "topvia1.width.1",
+            "topvia2.space.1",
+            "topvia2.width.1",
+            "via1.space.1",
+            "via1.width.1",
+            "via2.space.1",
+            "via2.width.1",
+            "via3.space.1",
+            "via3.width.1",
+            "via4.space.1",
+            "via4.width.1"
+          ],
+          "deck_scope": [
+            "Act",
+            "Cnt",
+            "Gat",
+            "M1",
+            "M2",
+            "M3",
+            "M4",
+            "M5",
+            "MIM",
+            "NW",
+            "TM1",
+            "TM2",
+            "TV1",
+            "TV2",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "pSD"
+          ]
+        }
+      }
     },
     {
       "tier": "T1",
