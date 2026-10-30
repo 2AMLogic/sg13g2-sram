@@ -1,7 +1,7 @@
 """Flat supply-connectivity analysis of the macro layout (issue #92).
 
-Grows the connected set of Metal1 / Via1 / Metal2 / Via2 / Metal3 / Via3 / Metal4 from
-each Metal4 trunk and reports, for the periphery body ties and the bitcell supply
+Grows the connected set of Metal1 / Via1 / Metal2 / Via2 / Metal3 / Via3 / Metal4 / Via4 / Metal5 from
+each Metal5 trunk and reports, for the periphery body ties and the bitcell supply
 risers, which net they reach. Used by ``test_macro.py`` and the record script.
 """
 
@@ -11,8 +11,9 @@ import klayout.db as kdb
 
 import generate as g
 
-_LAYERS = dict(m1=g.bc.L_METAL1, v1=g.L_VIA1, m2=g.L_METAL2, v2=g.L_VIA2, m3=g.L_METAL3, v3=g.L_VIA3, m4=g.L_METAL4)
-_EDGES = [("m1", "v1"), ("v1", "m2"), ("m2", "v2"), ("v2", "m3"), ("m3", "v3"), ("v3", "m4")]
+_LAYERS = dict(m1=g.bc.L_METAL1, v1=g.L_VIA1, m2=g.L_METAL2, v2=g.L_VIA2, m3=g.L_METAL3, v3=g.L_VIA3, m4=g.L_METAL4,
+               v4=g.L_VIA4, m5=g.L_METAL5)
+_EDGES = [("m1", "v1"), ("v1", "m2"), ("m2", "v2"), ("v2", "m3"), ("m3", "v3"), ("v3", "m4"), ("m4", "v4"), ("v4", "m5")]
 _U = 1000  # dbu per um
 
 
@@ -22,7 +23,7 @@ def _box(x: float, y: float, h: float) -> kdb.Box:
 
 def _grow(regions: dict[str, kdb.Region], seed: kdb.Region) -> dict[str, kdb.Region]:
     sel = {k: kdb.Region() for k in regions}
-    sel["m4"] = regions["m4"].interacting(seed)
+    sel["m5"] = regions["m5"].interacting(seed)
     changed = True
     while changed:
         changed = False
@@ -39,7 +40,7 @@ def analyse(layout: kdb.Layout, top: kdb.Cell, gen: g.Gen) -> dict:
     regions = {k: kdb.Region(top.begin_shapes_rec(layout.layer(*lp))).merged() for k, lp in _LAYERS.items()}
     y_mid = 10.0
     sel = {
-        net: _grow(regions, kdb.Region(_box(g.TRUNK_X[net], y_mid, 0.01)))
+        net: _grow(regions, kdb.Region(_box(gen.trunk_x[net], y_mid, 0.01)))
         for net in ("VDD", "VSS")
     }
     short = sum((sel["VDD"][k] & sel["VSS"][k]).count() for k in regions)
@@ -84,3 +85,20 @@ def analyse(layout: kdb.Layout, top: kdb.Cell, gen: g.Gen) -> dict:
         "bitcell_risers": risers,
         "polygons_on_rail": {net: {k: v.count() for k, v in sel[net].items()} for net in sel},
     }
+
+
+def wordline_gap_clearance(layout: kdb.Layout, top: kdb.Cell, gen: g.Gen) -> dict:
+    """Rail geometry inside the wordline fan-out gap (issue #102).
+
+    The gap between the row decoder and the array holds the wordline Metal2 lanes and Metal3
+    tracks. Only Metal4 and above may cross it; any rail shape on Metal1..Metal3 or a Via1..Via3
+    inside it would sit on a wordline lane or track. The count is over the ``rails`` cell, whose
+    shapes are all supply rails.
+    """
+    rails = layout.cell("rails")
+    gap = kdb.Region(kdb.Box(round(-g.WL_FANOUT_GAP * _U), -10**9, 0, 10**9))
+    layers = dict(m1=g.bc.L_METAL1, v1=g.L_VIA1, m2=g.L_METAL2, v2=g.L_VIA2, m3=g.L_METAL3, v3=g.L_VIA3,
+                  v4=g.L_VIA4)
+    inside = {k: (kdb.Region(rails.begin_shapes_rec(layout.layer(*lp))) & gap).count() for k, lp in layers.items()}
+    return {"gap_um": [-g.WL_FANOUT_GAP, 0.0], "rail_shapes_in_gap_below_metal4": inside,
+            "total": sum(inside.values())}

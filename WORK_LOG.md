@@ -5,6 +5,10 @@ triage agent. Newest first.
 
 ### 2026-10-30
 
+- **PR #97**: feat: route macro wordlines and bit lines between array and periphery
+- **Issue #94** (closed): layout: macro array-to-column-path and wordline routing
+- **PR #96**: feat: add per-device body ties to the macro periphery
+- **Issue #93** (closed): layout: macro supply rails and tie-to-rail connection
 - **PR #83**: docs: verify SRAM comp row against primary Liberty/LEF/datasheet
 - **Issue #76** (closed): spec: verify comp data against primary Liberty/LEF
 - **PR #87**: feat: add SG13G2 macro layout generator, GDS, LEF and item 2 attestation

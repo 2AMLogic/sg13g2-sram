@@ -73,7 +73,11 @@ hr "7. macro: socket-check and generator tests (8192 bitcells, LEF pins = netlis
 klt socket-check --socket $D/macro.socket.json $D/macro.gds
 (cd $D && uv run --with pytest --with klayout pytest -q test_macro.py)
 
-hr "8. macro: the rails record matches the committed layout and every tie and riser reaches a rail"
+hr "8. macro: DRC of the full array (klt drc --deck sg13g2; coverage gaps are in the report)"
+klt drc --deck sg13g2 --top macro $D/macro.gds
+klt drc --check layout/reports/drc-macro.json
+
+hr "9. macro: the rails record matches the committed layout; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
 python3 - <<'PYEOF'
 import hashlib, json, sys
 rec = json.load(open("layout/reports/macro-record-rails.json"))
@@ -88,5 +92,7 @@ ok = (c["ties_on_own_rail"] == c["ties_expected"] and c["ties_floating"] == 0 an
       and all(v["on_rail"] == v["expected"] and v["on_other_rail"] == 0 for v in c["bitcell_risers"].values()))
 if not ok:
     sys.exit("FAIL: macro-record-rails.json reports a floating tie, a stray rail or a short")
-print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail")
+if rec["rails_vs_wordline_gap"]["total"] != 0:
+    sys.exit("FAIL: macro-record-rails.json reports a rail shape below Metal4 in the wordline gap")
+print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
 PYEOF

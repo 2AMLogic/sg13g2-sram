@@ -1,14 +1,14 @@
 {
   "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-  "record_command": "./layout/reports/generate-macro.sh",
+  "record_command": "./layout/reports/generate-macro-rails.sh",
   "gds": {
-    "layout/sram_256x32/macro.gds": "b516950a6689e6f2c66a5845e8368cd6b22965556382e6f20cdafbabf4f1a275"
+    "layout/sram_256x32/macro.gds": "76b3a60b553bfe76ef3c6c8079f8f650bd34b1ceb27b5611d3067b930586715e"
   },
   "lef": {
-    "layout/sram_256x32/macro.lef": "36d61c280b3ad8c49aead1076efcf079b3166be7153226b4869898de79fa1dec"
+    "layout/sram_256x32/macro.lef": "b261f57e68da386dbff164322740462ec0212b1d28c5252446ce7cbf2cc3ae56"
   },
   "socket": {
-    "layout/sram_256x32/macro.socket.json": "c57be5cf92049a3c853c4a9d65301ed6def42e0f88916148dbf1dc60160beaff"
+    "layout/sram_256x32/macro.socket.json": "199022a8feb0b23b7884994b8b4c79fc9891f945e2b4086b7eb8d3cfce77e614"
   },
   "top_cell": "macro",
   "organization": "128 rows x 64 columns (mux 2), 32 bit_slice",
@@ -16,14 +16,14 @@
   "bl_pair_bitcell_instances": 128,
   "bit_slice_instances": 7,
   "macro_size_um": {
-    "x": 333.56,
-    "y": 573.615
+    "x": 417.96,
+    "y": 588.365
   },
-  "macro_area_um2": 191335.0,
+  "macro_area_um2": 245913.0,
   "array_area_um2": 84757.3,
   "reference_area_um2": 49488.5,
   "reference": "shipped sg13g2_sram 256x32 macro, 416.64 x 118.78 um (spec/bitcell-decision.md)",
-  "area_ratio_vs_reference": 3.87,
+  "area_ratio_vs_reference": 4.97,
   "socket_check": {
     "status": "pass"
   },
@@ -39,8 +39,8 @@
       "nfet": 34118,
       "pfet": 17830
     },
-    "net_count": 25108,
-    "pin_count": 8596
+    "net_count": 24724,
+    "pin_count": 8340
   },
   "netlist_flattened_device_count": 51948,
   "netlist_flattened_device_counts": {
@@ -48,7 +48,23 @@
     "pfet": 17830
   },
   "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net (record: macro-record-taps.json)",
-  "rails_step": "Via1 + Metal2 pad on every tie; Metal2 stub to a Metal3 lane (4 um pitch, VDD/VSS interleaved) per floorplan region; lanes to two Metal4 trunks (VDD x=-2.3, VSS x=-1.1) in the corridor left of the array. Array: Metal1 pad + Via1 on the risers and a Metal2 strap at every row seam (even VSS, odd VDD) to the trunks via Via2/Metal3/Via3",
+  "rails_step": "Via1 + Metal2 pad on every tie; Metal2 stub to a Via2/Metal3 pad/Via3 landing on a Metal4 lane (4 um pitch, VDD/VSS interleaved) per floorplan region, placed clear of the signal Metal2/Metal3; lanes run on Metal4 to two Metal5 trunks (VSS inner, VDD outer) right of the array. Array: Metal1 pad + Via1 on the risers; a Metal2 strap at every row seam (even VSS, odd VDD) continues right of the array to its trunk through Via2/Metal3/Via3/Metal4/Via4; seam 0 (above the bit-line stacks) leaves on a Metal4 strap instead",
+  "rails_vs_wordline_gap": {
+    "gap_um": [
+      -55.34,
+      0.0
+    ],
+    "rail_shapes_in_gap_below_metal4": {
+      "m1": 0,
+      "v1": 0,
+      "m2": 0,
+      "v2": 0,
+      "m3": 0,
+      "v3": 0,
+      "v4": 0
+    },
+    "total": 0
+  },
   "rails_connectivity": {
     "ties_expected": 2796,
     "ties_on_own_rail": 2796,
@@ -72,20 +88,24 @@
       "VDD": {
         "m1": 5542,
         "v1": 5542,
-        "m2": 1300,
-        "v2": 1300,
-        "m3": 125,
-        "v3": 125,
-        "m4": 1
+        "m2": 1509,
+        "v2": 1510,
+        "m3": 1510,
+        "v3": 1510,
+        "m4": 123,
+        "v4": 123,
+        "m5": 1
       },
       "VSS": {
         "m1": 5510,
         "v1": 5510,
-        "m2": 1311,
-        "v2": 1311,
-        "m3": 123,
-        "v3": 123,
-        "m4": 1
+        "m2": 1442,
+        "v2": 1478,
+        "m3": 1478,
+        "v3": 1478,
+        "m4": 127,
+        "v4": 127,
+        "m5": 1
       }
     }
   },
@@ -97,17 +117,17 @@
         34118
       ],
       [
-        "VDD",
+        "VDD$1",
         17830
       ]
     ]
   },
   "bottom_pins": "D[i]/Q[i] moved 0.5 um outward (just outside the content) so periphery Metal2 keeps spacing to them; macro grew by 0.5 um in y",
+  "trunks": "the Metal5 trunks sit right of the array and widen the macro in x",
   "vdd_vss_pin_squares": "not connected to the rails here (issue #95)",
   "not_drawn": [
     "VDD/VSS pin connection to the rails",
     "periphery signal routing",
-    "array-to-column-path and wordline routing",
     "signal pin routing"
   ],
   "deck": {
@@ -120,5 +140,5 @@
       "package_version": "0.8.0"
     }
   },
-  "klt_version": "klt 0.8.1.dev758+g8ca3f4951d15"
+  "klt_version": "klt 0.8.1.dev789+gbb2909afece8"
 }
