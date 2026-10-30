@@ -144,9 +144,10 @@ periphery transistor carries a body tie (n+ Activ in the PMOS well; p+ Activ in 
 with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`); and
 every tie and every bitcell VDD/VSS riser reaches a VDD or VSS rail (#88 step 2, #92, re-planned
 in #102; `macro-record-rails.json`). The `VDD`/`VSS` pin squares are **not connected to the
-rails** and there is still no signal wiring inside the periphery (a net with several device
-terminals in one cell, such as `BL` on both precharge PMOS drains, is reached at one of them)
-and none to the macro pins. The LEF pins are drawn Metal2 but are not connected to the logic, so
+rails**. Signal nets are drawn inside the leaf cells and between the children of the decoder
+(`predec3`, `predec4`, `wl_drivers`, `row_decoder`, issues #104, #105; `macro-record-decoder.json`: 87
+decoder nets, all drawn; the leaf cells' only undrawn net is `column_mux` `BLBM`); the latch and control cells' own nets, the
+fan-out between blocks and the macro pins are not. The LEF pins are drawn Metal2 but are not connected to the logic, so
 the macro is not LVS-able yet. The wordline label on GatPoly text (5/1) sits mid-cell, off the
 poly row, and is not read by `klt extract`; the wordline nets take their names from the driver
 labels. Routing the rest is #95; #30 (LVS) and #31 (power ERC) cannot proceed past it. Unrun

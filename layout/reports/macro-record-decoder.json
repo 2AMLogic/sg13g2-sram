@@ -1,0 +1,441 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+  "record_command": "./layout/reports/generate-macro-decoder.sh",
+  "gds": {
+    "layout/sram_256x32/macro.gds": "39b4229a06fac9d20ba6567a44ae11872770dab72d84d1588255f0ef1455d71b"
+  },
+  "lef": {
+    "layout/sram_256x32/macro.lef": "19787daeebc081963f3c413110fcdc6f518412ed79ccce7f57f5a0a707880f62"
+  },
+  "socket": {
+    "layout/sram_256x32/macro.socket.json": "e4edd7dbd569cf322744ffb680e13254837013acd8e3c9ec47c7f7126e4a1578"
+  },
+  "top_cell": "macro",
+  "macro_size_um": {
+    "x": 417.88,
+    "y": 586.635
+  },
+  "macro_area_um2": 245143.0,
+  "socket_check": {
+    "status": "pass"
+  },
+  "lef_pin_geometry_sources": [
+    "drawn"
+  ],
+  "extract": {
+    "status": "extracted",
+    "device_count": 51948,
+    "device_counts": {
+      "nfet": 34118,
+      "pfet": 17830
+    },
+    "net_count": 20561,
+    "pin_count": 4177
+  },
+  "drc": {
+    "status": "clean",
+    "violation_count": 0,
+    "rule_counts": {}
+  },
+  "leaf_signal_routing": {
+    "router": "MazeRouter (generate.py): Metal2/Metal3 maze on a 0.05 um lattice, Via1 landings on the Metal1 terminals, nets of two or more D/G/S terminals; supply, bit-line and wordline nets are not routed here",
+    "cells": {
+      "column_mux": {
+        "routed_nets": {
+          "BLM": 4,
+          "SEL0": 2,
+          "SEL0B": 2,
+          "SEL1": 2,
+          "SEL1B": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "BL0",
+          "BL1",
+          "BLB0",
+          "BLB1"
+        ],
+        "undrawn_nets": [
+          "BLBM"
+        ]
+      },
+      "dlatch": {
+        "routed_nets": {
+          "D": 2,
+          "EN": 2,
+          "ENB": 2,
+          "N1": 6,
+          "Q": 4,
+          "QB": 4
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "inv": {
+        "routed_nets": {
+          "A": 2,
+          "Y": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "inv_x4": {
+        "routed_nets": {
+          "A": 2,
+          "Y": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nand2": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "N1": 2,
+          "Y": 3
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nand3": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "C": 2,
+          "N1": 2,
+          "N2": 2,
+          "Y": 4
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nand4": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "C": 2,
+          "D": 2,
+          "N1": 2,
+          "N2": 2,
+          "N3": 2,
+          "Y": 5
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nor2": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "N1": 2,
+          "Y": 3
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "precharge": {
+        "routed_nets": {
+          "PRE_B": 3
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "BL",
+          "BLB",
+          "VDD"
+        ],
+        "undrawn_nets": []
+      },
+      "sense_amp": {
+        "routed_nets": {
+          "OUT": 5,
+          "OUTB": 5,
+          "SAE": 3,
+          "TAIL": 3
+        },
+        "single_terminal_nets": [
+          "BLBM",
+          "BLM"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "wl_driver": {
+        "routed_nets": {
+          "N1": 2,
+          "N2": 2,
+          "WLB": 6,
+          "WLEN": 2,
+          "X": 2,
+          "Y": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS",
+          "WL"
+        ],
+        "undrawn_nets": []
+      },
+      "write_driver": {
+        "routed_nets": {
+          "DIN": 3,
+          "DINB": 3,
+          "WA": 2,
+          "WB": 2,
+          "WE": 2
+        },
+        "single_terminal_nets": [
+          "BLBM",
+          "BLM"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      }
+    },
+    "routed_net_count": 53,
+    "undrawn": [
+      "column_mux/BLBM"
+    ],
+    "connectivity_check": "test_macro.py::test_leaf_cell_nets_are_one_net_each_and_never_short (per-cell extraction)"
+  },
+  "decoder_signal_routing": {
+    "router": "route_hier (generate.py): the nets between the child cells of predec3, predec4, wl_drivers and row_decoder, joined with MazeRouter on one landing per child; the children's own wiring, the body-tie pads and the wordline stubs and tracks are obstacles; supply and wordline nets are not routed here",
+    "cells": {
+      "predec3": {
+        "routed_nets": [
+          "A0B",
+          "A1B",
+          "A2B",
+          "A[0]",
+          "A[1]",
+          "A[2]",
+          "N0",
+          "N1",
+          "N2",
+          "N3",
+          "N4",
+          "N5",
+          "N6",
+          "N7"
+        ],
+        "nets_inside_one_child": 24,
+        "excluded_nets": 2,
+        "undrawn_nets": []
+      },
+      "predec4": {
+        "routed_nets": [
+          "A0B",
+          "A1B",
+          "A2B",
+          "A3B",
+          "A[0]",
+          "A[1]",
+          "A[2]",
+          "A[3]",
+          "N0",
+          "N1",
+          "N10",
+          "N11",
+          "N12",
+          "N13",
+          "N14",
+          "N15",
+          "N2",
+          "N3",
+          "N4",
+          "N5",
+          "N6",
+          "N7",
+          "N8",
+          "N9"
+        ],
+        "nets_inside_one_child": 64,
+        "excluded_nets": 2,
+        "undrawn_nets": []
+      },
+      "row_decoder": {
+        "routed_nets": [
+          "X[0]",
+          "X[1]",
+          "X[2]",
+          "X[3]",
+          "X[4]",
+          "X[5]",
+          "X[6]",
+          "X[7]",
+          "Y[0]",
+          "Y[10]",
+          "Y[11]",
+          "Y[12]",
+          "Y[13]",
+          "Y[14]",
+          "Y[15]",
+          "Y[1]",
+          "Y[2]",
+          "Y[3]",
+          "Y[4]",
+          "Y[5]",
+          "Y[6]",
+          "Y[7]",
+          "Y[8]",
+          "Y[9]"
+        ],
+        "nets_inside_one_child": 487,
+        "excluded_nets": 130,
+        "undrawn_nets": []
+      },
+      "wl_drivers": {
+        "routed_nets": [
+          "WLEN",
+          "X[0]",
+          "X[1]",
+          "X[2]",
+          "X[3]",
+          "X[4]",
+          "X[5]",
+          "X[6]",
+          "X[7]",
+          "Y[0]",
+          "Y[10]",
+          "Y[11]",
+          "Y[12]",
+          "Y[13]",
+          "Y[14]",
+          "Y[15]",
+          "Y[1]",
+          "Y[2]",
+          "Y[3]",
+          "Y[4]",
+          "Y[5]",
+          "Y[6]",
+          "Y[7]",
+          "Y[8]",
+          "Y[9]"
+        ],
+        "nets_inside_one_child": 384,
+        "excluded_nets": 130,
+        "undrawn_nets": []
+      }
+    },
+    "routed_net_count": 87,
+    "undrawn": [],
+    "connectivity_check": "test_macro.py::test_decoder_nets_are_one_net_each_and_never_short (flat extraction per cell)"
+  },
+  "tie_stubs": {
+    "Metal2": 2305,
+    "Metal3": 226,
+    "maze": 265
+  },
+  "rails_vs_wordline_gap": {
+    "gap_um": [
+      -55.34,
+      0.0
+    ],
+    "rail_shapes_in_gap_below_metal4": {
+      "m1": 0,
+      "v1": 0,
+      "m2": 0,
+      "v2": 0,
+      "m3": 0,
+      "v3": 0,
+      "v4": 0
+    },
+    "total": 0
+  },
+  "rails_connectivity": {
+    "ties_expected": 2796,
+    "ties_on_own_rail": 2796,
+    "ties_on_other_rail": 0,
+    "ties_floating": 0,
+    "floating_ties": [],
+    "vdd_vss_short_polygons": 0,
+    "bitcell_risers": {
+      "VDD": {
+        "expected": 8192,
+        "on_rail": 8192,
+        "on_other_rail": 0
+      },
+      "VSS": {
+        "expected": 8192,
+        "on_rail": 8192,
+        "on_other_rail": 0
+      }
+    },
+    "polygons_on_rail": {
+      "VDD": {
+        "m1": 5542,
+        "v1": 5542,
+        "m2": 1346,
+        "v2": 1560,
+        "m3": 1535,
+        "v3": 1510,
+        "m4": 138,
+        "v4": 138,
+        "m5": 1
+      },
+      "VSS": {
+        "m1": 5510,
+        "v1": 5510,
+        "m2": 1520,
+        "v2": 1608,
+        "m3": 1543,
+        "v3": 1478,
+        "m4": 134,
+        "v4": 134,
+        "m5": 1
+      }
+    }
+  },
+  "not_drawn": [
+    "VDD/VSS pin connection to the rails",
+    "latch and control signal routing",
+    "inter-block signal fan-out",
+    "signal pin routing",
+    "column_mux BLBM (listed in undrawn)"
+  ],
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    }
+  },
+  "klt_version": "klt 0.8.1.dev807+g125541d726ce"
+}

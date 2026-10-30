@@ -5,6 +5,7 @@ leaf-cell signal routing (flat-net resolution, router, per-cell connectivity).
     cd layout/sram_256x32 && uv run --with pytest --with klayout pytest -q test_macro.py
 """
 
+import functools
 import os
 import re
 import sys
@@ -15,6 +16,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import generate as g  # noqa: E402
 
 LEF = os.path.join(g.HERE, "macro.lef")
+
+
+@functools.lru_cache(maxsize=1)
+def _build():
+    """One generated layout shared by the tests that only read it (a build takes over a minute)."""
+    return g.build()
 
 
 def _bytes(tmp_path, name):
@@ -33,7 +40,7 @@ def test_committed_gds_is_current(tmp_path):
 
 
 def test_bitcell_count_and_top():
-    layout, _, top = g.build()
+    layout, _, top = _build()
     assert top.name == "macro"
     assert [c.name for c in layout.top_cells()] == ["macro"]
     bit = layout.cell("bitcell")
@@ -45,7 +52,7 @@ def test_bitcell_count_and_top():
 
 
 def test_array_is_mirror_abutted():
-    layout, _, _ = g.build()
+    layout, _, _ = _build()
     pair = layout.cell("bl_pair")
     h = round(g.bc.H_CELL / g.DBU)
     ys = sorted(i.trans.disp.y - (h if i.trans.is_mirror() else 0) for i in pair.each_inst())
@@ -55,7 +62,7 @@ def test_array_is_mirror_abutted():
 
 def test_pins_match_netlist_ports():
     ports = g.parse_netlist(g.NETLIST)["macro"].ports
-    _, gen, _ = g.build()
+    _, gen, _ = _build()
     assert sorted(p["name"] for p in gen.pin_list) == sorted(ports)
 
 
@@ -68,7 +75,7 @@ def test_lef_pins_match_netlist_ports():
 
 
 def test_bus_ends_present():
-    _, gen, _ = g.build()
+    _, gen, _ = _build()
     names = {p["name"] for p in gen.pin_list}
     assert {"A[7]", "A[0]", "D[31]", "D[0]", "Q[31]", "Q[0]"} <= names
 
@@ -183,7 +190,7 @@ def test_bitline_trace_has_teeth():
 
 def test_every_periphery_device_has_a_body_tie():
     """Each transistor cell carries a tie Activ with a Cont and a Metal1 label for its bulk net."""
-    layout, _, _ = g.build()
+    layout, _, _ = _build()
     li = lambda lp: layout.layer(*lp)
     devs = [c for c in layout.each_cell() if c.name.startswith("sg13_lv_")]
     assert devs
@@ -197,7 +204,7 @@ def test_every_periphery_device_has_a_body_tie():
 
 
 def test_tie_labels_name_the_netlist_bulk():
-    layout, _, _ = g.build()
+    layout, _, _ = _build()
     nets = {i.nets[3] for sc in g.parse_netlist(g.NETLIST).values() for i in sc.insts
             if i.ref in ("sg13_lv_nmos", "sg13_lv_pmos")}
     assert nets == {"VSS", "VDD"}
@@ -254,7 +261,7 @@ def test_rail_pitch_does_not_alias_the_wordline_lane_pitch():
 def test_no_rail_shape_below_metal4_in_the_wordline_gap():
     import rails_check
 
-    layout, gen, top = g.build()
+    layout, gen, top = _build()
     res = rails_check.wordline_gap_clearance(layout, top, gen)
     assert res["total"] == 0, res
     # the lanes do cross the gap, on Metal4 only
@@ -266,7 +273,7 @@ def test_no_rail_shape_below_metal4_in_the_wordline_gap():
 def test_gap_clearance_check_has_teeth():
     import rails_check
 
-    layout, gen, top = g.build()
+    layout, gen, top = _build()
     gen.box(layout.cell("rails"), g.L_VIA2, -10.0, 20.0, -9.81, 20.19)
     assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1
 
@@ -411,7 +418,7 @@ def _leaf_nets(layout, gen, name):
 
 
 def test_leaf_cell_nets_are_one_net_each_and_never_short():
-    layout, gen, _ = g.build()
+    layout, gen, _ = _build()
     assert set(gen.leaf_report) == set(g.LEAF_ROUTED)
     n_checked = 0
     for name in g.LEAF_ROUTED:
@@ -422,11 +429,11 @@ def test_leaf_cell_nets_are_one_net_each_and_never_short():
         reps = [cl[0] for cl in ids.values()]
         assert len(set(reps)) == len(reps), (name, "two netlist nets share a cluster")
         n_checked += len(ids)
-    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 47
+    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 53
 
 
 def test_leaf_cell_undrawn_nets_are_listed():
-    _, gen, _ = g.build()
+    _, gen, _ = _build()
     # every net of every leaf cell is either drawn, listed as undrawn, or excluded/single-terminal by rule
     for name in g.LEAF_ROUTED:
         rep = gen.leaf_report[name]
@@ -459,3 +466,65 @@ def test_leaf_cell_trace_has_teeth_via2():
     _erase_at(layout.cell(name), g.L_VIA2, v["x"], v["y"])
     ids = _leaf_nets(layout, gen, name)
     assert len(set(ids[v["net"]])) > 1, (name, v)
+
+
+# ---- decoder nets between child cells (issue #105) -----------------------------------
+def _extract_flat(layout, cell):
+    """Flat connectivity of ``cell``: net ids are comparable across the whole cell, children included."""
+    flat = kdb.Layout()
+    flat.assign(layout)
+    top = flat.cell(cell.name)
+    top.flatten(True)
+    return _extract_cell(flat, top)
+
+
+def _flat_clusters(layout, gen, name):
+    """{flat net: [cluster id of each D/G/S terminal]} for every signal net of ``name`` with two or more terminals."""
+    net = _extract_flat(layout, layout.cell(name))
+    out = {}
+    for key, v in g.flat_nets(gen.nl, name).items():
+        pts = [gen.locate(name, p, d, t) for p, d, t in v["terminals"] if t != "B"]
+        if not v["excluded"] and len(pts) >= 2:
+            out[key] = [net(x, y) for x, y in pts]
+    return out
+
+
+def test_decoder_nets_are_one_net_each_and_never_short():
+    layout, gen, _ = _build()
+    assert set(gen.hier_report) == set(g.HIER_ROUTED)
+    n_checked = 0
+    for name in g.HIER_ROUTED:
+        ids = _flat_clusters(layout, gen, name)
+        assert ids, name
+        undrawn = set(gen.hier_report[name]["failed"])
+        for key, cl in ids.items():
+            if key in undrawn:
+                continue
+            assert None not in cl and len(set(cl)) == 1, (name, key, cl)
+            n_checked += 1
+        reps = [cl[0] for k, cl in ids.items() if k not in undrawn]
+        assert len(set(reps)) == len(reps), (name, "two netlist nets share a cluster")
+    assert n_checked > 0
+
+
+def test_decoder_nets_undrawn_are_listed():
+    _, gen, _ = _build()
+    undrawn = {(n, k) for n in g.HIER_ROUTED for k in gen.hier_report[n]["failed"]}
+    assert undrawn == set(), undrawn
+    # the wordlines and the supply are not signal-routed here
+    assert {"VDD", "VSS", "WL[0]", "WL[127]"} <= set(gen.hier_report["row_decoder"]["excluded"])
+    # the 8 + 16 predecoder outputs reach the wordline drivers (WLEN and the address bits stay inside one child)
+    routed = gen.hier_report["row_decoder"]["routed"]
+    assert sum(1 for k in routed if k.startswith(("X[", "Y["))) == 24
+
+
+def test_decoder_trace_has_teeth():
+    layout, gen, _ = g.build()
+    name = "predec3"
+    vias = [v for v in gen.leaf_vias[name]]
+    assert vias, name
+    net = vias[0]["net"]
+    before = _flat_clusters(layout, gen, name)
+    assert len(set(before[net])) == 1
+    _erase_at(layout.cell(name), g.L_VIA2, vias[0]["x"], vias[0]["y"])
+    assert len(set(_flat_clusters(layout, gen, name)[net])) > 1
