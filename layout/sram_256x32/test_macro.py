@@ -69,3 +69,31 @@ def test_bus_ends_present():
     _, gen, _ = g.build()
     names = {p["name"] for p in gen.pin_list}
     assert {"A[7]", "A[0]", "D[31]", "D[0]", "Q[31]", "Q[0]"} <= names
+
+
+def test_every_periphery_device_has_a_body_tie():
+    """Each transistor cell carries a tie Activ with a Cont and a Metal1 label for its bulk net."""
+    layout, _, _ = g.build()
+    li = lambda lp: layout.layer(*lp)
+    devs = [c for c in layout.each_cell() if c.name.startswith("sg13_lv_")]
+    assert devs
+    for c in devs:
+        assert c.shapes(li(g.bc.L_ACTIV)).size() == 2, c.name  # channel + tie
+        kind_p = "pmos" in c.name
+        psd = [b for b in (s.box for s in c.shapes(li(g.bc.L_PSD)).each())]
+        tie = sorted((s.box for s in c.shapes(li(g.bc.L_ACTIV)).each()), key=lambda b: b.left)[-1]
+        in_psd = any(b.contains(tie.p1) and b.contains(tie.p2) for b in psd)
+        assert in_psd == (not kind_p), c.name  # p-tap sits in pSD; n-tap does not
+
+
+def test_tie_labels_name_the_netlist_bulk():
+    layout, _, _ = g.build()
+    nets = {i.nets[3] for sc in g.parse_netlist(g.NETLIST).values() for i in sc.insts
+            if i.ref in ("sg13_lv_nmos", "sg13_lv_pmos")}
+    assert nets == {"VSS", "VDD"}
+    texts = set()
+    for c in layout.each_cell():
+        if c.name.startswith("sg13_lv_") or c.name in g.Gen().nl:
+            for s in c.shapes(layout.layer(*g.bc.L_METAL1_LBL)).each():
+                texts.add(s.text_string)
+    assert {"VSS", "VDD"} <= texts

@@ -33,9 +33,9 @@ What is drawn
 What is NOT drawn (disclosed, not hidden)
 -----------------------------------------
 No signal routing in the periphery and none between the array and the column
-path, the decoder, or the pins; no well or substrate taps in the periphery
-(only the bitcell carries in-cell ties); no body connection. The macro is a
-placed-and-labelled layout, not a connected one. DRC (#29), LVS (#30) and power
+path, the decoder, or the pins; no supply rails. Each periphery transistor has
+its own body tie (Activ + Cont + Metal1 pad, labelled with the bulk net) but the
+ties are not yet wired to a rail. The macro is placed and tapped, not connected. DRC (#29), LVS (#30) and power
 delivery (#31) are the checks that must be run once routing exists.
 """
 
@@ -199,13 +199,31 @@ class Gen:
         gcy = y_pad0 + bc.POLY_PAD / 2
         self.box(c, bc.L_CONT, gx - bc.CO / 2, gcy - bc.CO / 2, gx + bc.CO / 2, gcy + bc.CO / 2)
         self.box(c, bc.L_METAL1, gx - bc.CO / 2 - bc.CO_ENC_M1, gcy - bc.CO / 2 - bc.CO_ENC_M1, gx + bc.CO / 2 + bc.CO_ENC_M1, gcy + bc.CO / 2 + bc.CO_ENC_M1)
+        # body tie: one PAD-square Activ with one Cont and a Metal1 pad, to the right of
+        # the drain. pSD of the device (PMOS) or of the tie (NMOS p-tap) is kept
+        # PSD_TO_NACT from the other polarity's Activ (pSD.e class), which sets the offset.
+        tx0 = xw + bc.PSD_ENC_ACT + bc.PSD_TO_NACT
+        tx0 = math.ceil(tx0 / 0.005 - 1e-9) * 0.005
+        tx1 = tx0 + bc.PAD
+        ty0 = (h - bc.PAD) / 2 if h > bc.PAD else 0.0
+        ty0 = math.floor(ty0 / 0.005 + 1e-9) * 0.005
+        ty1 = ty0 + bc.PAD
+        self.box(c, bc.L_ACTIV, tx0, ty0, tx1, ty1)
+        tcx, tcy = 0.5 * (tx0 + tx1), 0.5 * (ty0 + ty1)
+        self.box(c, bc.L_CONT, tcx - bc.CO / 2, tcy - bc.CO / 2, tcx + bc.CO / 2, tcy + bc.CO / 2)
+        self.box(c, bc.L_METAL1, tcx - bc.M1_W / 2, tcy - bc.CO / 2 - bc.CO_ENC_M1, tcx + bc.M1_W / 2, tcy + bc.CO / 2 + bc.CO_ENC_M1)
         if kind == "pmos":
             self.box(c, bc.L_PSD, -bc.PSD_ENC_ACT, -bc.PSD_ENC_ACT, xw + bc.PSD_ENC_ACT, h + bc.PSD_ENC_ACT)
-            self.box(c, bc.L_NWELL, -bc.NW_ENC_PACT, -bc.NW_ENC_PACT, xw + bc.NW_ENC_PACT, h + bc.NW_ENC_PACT)
+            # n-well tie (n+ Activ, no pSD) inside the device's well
+            self.box(c, bc.L_NWELL, -bc.NW_ENC_PACT, -bc.NW_ENC_PACT, tx1 + bc.NW_ENC_NACT, h + bc.NW_ENC_PACT)
+        else:
+            # p-substrate tie: pSD over the tie
+            self.box(c, bc.L_PSD, tx0 - bc.PSD_ENC_ACT, ty0 - bc.PSD_ENC_ACT, tx1 + bc.PSD_ENC_ACT, ty1 + bc.PSD_ENC_ACT)
         pts = {
             "D": (0.5 * (x_s[0] + x_s[1]), h / 2),
             "G": (gx, gcy),
             "S": (0.5 * (x_d[0] + x_d[1]), h / 2),
+            "B": (tcx, tcy),
         }
         self.devs[key] = (c, pts)
         return c, pts
@@ -260,8 +278,8 @@ class Gen:
         for (inst, ch, pts), (_, dx, dy) in zip(meta, placed):
             self.place(cell, ch, dx, dy)
             if pts is not None:
-                # SPICE order: d g s b
-                for term, net in zip("DGS", inst.nets[:3]):
+                # SPICE order: d g s b (B is the body tie)
+                for term, net in zip("DGSB", inst.nets[:4]):
                     px, py = pts[term]
                     self.text(cell, bc.L_METAL1_LBL, net, px + dx * DBU, py + dy * DBU)
         return cell
