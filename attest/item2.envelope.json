@@ -15,7 +15,7 @@
         "check": "stream_readable",
         "role": "layout",
         "passed": true,
-        "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747"
+        "content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec"
       },
       {
         "check": "top_cell_non_empty",
@@ -34,7 +34,7 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.8.1.dev70+gce6583fe1e8f",
+    "klt_version": "0.8.1.dev849+gf05774458ae2",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": null,
@@ -43,11 +43,11 @@
         "path": "layout/sram_256x32/macro.gds",
         "scope": "repo"
       },
-      "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747"
+      "content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec"
     },
     "regeneration": {
       "generator": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-      "regenerated_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747"
+      "regenerated_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec"
     }
   }
 }

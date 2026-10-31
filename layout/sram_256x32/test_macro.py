@@ -422,7 +422,7 @@ def test_leaf_cell_nets_are_one_net_each_and_never_short():
         reps = [cl[0] for cl in ids.values()]
         assert len(set(reps)) == len(reps), (name, "two netlist nets share a cluster")
         n_checked += len(ids)
-    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 47
+    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 53
 
 
 def test_leaf_cell_undrawn_nets_are_listed():
@@ -551,4 +551,28 @@ def test_hier_cell_trace_has_teeth_wire():
         return sh.dbox.center().x, sh.dbox.center().y
 
     after = _hier_split("control", g.L_METAL3, pick)
+    assert any(len(c) > 1 for c in after.values())
+
+
+# ---- nets between the child cells of the decoder (issue #105) ---------------------------
+def test_decoder_nets_are_all_drawn_and_listed():
+    _, gen = _hier_build()
+    decoder = ("predec3", "predec4", "wl_drivers", "row_decoder")
+    assert set(decoder) <= set(g.HIER_ROUTED) and "wl_driver" in g.LEAF_ROUTED
+    assert {n: gen.hier_report[n]["failed"] for n in decoder} == {n: [] for n in decoder}
+    # the wordlines and the supply are not signal-routed here
+    assert {"VDD", "VSS", "WL[0]", "WL[127]"} <= set(gen.hier_report["row_decoder"]["excluded"])
+    # the 8 + 16 predecoder outputs reach the wordline drivers
+    routed = gen.hier_report["row_decoder"]["routed"]
+    assert sum(1 for k in routed if k.startswith(("X[", "Y["))) == 24
+    assert set(gen.hier_report["wl_drivers"]["routed"]) == {f"X[{i}]" for i in range(8)} | {f"Y[{i}]" for i in range(16)} | {"WLEN"}
+
+
+def test_decoder_trace_has_teeth_via2():
+    """Cutting a Via2 of a net inside ``predec3`` splits that net: the connectivity check can fail."""
+    def pick(gen, layout):
+        sh = next(iter(layout.cell("predec3").shapes(layout.layer(*g.L_VIA2)).each()))
+        return sh.dbox.center().x, sh.dbox.center().y
+
+    after = _hier_split("predec3", g.L_VIA2, pick)
     assert any(len(c) > 1 for c in after.values())
