@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-10-31
+
+- **PR #121**: feat: route the decoder nets on main's router, one HIER_ROUTED for eight cells
+- **Issue #119** (closed): Rebase decoder-net routing (PR #116) onto main's leaf-cell router
+
 ### 2026-10-30
 
 - **PR #115**: feat: route latch and control nets between leaf cells
