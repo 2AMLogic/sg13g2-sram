@@ -80,9 +80,13 @@ margin, not a pass/fail:
 - **Read SNM**: minimum butterfly-curve square side, bit lines precharged,
   wordline asserted, cell holding both values. Strictly positive.
 - **Hold SNM**: same measurement in standby. Strictly positive.
-- **Write margin**: minimum bit-line / write-driver drive that flips the
-  cell within a fixed **1 ns** write pulse (`spec/write-pulse-width-decision.md`).
-  Strictly positive. No independent macro timing target is ratified.
+- **Write margin**: in volts on the bit-line low level, the highest level at
+  which the cell still flips within a fixed **1 ns** write pulse
+  (`spec/write-pulse-width-decision.md`), taken through the real write driver
+  (worse of write-0 and write-1) as the signed-off figure. Strictly positive;
+  a cell that never flips is `null` and fails. Unit, sign, 25 mV resolution
+  and flip criterion are pinned in `spec/write-margin-definition-decision.md`.
+  No independent macro timing target is ratified.
 - **Access time**: clock edge to valid output, and write completion, per
   corner. Feeds the Liberty tables. Recorded, no pass threshold.
 
