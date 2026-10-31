@@ -361,6 +361,11 @@
       "name": "d_fin_32",
       "unit": "V",
       "spice": ".meas tran d_fin_32 FIND par('v(q32)-v(qb32)') AT=2.5n"
+    },
+    {
+      "name": "tflip_0",
+      "unit": "s",
+      "spice": ".meas tran tflip_0 TRIG par('v(wl)-v(vdd)/2') VAL=0 RISE=1 TARG par('v(q0)-v(qb0)') VAL=0 FALL=1"
     }
   ],
   "options": {

@@ -3,15 +3,18 @@
 * 33 copies of design/bitcell/bitcell.spice, copy k with its BL driven to a
 * constant low level L_k = 25 mV * k (k = 0..32, 0 .. 0.8 V) while BLB is held
 * at VDD. The cell starts holding Q=1/QB=0 (.ic below: Q high, QB low, rail-independent).
-* One 1 ns wordline pulse (spec/write-pulse-width-decision.md) is applied; copy
+* One wordline pulse, `pw` wide (1 ns, spec/write-pulse-width-decision.md; the
+* 0.5/1/2 ns sensitivity sweep derives benches with another pw) is applied; copy
 * k "flipped" if QB > Q at the end of the pulse and still at 2.5 ns. The write
 * margin is the highest L_k at which the cell still flips (run_bitcell.sh
-* post-processes the flip flags). Wordline amplitude = VDD.
+* post-processes the flip flags). Wordline amplitude = VDD. tflip_0 = time from
+* 50 % WL rise to Q = QB for the BL = 0 V cell.
+.param pw=1n
 .include ../../design/bitcell/bitcell.spice
 
 Vdd vdd 0 DC 1.2
-* wordline pulse (0..1 normalised, scaled by VDD): 20 ps edges, 1 ns plateau from 0.3 ns
-Vp  p 0 PULSE(0 1 0.3n 20p 20p 1n 10n)
+* wordline pulse (0..1 normalised, scaled by VDD): 20 ps edges, `pw` plateau from 0.3 ns
+Vp  p 0 PULSE(0 1 0.3n 20p 20p {pw} 10n)
 Bwl wl 0 V = v(p)*v(vdd)
 *      BL  BLB WL VDD VSS Q   QB
 Vbl0 bl0 0 DC 0.000

@@ -1,0 +1,69 @@
+{
+  "label": "sweep_pw2ns",
+  "kind": "simulated",
+  "bl_step_v": 0.025,
+  "pulse_ns": 2.0,
+  "decision": "flipped iff Q<QB at end of pulse (2.3n) and 3.5n after it",
+  "corners": [
+    {
+      "corner_id": "mos_sf/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 3.5054e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111110000000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.25,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 3.41995e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111100000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.3,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 3.67136e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111100000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.3,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 3.6071e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111110000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.325,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 3.01798e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111100000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.3,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.94544e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.35,
+      "saturated": false
+    }
+  ]
+}
