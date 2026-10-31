@@ -1,0 +1,975 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+  "record_command": "./layout/reports/generate-macro-decoder.sh",
+  "gds": {
+    "layout/sram_256x32/macro.gds": "3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec"
+  },
+  "lef": {
+    "layout/sram_256x32/macro.lef": "f70241c171901be7c536614ea64c59b2061f7c3d0f9693b28ae4117add2a4907"
+  },
+  "socket": {
+    "layout/sram_256x32/macro.socket.json": "d8759245176e6a8959f1f358dbbd087bc8b37ff1c94311620599ac36979fc706"
+  },
+  "top_cell": "macro",
+  "macro_size_um": {
+    "x": 417.88,
+    "y": 616.395
+  },
+  "macro_area_um2": 257579.1,
+  "socket_check": {
+    "status": "pass"
+  },
+  "lef_pin_geometry_sources": [
+    "drawn"
+  ],
+  "extract": {
+    "status": "extracted",
+    "device_count": 51948,
+    "device_counts": {
+      "nfet": 34118,
+      "pfet": 17830
+    },
+    "net_count": 20384,
+    "pin_count": 4000
+  },
+  "drc": {
+    "status": "clean",
+    "violation_count": 0,
+    "rule_counts": {}
+  },
+  "leaf_signal_routing": {
+    "router": "MazeRouter (generate.py): Metal2/Metal3 maze on a 0.05 um lattice, Via1 landings on the Metal1 terminals, nets of two or more D/G/S terminals; supply, bit-line and wordline nets are not routed here",
+    "cells": {
+      "column_mux": {
+        "routed_nets": {
+          "BLM": 4,
+          "SEL0": 2,
+          "SEL0B": 2,
+          "SEL1": 2,
+          "SEL1B": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "BL0",
+          "BL1",
+          "BLB0",
+          "BLB1"
+        ],
+        "undrawn_nets": [
+          "BLBM"
+        ]
+      },
+      "dlatch": {
+        "routed_nets": {
+          "D": 2,
+          "EN": 2,
+          "ENB": 2,
+          "N1": 6,
+          "Q": 4,
+          "QB": 4
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "inv": {
+        "routed_nets": {
+          "A": 2,
+          "Y": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "inv_x4": {
+        "routed_nets": {
+          "A": 2,
+          "Y": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nand2": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "N1": 2,
+          "Y": 3
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nand3": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "C": 2,
+          "N1": 2,
+          "N2": 2,
+          "Y": 4
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nand4": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "C": 2,
+          "D": 2,
+          "N1": 2,
+          "N2": 2,
+          "N3": 2,
+          "Y": 5
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "nor2": {
+        "routed_nets": {
+          "A": 2,
+          "B": 2,
+          "N1": 2,
+          "Y": 3
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "precharge": {
+        "routed_nets": {
+          "PRE_B": 3
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "BL",
+          "BLB",
+          "VDD"
+        ],
+        "undrawn_nets": []
+      },
+      "sense_amp": {
+        "routed_nets": {
+          "OUT": 5,
+          "OUTB": 5,
+          "SAE": 3,
+          "TAIL": 3
+        },
+        "single_terminal_nets": [
+          "BLBM",
+          "BLM"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "wl_driver": {
+        "routed_nets": {
+          "N1": 2,
+          "N2": 2,
+          "WLB": 6,
+          "WLEN": 2,
+          "X": 2,
+          "Y": 2
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS",
+          "WL"
+        ],
+        "undrawn_nets": []
+      },
+      "write_driver": {
+        "routed_nets": {
+          "DIN": 3,
+          "DINB": 3,
+          "WA": 2,
+          "WB": 2,
+          "WE": 2
+        },
+        "single_terminal_nets": [
+          "BLBM",
+          "BLM"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      }
+    },
+    "routed_net_count": 53,
+    "undrawn": [
+      "column_mux/BLBM"
+    ],
+    "connectivity_check": "test_macro.py::test_leaf_cell_nets_are_one_net_each_and_never_short (per-cell extraction)"
+  },
+  "hier_signal_routing": {
+    "router": "MazeRouter (generate.py) over the child cells of addr_latch, data_latch, out_latch, control, predec3, predec4, wl_drivers and row_decoder: one terminal per instance port; the children's own Metal2/Metal3, the body-tie pads and the wordline stubs and tracks are obstacles except the nets being joined; supply and wordline nets are not routed",
+    "cells": {
+      "addr_latch": {
+        "routed_nets": {
+          "CLK": 12,
+          "CLKB": 12
+        },
+        "single_terminal_nets": [
+          "AL[0]",
+          "AL[1]",
+          "AL[2]",
+          "AL[3]",
+          "AL[4]",
+          "AL[5]",
+          "AL[6]",
+          "AL[7]",
+          "A[0]",
+          "A[1]",
+          "A[2]",
+          "A[3]",
+          "A[4]",
+          "A[5]",
+          "A[6]",
+          "A[7]",
+          "CEN",
+          "CENL",
+          "GWEN",
+          "GWENL",
+          "WEN",
+          "WENL"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "control": {
+        "routed_nets": {
+          "ACT": 4,
+          "CLKB": 2,
+          "D1": 2,
+          "D2": 2,
+          "D3": 2,
+          "D4": 2,
+          "E1": 2,
+          "E2": 2,
+          "E3": 2,
+          "E4": 2,
+          "NA": 3,
+          "PA": 2,
+          "PREB1": 2,
+          "SAEN": 2,
+          "SEL0": 2,
+          "SEL1": 2,
+          "WEB": 2,
+          "WLEN": 4,
+          "WLENB": 2,
+          "WRITE": 3,
+          "WRITEB": 2
+        },
+        "single_terminal_nets": [
+          "A0L",
+          "CENL",
+          "CLK",
+          "GWENL",
+          "PRE_B",
+          "SAE",
+          "SEL0B",
+          "SEL1B",
+          "WE",
+          "WENL"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "data_latch": {
+        "routed_nets": {
+          "CLK": 33,
+          "CLKB": 33
+        },
+        "single_terminal_nets": [
+          "D[0]",
+          "D[10]",
+          "D[11]",
+          "D[12]",
+          "D[13]",
+          "D[14]",
+          "D[15]",
+          "D[16]",
+          "D[17]",
+          "D[18]",
+          "D[19]",
+          "D[1]",
+          "D[20]",
+          "D[21]",
+          "D[22]",
+          "D[23]",
+          "D[24]",
+          "D[25]",
+          "D[26]",
+          "D[27]",
+          "D[28]",
+          "D[29]",
+          "D[2]",
+          "D[30]",
+          "D[31]",
+          "D[3]",
+          "D[4]",
+          "D[5]",
+          "D[6]",
+          "D[7]",
+          "D[8]",
+          "D[9]",
+          "Q[0]",
+          "Q[10]",
+          "Q[11]",
+          "Q[12]",
+          "Q[13]",
+          "Q[14]",
+          "Q[15]",
+          "Q[16]",
+          "Q[17]",
+          "Q[18]",
+          "Q[19]",
+          "Q[1]",
+          "Q[20]",
+          "Q[21]",
+          "Q[22]",
+          "Q[23]",
+          "Q[24]",
+          "Q[25]",
+          "Q[26]",
+          "Q[27]",
+          "Q[28]",
+          "Q[29]",
+          "Q[2]",
+          "Q[30]",
+          "Q[31]",
+          "Q[3]",
+          "Q[4]",
+          "Q[5]",
+          "Q[6]",
+          "Q[7]",
+          "Q[8]",
+          "Q[9]"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "out_latch": {
+        "routed_nets": {
+          "SAE": 33,
+          "SAEB": 33
+        },
+        "single_terminal_nets": [
+          "D[0]",
+          "D[10]",
+          "D[11]",
+          "D[12]",
+          "D[13]",
+          "D[14]",
+          "D[15]",
+          "D[16]",
+          "D[17]",
+          "D[18]",
+          "D[19]",
+          "D[1]",
+          "D[20]",
+          "D[21]",
+          "D[22]",
+          "D[23]",
+          "D[24]",
+          "D[25]",
+          "D[26]",
+          "D[27]",
+          "D[28]",
+          "D[29]",
+          "D[2]",
+          "D[30]",
+          "D[31]",
+          "D[3]",
+          "D[4]",
+          "D[5]",
+          "D[6]",
+          "D[7]",
+          "D[8]",
+          "D[9]",
+          "Q[0]",
+          "Q[10]",
+          "Q[11]",
+          "Q[12]",
+          "Q[13]",
+          "Q[14]",
+          "Q[15]",
+          "Q[16]",
+          "Q[17]",
+          "Q[18]",
+          "Q[19]",
+          "Q[1]",
+          "Q[20]",
+          "Q[21]",
+          "Q[22]",
+          "Q[23]",
+          "Q[24]",
+          "Q[25]",
+          "Q[26]",
+          "Q[27]",
+          "Q[28]",
+          "Q[29]",
+          "Q[2]",
+          "Q[30]",
+          "Q[31]",
+          "Q[3]",
+          "Q[4]",
+          "Q[5]",
+          "Q[6]",
+          "Q[7]",
+          "Q[8]",
+          "Q[9]"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "predec3": {
+        "routed_nets": {
+          "A0B": 5,
+          "A1B": 5,
+          "A2B": 5,
+          "A[0]": 5,
+          "A[1]": 5,
+          "A[2]": 5,
+          "N0": 2,
+          "N1": 2,
+          "N2": 2,
+          "N3": 2,
+          "N4": 2,
+          "N5": 2,
+          "N6": 2,
+          "N7": 2
+        },
+        "single_terminal_nets": [
+          "X[0]",
+          "X[1]",
+          "X[2]",
+          "X[3]",
+          "X[4]",
+          "X[5]",
+          "X[6]",
+          "X[7]"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "predec4": {
+        "routed_nets": {
+          "A0B": 9,
+          "A1B": 9,
+          "A2B": 9,
+          "A3B": 9,
+          "A[0]": 9,
+          "A[1]": 9,
+          "A[2]": 9,
+          "A[3]": 9,
+          "N0": 2,
+          "N1": 2,
+          "N10": 2,
+          "N11": 2,
+          "N12": 2,
+          "N13": 2,
+          "N14": 2,
+          "N15": 2,
+          "N2": 2,
+          "N3": 2,
+          "N4": 2,
+          "N5": 2,
+          "N6": 2,
+          "N7": 2,
+          "N8": 2,
+          "N9": 2
+        },
+        "single_terminal_nets": [
+          "Y[0]",
+          "Y[10]",
+          "Y[11]",
+          "Y[12]",
+          "Y[13]",
+          "Y[14]",
+          "Y[15]",
+          "Y[1]",
+          "Y[2]",
+          "Y[3]",
+          "Y[4]",
+          "Y[5]",
+          "Y[6]",
+          "Y[7]",
+          "Y[8]",
+          "Y[9]"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS"
+        ],
+        "undrawn_nets": []
+      },
+      "row_decoder": {
+        "routed_nets": {
+          "X[0]": 2,
+          "X[1]": 2,
+          "X[2]": 2,
+          "X[3]": 2,
+          "X[4]": 2,
+          "X[5]": 2,
+          "X[6]": 2,
+          "X[7]": 2,
+          "Y[0]": 2,
+          "Y[10]": 2,
+          "Y[11]": 2,
+          "Y[12]": 2,
+          "Y[13]": 2,
+          "Y[14]": 2,
+          "Y[15]": 2,
+          "Y[1]": 2,
+          "Y[2]": 2,
+          "Y[3]": 2,
+          "Y[4]": 2,
+          "Y[5]": 2,
+          "Y[6]": 2,
+          "Y[7]": 2,
+          "Y[8]": 2,
+          "Y[9]": 2
+        },
+        "single_terminal_nets": [
+          "A[0]",
+          "A[1]",
+          "A[2]",
+          "A[3]",
+          "A[4]",
+          "A[5]",
+          "A[6]",
+          "WLEN"
+        ],
+        "excluded_nets": [
+          "VDD",
+          "VSS",
+          "WL[0]",
+          "WL[100]",
+          "WL[101]",
+          "WL[102]",
+          "WL[103]",
+          "WL[104]",
+          "WL[105]",
+          "WL[106]",
+          "WL[107]",
+          "WL[108]",
+          "WL[109]",
+          "WL[10]",
+          "WL[110]",
+          "WL[111]",
+          "WL[112]",
+          "WL[113]",
+          "WL[114]",
+          "WL[115]",
+          "WL[116]",
+          "WL[117]",
+          "WL[118]",
+          "WL[119]",
+          "WL[11]",
+          "WL[120]",
+          "WL[121]",
+          "WL[122]",
+          "WL[123]",
+          "WL[124]",
+          "WL[125]",
+          "WL[126]",
+          "WL[127]",
+          "WL[12]",
+          "WL[13]",
+          "WL[14]",
+          "WL[15]",
+          "WL[16]",
+          "WL[17]",
+          "WL[18]",
+          "WL[19]",
+          "WL[1]",
+          "WL[20]",
+          "WL[21]",
+          "WL[22]",
+          "WL[23]",
+          "WL[24]",
+          "WL[25]",
+          "WL[26]",
+          "WL[27]",
+          "WL[28]",
+          "WL[29]",
+          "WL[2]",
+          "WL[30]",
+          "WL[31]",
+          "WL[32]",
+          "WL[33]",
+          "WL[34]",
+          "WL[35]",
+          "WL[36]",
+          "WL[37]",
+          "WL[38]",
+          "WL[39]",
+          "WL[3]",
+          "WL[40]",
+          "WL[41]",
+          "WL[42]",
+          "WL[43]",
+          "WL[44]",
+          "WL[45]",
+          "WL[46]",
+          "WL[47]",
+          "WL[48]",
+          "WL[49]",
+          "WL[4]",
+          "WL[50]",
+          "WL[51]",
+          "WL[52]",
+          "WL[53]",
+          "WL[54]",
+          "WL[55]",
+          "WL[56]",
+          "WL[57]",
+          "WL[58]",
+          "WL[59]",
+          "WL[5]",
+          "WL[60]",
+          "WL[61]",
+          "WL[62]",
+          "WL[63]",
+          "WL[64]",
+          "WL[65]",
+          "WL[66]",
+          "WL[67]",
+          "WL[68]",
+          "WL[69]",
+          "WL[6]",
+          "WL[70]",
+          "WL[71]",
+          "WL[72]",
+          "WL[73]",
+          "WL[74]",
+          "WL[75]",
+          "WL[76]",
+          "WL[77]",
+          "WL[78]",
+          "WL[79]",
+          "WL[7]",
+          "WL[80]",
+          "WL[81]",
+          "WL[82]",
+          "WL[83]",
+          "WL[84]",
+          "WL[85]",
+          "WL[86]",
+          "WL[87]",
+          "WL[88]",
+          "WL[89]",
+          "WL[8]",
+          "WL[90]",
+          "WL[91]",
+          "WL[92]",
+          "WL[93]",
+          "WL[94]",
+          "WL[95]",
+          "WL[96]",
+          "WL[97]",
+          "WL[98]",
+          "WL[99]",
+          "WL[9]"
+        ],
+        "undrawn_nets": []
+      },
+      "wl_drivers": {
+        "routed_nets": {
+          "WLEN": 128,
+          "X[0]": 16,
+          "X[1]": 16,
+          "X[2]": 16,
+          "X[3]": 16,
+          "X[4]": 16,
+          "X[5]": 16,
+          "X[6]": 16,
+          "X[7]": 16,
+          "Y[0]": 8,
+          "Y[10]": 8,
+          "Y[11]": 8,
+          "Y[12]": 8,
+          "Y[13]": 8,
+          "Y[14]": 8,
+          "Y[15]": 8,
+          "Y[1]": 8,
+          "Y[2]": 8,
+          "Y[3]": 8,
+          "Y[4]": 8,
+          "Y[5]": 8,
+          "Y[6]": 8,
+          "Y[7]": 8,
+          "Y[8]": 8,
+          "Y[9]": 8
+        },
+        "single_terminal_nets": [],
+        "excluded_nets": [
+          "VDD",
+          "VSS",
+          "WL[0]",
+          "WL[100]",
+          "WL[101]",
+          "WL[102]",
+          "WL[103]",
+          "WL[104]",
+          "WL[105]",
+          "WL[106]",
+          "WL[107]",
+          "WL[108]",
+          "WL[109]",
+          "WL[10]",
+          "WL[110]",
+          "WL[111]",
+          "WL[112]",
+          "WL[113]",
+          "WL[114]",
+          "WL[115]",
+          "WL[116]",
+          "WL[117]",
+          "WL[118]",
+          "WL[119]",
+          "WL[11]",
+          "WL[120]",
+          "WL[121]",
+          "WL[122]",
+          "WL[123]",
+          "WL[124]",
+          "WL[125]",
+          "WL[126]",
+          "WL[127]",
+          "WL[12]",
+          "WL[13]",
+          "WL[14]",
+          "WL[15]",
+          "WL[16]",
+          "WL[17]",
+          "WL[18]",
+          "WL[19]",
+          "WL[1]",
+          "WL[20]",
+          "WL[21]",
+          "WL[22]",
+          "WL[23]",
+          "WL[24]",
+          "WL[25]",
+          "WL[26]",
+          "WL[27]",
+          "WL[28]",
+          "WL[29]",
+          "WL[2]",
+          "WL[30]",
+          "WL[31]",
+          "WL[32]",
+          "WL[33]",
+          "WL[34]",
+          "WL[35]",
+          "WL[36]",
+          "WL[37]",
+          "WL[38]",
+          "WL[39]",
+          "WL[3]",
+          "WL[40]",
+          "WL[41]",
+          "WL[42]",
+          "WL[43]",
+          "WL[44]",
+          "WL[45]",
+          "WL[46]",
+          "WL[47]",
+          "WL[48]",
+          "WL[49]",
+          "WL[4]",
+          "WL[50]",
+          "WL[51]",
+          "WL[52]",
+          "WL[53]",
+          "WL[54]",
+          "WL[55]",
+          "WL[56]",
+          "WL[57]",
+          "WL[58]",
+          "WL[59]",
+          "WL[5]",
+          "WL[60]",
+          "WL[61]",
+          "WL[62]",
+          "WL[63]",
+          "WL[64]",
+          "WL[65]",
+          "WL[66]",
+          "WL[67]",
+          "WL[68]",
+          "WL[69]",
+          "WL[6]",
+          "WL[70]",
+          "WL[71]",
+          "WL[72]",
+          "WL[73]",
+          "WL[74]",
+          "WL[75]",
+          "WL[76]",
+          "WL[77]",
+          "WL[78]",
+          "WL[79]",
+          "WL[7]",
+          "WL[80]",
+          "WL[81]",
+          "WL[82]",
+          "WL[83]",
+          "WL[84]",
+          "WL[85]",
+          "WL[86]",
+          "WL[87]",
+          "WL[88]",
+          "WL[89]",
+          "WL[8]",
+          "WL[90]",
+          "WL[91]",
+          "WL[92]",
+          "WL[93]",
+          "WL[94]",
+          "WL[95]",
+          "WL[96]",
+          "WL[97]",
+          "WL[98]",
+          "WL[99]",
+          "WL[9]"
+        ],
+        "undrawn_nets": []
+      }
+    },
+    "routed_net_count": 114,
+    "undrawn": [],
+    "connectivity_check": "test_macro.py::test_hier_cell_nets_are_one_net_each_and_never_short (per-cell extraction)"
+  },
+  "tie_stubs": {
+    "Metal2": 2444,
+    "Metal3": 150,
+    "maze": 202
+  },
+  "rails_vs_wordline_gap": {
+    "gap_um": [
+      -55.34,
+      0.0
+    ],
+    "rail_shapes_in_gap_below_metal4": {
+      "m1": 0,
+      "v1": 0,
+      "m2": 0,
+      "v2": 0,
+      "m3": 0,
+      "v3": 0,
+      "v4": 0
+    },
+    "total": 0
+  },
+  "rails_connectivity": {
+    "ties_expected": 2796,
+    "ties_on_own_rail": 2796,
+    "ties_on_other_rail": 0,
+    "ties_floating": 0,
+    "floating_ties": [],
+    "vdd_vss_short_polygons": 0,
+    "bitcell_risers": {
+      "VDD": {
+        "expected": 8192,
+        "on_rail": 8192,
+        "on_other_rail": 0
+      },
+      "VSS": {
+        "expected": 8192,
+        "on_rail": 8192,
+        "on_other_rail": 0
+      }
+    },
+    "polygons_on_rail": {
+      "VDD": {
+        "m1": 5542,
+        "v1": 5542,
+        "m2": 1332,
+        "v2": 1556,
+        "m3": 1533,
+        "v3": 1510,
+        "m4": 150,
+        "v4": 150,
+        "m5": 1
+      },
+      "VSS": {
+        "m1": 5510,
+        "v1": 5510,
+        "m2": 1458,
+        "v2": 1562,
+        "m3": 1520,
+        "v3": 1478,
+        "m4": 145,
+        "v4": 145,
+        "m5": 1
+      }
+    }
+  },
+  "not_drawn": [
+    "VDD/VSS pin connection to the rails",
+    "signal nets between the blocks",
+    "inter-block signal fan-out",
+    "signal pin routing",
+    "column_mux BLBM (listed in undrawn)"
+  ],
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    }
+  },
+  "klt_version": "klt 0.8.1.dev849+gf05774458ae2"
+}

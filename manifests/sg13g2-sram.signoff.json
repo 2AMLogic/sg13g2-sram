@@ -70,7 +70,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747",
+        "content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -79,7 +79,7 @@
             "path": "layout/sram_256x32/macro.gds",
             "scope": "repo"
           },
-          "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747",
+          "content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
           "input_verified": true,
           "summary": "T1 item 2 (Layout): 3/3 attestation checks passed (klt signoff --attest)",
           "source": "layout/sram_256x32/macro.gds",
@@ -91,7 +91,7 @@
           },
           "regeneration": {
             "generator": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-            "regenerated_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747",
+            "regenerated_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
             "executed_by_klt": false
           }
         }
@@ -112,7 +112,7 @@
         "command": null,
         "kind": "drc",
         "check_status": "clean",
-        "content_hash": "sha256:ff9e75a0046bdc3c54fd1157c1428b77ed5710b60ffe1ab8001a047ce326f747",
+        "content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
         "input_verified": true,
         "exit_status": 0,
         "coverage": {
