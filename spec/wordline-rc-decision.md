@@ -74,10 +74,17 @@ single-corner comparison shows" (180 nm, 3.3 V, 2 ns pulse):
    The `rsil` 7.98 Ω/sq is a *device* corner for a resistor, not an
    interconnect bound, so it is cited as the nearest PDK-stated poly figure
    and is not asserted to be the interconnect high end. **Not found:** a
-   stated interconnect-capacitance corner. `cornerCAP.lib`'s `cap_cpara`
-   (0.9 / 1.0 / 1.1) scales capacitor *devices*, not wire capacitance. Which
-   layer the wordline actually runs on in the repo's own array is decided by
-   the array layout issue; `spec/bitcell-decision.md` lists `GatPoly` and
+   stated interconnect-capacitance corner *in the ITF or in `cornerCAP.lib`*:
+   the ITF is typical only, and `cornerCAP.lib`'s `cap_cpara`
+   (0.9 / 1.0 / 1.1) scales capacitor *devices*, not wire capacitance.
+   **Found:** `ihp-sg13g2-extract.tech` does state interconnect-capacitance
+   corners. It declares the variants `(hrhc),(lrhc),(hrlc),(lrlc)`; its
+   "Parasitic capacitance values for maximum corner" block
+   (`variants (hrhc),(lrhc)`) and "minimum corner" block
+   (`variants (hrlc),(lrlc)`) state capacitances that differ from the nominal
+   (`variants ()`) block. `hrhc` (high R, high C) is the PDK's own
+   worst-delay variant. Which layer the wordline actually runs on in the
+   repo's own array is decided by the array layout issue; `spec/bitcell-decision.md` lists `GatPoly` and
    `Metal1`–`Metal3` in the foundry cell.
 
 ## Options, best to worst for this block
@@ -122,7 +129,7 @@ later change to `spec/sram.md` names it):
 | Case | Resistance | Capacitance |
 |---|---|---|
 | Typical | the ITF typical values above | the ITF stack as given |
-| High-end R | the PDK-stated high-end values above (Metal1 0.135, Metal2–5 0.103 Ω/sq, `Cont` 20 Ω) and, for poly, the highest PDK-stated poly sheet resistance found at that time; if none is found the record of the run says so | not scaled: no PDK-stated capacitance corner was found |
+| High-end R and C (`hrhc`) | the PDK-stated high-end values above (Metal1 0.135, Metal2–5 0.103 Ω/sq, `Cont` 20 Ω) and, for poly, the highest PDK-stated poly sheet resistance found at that time; if none is found the record of the run says so | the maximum-corner capacitances of `ihp-sg13g2-extract.tech` (`variants (hrhc),(lrhc)`, "Maximum corner capacitances"), as stated; not scaled or invented here |
 
 Rules for the axis: only values stated by a named PDK file are used; **no
 multiplier such as ×1.5 is invented** (the origin's ×1.5 was a sensitivity
@@ -134,7 +141,7 @@ record's to make with evidence; this record does not prune the matrix.
 ### Pass criterion
 
 Reused, not new: the far cell, driven by the extracted wordline waveform,
-meets the ratified write-margin requirement of `spec/sram.md` ("Write
+meets the write-margin requirement of `spec/sram.md` (Proposed; "Write
 margin": strictly positive at every corner, within the fixed write pulse of
 `spec/write-pulse-width-decision.md`), plus the existing read SNM and hold SNM
 requirements. **No threshold is introduced**, and no numeric wordline delay
