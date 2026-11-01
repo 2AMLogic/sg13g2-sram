@@ -23,8 +23,10 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 - **#105**: layout: route decoder cell internals
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
+- **#108**: layout: connect macro pins, signals record, verify and README
 
 ## Ready
 
@@ -98,7 +100,7 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 3 |
 | Very important | 0 |
-| Important | 3 |
+| Important | 5 |
 | Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 10 |
 | PRs awaiting review | 4 |
