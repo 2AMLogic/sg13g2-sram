@@ -5,7 +5,8 @@ step (approval of the PR that lands this file); this document does not
 ratify itself.
 **Resolves**: #2
 **Depends on**: `spec/bitcell-decision.md`, `spec/porting-plan.md`,
-`spec/write-pulse-width-decision.md`
+`spec/write-pulse-width-decision.md`,
+`spec/area-pulse-power-decision.md`
 **Origin**: `gf180-sram` `spec/sram.md` @ `d0bacc0`
 
 Once ratified this is the spec agents build and verify against. It is not
@@ -85,6 +86,13 @@ margin, not a pass/fail:
   Strictly positive. No independent macro timing target is ratified.
 - **Access time**: clock edge to valid output, and write completion, per
   corner. Feeds the Liberty tables. Recorded, no pass threshold.
+- **Area, minimum clock pulse, power**: recorded, no pass threshold
+  (`spec/area-pulse-power-decision.md`). Area is the macro area in µm², with
+  area per bit and bitcell area alongside; the comp figures below are the
+  reference scale. Minimum clock pulse is a Liberty-characterized output.
+  Power (dynamic energy per access, standby leakage) is not measured yet.
+- **Retention**: hold SNM above is the retention row. Data-retention voltage
+  is a non-goal at the canary tier.
 
 A corner passes only when read SNM, hold SNM and write margin are strictly
 positive and access time is recorded.
@@ -193,10 +201,12 @@ protocol, described generically.
 | Origin harness on OSDI-loaded models | open, verify at first run | #5, #4 |
 | Rail sharing | open (target one rail) | bitcell characterization issue |
 | `SRAM.drawing` marker rules | open | bitcell layout issue |
+| Numeric area target | open, after array layout (`spec/area-pulse-power-decision.md`) | array layout issue |
+| Macro minimum clock pulse, dynamic and leakage power | open, not measured (`spec/area-pulse-power-decision.md`) | Liberty generation and characterization issues |
 
 ## References
 
 - `spec/bitcell-decision.md`, `spec/porting-plan.md`,
-  `spec/write-pulse-width-decision.md`
+  `spec/write-pulse-width-decision.md`, `spec/area-pulse-power-decision.md`
 - `gf180-sram` `spec/sram.md` @ `d0bacc0`
 - `~/share/pdk/ihp-sg13g2/libs.ref/sg13g2_sram/` (reference macro views)
