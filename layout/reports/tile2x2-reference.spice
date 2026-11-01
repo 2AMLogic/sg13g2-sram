@@ -1,0 +1,16 @@
+
+
+.subckt bitcell BL BLB WL VDD VSS Q QB
+XMP0 Q QB VDD VDD sg13_lv_pmos w=0.15u l=0.13u ng=1 m=1
+XMN0 Q QB VSS VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+XMP1 QB Q VDD VDD sg13_lv_pmos w=0.15u l=0.13u ng=1 m=1
+XMN1 QB Q VSS VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+XMN2 BL WL Q VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+XMN3 BLB WL QB VSS sg13_lv_nmos w=0.30u l=0.13u ng=1 m=1
+.ends
+.subckt tile2x2 BL0 BLB0 BL1 BLB1 WL0 WL1 VDD VSS
+Xc00 BL0 BLB0 WL0 VDD VSS q00 qb00 bitcell
+Xc10 BL1 BLB1 WL0 VDD VSS q10 qb10 bitcell
+Xc01 BL0 BLB0 WL1 VDD VSS q01 qb01 bitcell
+Xc11 BL1 BLB1 WL1 VDD VSS q11 qb11 bitcell
+.ends
