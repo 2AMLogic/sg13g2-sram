@@ -101,14 +101,14 @@
         "role": "source",
         "path": "design/control/control.sch",
         "passed": true,
-        "content_hash": "sha256:a2041aa27ef25f50caec785a43968694a231e00e753de51b2f6bf4d37cdc056d"
+        "content_hash": "sha256:df54c419ad322d10d668d282d4ccb730fbe20da6c723e3f9cb55395d3a625d3f"
       },
       {
         "check": "present",
         "role": "source",
         "path": "design/control/control.sym",
         "passed": true,
-        "content_hash": "sha256:bcbeafbfb316aa25447b0a87a7e4b9416a55b5f08ca20d35aa3c808032d6f39a"
+        "content_hash": "sha256:b9bff157d748477ebed832bf296b7b9d1de74004c4830dc83c942fb0e59ca1bd"
       },
       {
         "check": "present",
@@ -269,28 +269,28 @@
         "role": "source",
         "path": "design/latches/addr_latch.sch",
         "passed": true,
-        "content_hash": "sha256:33125b1c5c2fcaf0f02819f1b9f890e63d298761db4c6c08fd78bc2f17459e81"
+        "content_hash": "sha256:2a6662cac16a2a7fee2a0d3021bf51464eed8326d75230267bede3af0b41fb4e"
       },
       {
         "check": "present",
         "role": "source",
         "path": "design/latches/addr_latch.sym",
         "passed": true,
-        "content_hash": "sha256:69ba7df53b049fd90eb11b822606c91e7bd10d9e3d796d782f1a184a6db7bea5"
+        "content_hash": "sha256:e4af83a587e9b243ed7dda529779c1fcc6724466db45c9d46f15501a5b665111"
       },
       {
         "check": "present",
         "role": "source",
         "path": "design/latches/data_latch.sch",
         "passed": true,
-        "content_hash": "sha256:e1a5257b5266227e9faa7fd00a1dd2c989289367749e3a8a1fb81a7bb0d1d5ed"
+        "content_hash": "sha256:b177977d8537d47244e5ff354aff18d1dd2ba86f4079da0206c29063a273dcfa"
       },
       {
         "check": "present",
         "role": "source",
         "path": "design/latches/data_latch.sym",
         "passed": true,
-        "content_hash": "sha256:29a51b26c235a253f2c751f447f248e016657a19d44c86cefa27eaf05f98c2bb"
+        "content_hash": "sha256:5ce4ddce71a18dfea56885b835c391ae5f6f9d6d6652f6c275fa4310ad28d20c"
       },
       {
         "check": "present",
@@ -325,14 +325,14 @@
         "role": "source",
         "path": "design/macro/bit_slice.sch",
         "passed": true,
-        "content_hash": "sha256:4091e61e09e178e0c65f979ba3925402432d269d311b673030efb82bfbfd6fbb"
+        "content_hash": "sha256:98b161fa7728e9e369bca9cdd91d60ea95be655e40d32f289d78b2e559d4bec9"
       },
       {
         "check": "present",
         "role": "source",
         "path": "design/macro/bit_slice.sym",
         "passed": true,
-        "content_hash": "sha256:2c110f6aa1b9e92fd0132e501893591ade58fb610b9aaa90dcc69680aa7a853d"
+        "content_hash": "sha256:c09890051176a6397402846c034d6d41cb52724a9f976bee9e7bd50d3ffdc567"
       },
       {
         "check": "present",
@@ -353,14 +353,14 @@
         "role": "source",
         "path": "design/macro/macro.sch",
         "passed": true,
-        "content_hash": "sha256:7c4bc58d365f183c92bc9db8d6a6cb7813bd7cb6dcd9379fe86fdb364242c09e"
+        "content_hash": "sha256:c084a003ae7ea7f39c2911221dcddd092489c42918e95e958eddd32ec15f0531"
       },
       {
         "check": "present",
         "role": "source",
         "path": "design/macro/macro.sym",
         "passed": true,
-        "content_hash": "sha256:aca4e98f158d53d98373a910b912617e41bf2e37cb11b4747b025e09d8e5df72"
+        "content_hash": "sha256:4c5703df61a75b81b5e49ebd42c028e56e9e25883e62a906d83dea5482ace6c4"
       },
       {
         "check": "present",
@@ -423,7 +423,7 @@
         "role": "derived",
         "path": "design/control/control.spice",
         "passed": true,
-        "content_hash": "sha256:e9003e7507a09bdb5e9a3711d41bbd103462ec382f6eddf19aebc9bf111cd2b1"
+        "content_hash": "sha256:7ea5daf8b679a8ac22175453a346c4ce0e9f6aee82f47ff228d0d7fd664be241"
       },
       {
         "check": "present",
@@ -507,14 +507,14 @@
         "role": "derived",
         "path": "design/latches/addr_latch.spice",
         "passed": true,
-        "content_hash": "sha256:2688be84edf65ffef63675543529c2d21b5439f97dfa68aad1bf1d63f94aa1c8"
+        "content_hash": "sha256:1454ed2399b1ad3b3711cd10398271d3680033d9ccfb8e810b43c11b168f55a5"
       },
       {
         "check": "present",
         "role": "derived",
         "path": "design/latches/data_latch.spice",
         "passed": true,
-        "content_hash": "sha256:398e8d2529078cb00d8611ae5d74ddf589b92d5ce40825758b17ee912159b583"
+        "content_hash": "sha256:71d7c18c8206014539ce3df3c596f3f6747713416d7d99a93b8fad6374df4857"
       },
       {
         "check": "present",
@@ -535,7 +535,7 @@
         "role": "derived",
         "path": "design/macro/bit_slice.spice",
         "passed": true,
-        "content_hash": "sha256:921d8050f10546d9ca66263fec7fe81cea7b3e80e9e83f47bd03f59604f16bff"
+        "content_hash": "sha256:4fe4a814de0c5267bc4de3c9d989b1d2e5c981b3d1468e25d6c788ca0e9d877d"
       },
       {
         "check": "present",
@@ -549,7 +549,7 @@
         "role": "derived",
         "path": "design/macro/macro.spice",
         "passed": true,
-        "content_hash": "sha256:5637521969c90e9dfffbf8fa731f69ec3c2e322f23c4296d739518ff71c221a1"
+        "content_hash": "sha256:c8608fff0b498a7e428787f237bffc1ed30da7da92369a518b5f112db75caf50"
       },
       {
         "check": "command",

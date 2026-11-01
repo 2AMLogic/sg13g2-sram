@@ -1,7 +1,7 @@
 ** sch_path: design/control/control.sch
 
-* timing: ACT = CLK & ~CENL; PRE_B follows ACT; WLEN = ACT & delayed ACT; SAE = WLEN & delayed WLEN
-*+ & read; WE = WLEN & write; SEL* from A0L
+* timing: ACT = CLK & ~CENL; PRE_B follows ACT; WLEN = ACT & delayed ACT; SAE = WLEN & delayed WLEN & read; WE = WLEN & write;
+*+ SEL* from A0L
 
 .subckt control CLK CENL GWENL A0L PRE_B WLEN SAE WE SEL0 SEL0B SEL1 SEL1B VDD VSS
 *.ipin CLK
