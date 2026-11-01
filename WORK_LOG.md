@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-11-01
 
+- **PR #79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
+- **Issue #75** (closed): spec: Verilog and CDL views are only stretch; Liberty corner count unspecified
 - **PR #123**: Bump Repo Skills 0.24.7 -> 0.25.1
 
 ### 2026-10-31
