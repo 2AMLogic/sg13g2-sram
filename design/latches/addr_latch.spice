@@ -2,8 +2,8 @@
 
 * address and control input latches, transparent while CLK is low, hold while CLK is high
 
-.subckt addr_latch CLK A[7] A[6] A[5] A[4] A[3] A[2] A[1] A[0] CEN GWEN WEN AL[7] AL[6] AL[5] AL[4] AL[3] AL[2] AL[1] AL[0] CENL
-+ GWENL WENL VDD VSS
+.subckt addr_latch CLK A[7] A[6] A[5] A[4] A[3] A[2] A[1] A[0] CEN GWEN AL[7] AL[6] AL[5] AL[4]
++ AL[3] AL[2] AL[1] AL[0] CENL GWENL VDD VSS
 *.ipin CLK
 *.ipin A[7]
 *.ipin A[6]
@@ -15,7 +15,6 @@
 *.ipin A[0]
 *.ipin CEN
 *.ipin GWEN
-*.ipin WEN
 *.opin AL[7]
 *.opin AL[6]
 *.opin AL[5]
@@ -26,7 +25,6 @@
 *.opin AL[0]
 *.opin CENL
 *.opin GWENL
-*.opin WENL
 *.iopin VDD
 *.iopin VSS
 XCB CLK CLKB VDD VSS inv
@@ -40,7 +38,6 @@ XLA[1] A[1] CLKB CLK AL[1] VDD VSS dlatch
 XLA[0] A[0] CLKB CLK AL[0] VDD VSS dlatch
 XLC CEN CLKB CLK CENL VDD VSS dlatch
 XLG GWEN CLKB CLK GWENL VDD VSS dlatch
-XLW WEN CLKB CLK WENL VDD VSS dlatch
 .ends
 
 * expanding   symbol:  gates/inv.sym # of pins=4

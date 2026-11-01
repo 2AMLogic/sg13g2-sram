@@ -1,15 +1,18 @@
 ** sch_path: design/macro/bit_slice.sch
 
-* one I/O bit: two bit-line pairs (mux 2), precharge on each, column mux, sense amp, write driver; both precharges share PRE_B
+* one I/O bit: two bit-line pairs (mux 2), precharge on each, column mux, sense amp, write driver;
+*+ both precharges share PRE_B
 
-.subckt bit_slice PRE_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119]
-+ WL[118] WL[117] WL[116] WL[115] WL[114] WL[113] WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103] WL[102]
-+ WL[101] WL[100] WL[99] WL[98] WL[97] WL[96] WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83]
-+ WL[82] WL[81] WL[80] WL[79] WL[78] WL[77] WL[76] WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64]
-+ WL[63] WL[62] WL[61] WL[60] WL[59] WL[58] WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45]
-+ WL[44] WL[43] WL[42] WL[41] WL[40] WL[39] WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28] WL[27] WL[26]
-+ WL[25] WL[24] WL[23] WL[22] WL[21] WL[20] WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6]
-+ WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] DOUT DOUTB VDD VSS
+.subckt bit_slice PRE_B SEL0 SEL0B SEL1 SEL1B SAE WE DIN WEN WL[127] WL[126] WL[125] WL[124]
++ WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116] WL[115] WL[114] WL[113] WL[112] WL[111]
++ WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103] WL[102] WL[101] WL[100] WL[99] WL[98]
++ WL[97] WL[96] WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83]
++ WL[82] WL[81] WL[80] WL[79] WL[78] WL[77] WL[76] WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68]
++ WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60] WL[59] WL[58] WL[57] WL[56] WL[55] WL[54] WL[53]
++ WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43] WL[42] WL[41] WL[40] WL[39] WL[38]
++ WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28] WL[27] WL[26] WL[25] WL[24] WL[23]
++ WL[22] WL[21] WL[20] WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8]
++ WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] DOUT DOUTB VDD VSS
 *.ipin PRE_B
 *.ipin SEL0
 *.ipin SEL0B
@@ -18,6 +21,7 @@
 *.ipin SAE
 *.ipin WE
 *.ipin DIN
+*.ipin WEN
 *.ipin WL[127]
 *.ipin WL[126]
 *.ipin WL[125]
@@ -150,40 +154,46 @@
 *.iopin DOUTB
 *.iopin VDD
 *.iopin VSS
-XA0 WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116] WL[115] WL[114] WL[113]
-+ WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103] WL[102] WL[101] WL[100] WL[99] WL[98] WL[97] WL[96]
-+ WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79] WL[78] WL[77]
-+ WL[76] WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60] WL[59] WL[58]
-+ WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43] WL[42] WL[41] WL[40] WL[39]
-+ WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28] WL[27] WL[26] WL[25] WL[24] WL[23] WL[22] WL[21] WL[20]
-+ WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] BL0
-+ BLB0 VDD VSS bl_pair
-XA1 WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116] WL[115] WL[114] WL[113]
-+ WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103] WL[102] WL[101] WL[100] WL[99] WL[98] WL[97] WL[96]
-+ WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79] WL[78] WL[77]
-+ WL[76] WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60] WL[59] WL[58]
-+ WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43] WL[42] WL[41] WL[40] WL[39]
-+ WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28] WL[27] WL[26] WL[25] WL[24] WL[23] WL[22] WL[21] WL[20]
-+ WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] BL1
-+ BLB1 VDD VSS bl_pair
+XA0 WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116]
++ WL[115] WL[114] WL[113] WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103]
++ WL[102] WL[101] WL[100] WL[99] WL[98] WL[97] WL[96] WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88]
++ WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79] WL[78] WL[77] WL[76] WL[75] WL[74] WL[73]
++ WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60] WL[59] WL[58]
++ WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43]
++ WL[42] WL[41] WL[40] WL[39] WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28]
++ WL[27] WL[26] WL[25] WL[24] WL[23] WL[22] WL[21] WL[20] WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13]
++ WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] BL0 BLB0 VDD VSS bl_pair
+XA1 WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116]
++ WL[115] WL[114] WL[113] WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103]
++ WL[102] WL[101] WL[100] WL[99] WL[98] WL[97] WL[96] WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88]
++ WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79] WL[78] WL[77] WL[76] WL[75] WL[74] WL[73]
++ WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60] WL[59] WL[58]
++ WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43]
++ WL[42] WL[41] WL[40] WL[39] WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28]
++ WL[27] WL[26] WL[25] WL[24] WL[23] WL[22] WL[21] WL[20] WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13]
++ WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] BL1 BLB1 VDD VSS bl_pair
 XPC0 PRE_B BL0 BLB0 VDD VSS precharge
 XPC1 PRE_B BL1 BLB1 VDD VSS precharge
 XMX SEL0 SEL0B SEL1 SEL1B BL0 BLB0 BL1 BLB1 BLM BLBM VDD VSS column_mux
 XSA SAE BLM BLBM DOUT DOUTB VDD VSS sense_amp
-XWR WE DIN BLM BLBM VDD VSS write_driver
+XWR WEI DIN BLM BLBM VDD VSS write_driver
+XWI WE WEB VDD VSS inv
+XWG WEB WEN WEI VDD VSS nor2
 .ends
 
 * expanding   symbol:  macro/bl_pair.sym # of pins=132
 ** sym_path: design/macro/bl_pair.sym
 ** sch_path: design/macro/bl_pair.sch
-.subckt bl_pair WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118] WL[117] WL[116] WL[115] WL[114]
-+ WL[113] WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105] WL[104] WL[103] WL[102] WL[101] WL[100] WL[99] WL[98] WL[97]
-+ WL[96] WL[95] WL[94] WL[93] WL[92] WL[91] WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79] WL[78]
-+ WL[77] WL[76] WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61] WL[60] WL[59]
-+ WL[58] WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46] WL[45] WL[44] WL[43] WL[42] WL[41] WL[40]
-+ WL[39] WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31] WL[30] WL[29] WL[28] WL[27] WL[26] WL[25] WL[24] WL[23] WL[22] WL[21]
-+ WL[20] WL[19] WL[18] WL[17] WL[16] WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0]
-+ BL BLB VDD VSS
+.subckt bl_pair WL[127] WL[126] WL[125] WL[124] WL[123] WL[122] WL[121] WL[120] WL[119] WL[118]
++ WL[117] WL[116] WL[115] WL[114] WL[113] WL[112] WL[111] WL[110] WL[109] WL[108] WL[107] WL[106] WL[105]
++ WL[104] WL[103] WL[102] WL[101] WL[100] WL[99] WL[98] WL[97] WL[96] WL[95] WL[94] WL[93] WL[92] WL[91]
++ WL[90] WL[89] WL[88] WL[87] WL[86] WL[85] WL[84] WL[83] WL[82] WL[81] WL[80] WL[79] WL[78] WL[77] WL[76]
++ WL[75] WL[74] WL[73] WL[72] WL[71] WL[70] WL[69] WL[68] WL[67] WL[66] WL[65] WL[64] WL[63] WL[62] WL[61]
++ WL[60] WL[59] WL[58] WL[57] WL[56] WL[55] WL[54] WL[53] WL[52] WL[51] WL[50] WL[49] WL[48] WL[47] WL[46]
++ WL[45] WL[44] WL[43] WL[42] WL[41] WL[40] WL[39] WL[38] WL[37] WL[36] WL[35] WL[34] WL[33] WL[32] WL[31]
++ WL[30] WL[29] WL[28] WL[27] WL[26] WL[25] WL[24] WL[23] WL[22] WL[21] WL[20] WL[19] WL[18] WL[17] WL[16]
++ WL[15] WL[14] WL[13] WL[12] WL[11] WL[10] WL[9] WL[8] WL[7] WL[6] WL[5] WL[4] WL[3] WL[2] WL[1] WL[0] BL
++ BLB VDD VSS
 *.ipin WL[127]
 *.ipin WL[126]
 *.ipin WL[125]
@@ -549,6 +559,45 @@ XMNB1 WB WE VSS VSS sg13_lv_nmos w=3.0u l=0.13u ng=1 m=1
 **** begin user architecture code
 
 * write driver: WE and DIN pull BLBM low, WE and DINB pull BLM low (cell Q takes DIN)
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/inv.sym # of pins=4
+** sym_path: design/gates/inv.sym
+** sch_path: design/gates/inv.sch
+.subckt inv A Y VDD VSS
+*.ipin A
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP Y A VDD VDD sg13_lv_pmos w=1.0u l=0.13u ng=1 m=1
+XMN Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* inverter, N 0.5 um / P 1.0 um
+
+**** end user architecture code
+.ends
+
+
+* expanding   symbol:  gates/nor2.sym # of pins=5
+** sym_path: design/gates/nor2.sym
+** sch_path: design/gates/nor2.sch
+.subckt nor2 A B Y VDD VSS
+*.ipin A
+*.ipin B
+*.opin Y
+*.iopin VDD
+*.iopin VSS
+XMP0 N1 A VDD VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMP1 Y B N1 VDD sg13_lv_pmos w=2.0u l=0.13u ng=1 m=1
+XMN0 Y A VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XMN1 Y B VSS VSS sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+**** begin user architecture code
+
+* 2-input NOR, N 0.5 um / P 2.0 um stack
 
 **** end user architecture code
 .ends
