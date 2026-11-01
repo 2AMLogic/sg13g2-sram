@@ -18,13 +18,21 @@ typical clock-to-Q). Should access time get a pass threshold, and what is it?
 **Threshold, relative to the comp, no absolute figure invented.**
 
 - **Graded point**: typical corner (`mos_tt`, 25 °C, 1.20 V). Clock edge to
-  valid `DOUT[0]` (50 % of VDD clock edge to 50 % of VDD output rise, the bench's
-  stated crossings) **no worse than 3.05 ns**, the comp's typical figure.
-  Ratio 1.0 against the comp.
+  valid macro output pin `Q[0]`, as the bench grades it: CLK 50 % of VDD rise
+  to `Q[0]` crossing 90 % of VDD (read of 1; 10 % for the read of 0), per
+  `access_measurements()` in `sim/array/array_post.py`. **No worse than
+  3.05 ns**, the comp's typical figure. Ratio 1.0 against the comp. The comp's
+  Liberty delay is measured 50 % to 50 % (`output_threshold_pct_rise 50`); a
+  90 % crossing is later than a 50 % one, so the bench figure is conservative
+  against the comp's definition, not flattering.
 - **Context, not graded**: the comp's fast and slow figures, **1.876 ns** and
   **5.126 ns** (`spec/sram.md` "Reference row", Liberty, read 2026-10-17).
-  The slow corner `mos_ss`, 125 °C, 1.08 V is measured in this repo's set and
-  its ratio to 5.126 ns is reported next to the result. It does not gate.
+  The comp's slow point (1.08 V, 125 °C) matches `mos_ss`, 125 °C, 1.08 V in
+  this repo's set; its ratio to 5.126 ns is reported next to the result. It
+  does not gate. It is not this macro's worst access corner: on the committed
+  records the slowest read is `mos_ss`, 1.08 V, 25 °C at 3.2241 ns
+  (3.2206 ns at -40 °C, 3.0578 ns at 125 °C), because at 1.08 V on these LV
+  devices delay is V_T-dominated and rises as temperature falls.
 - **All other corners**: recorded, as today. A corner's access time does not
   fail that corner.
 - **Revision rule**: if the first measurement misses 3.05 ns, the threshold
@@ -52,9 +60,11 @@ typical clock-to-Q). Should access time get a pass threshold, and what is it?
    part a buyer compares it to; a tighter one has no basis in anything
    measured. 1.0 invents nothing.
 4. **Comparable condition.** The comp figure is the lowest slew and load
-   `cell_rise` entry for bit 0. The macro measurement must use a comparable
-   condition: bit 0, rising output, the bench's own clock slew, and a load no
-   heavier than the Liberty's lowest-load entry. The bench is schematic level,
+   `cell_rise` entry of the single `A_DOUT[31:0]` bus arc (`related_pin
+   A_CLK`, `rising_edge`), which covers all 32 bits. The macro measurement is
+   bit 0 (`Q[0]`), rising output, the bench's own clock slew (100 ps edges,
+   within about 6 ps of the like-for-like comp entry) and no load on `Q[0]`
+   (the comp's lowest-load entry is 0.0008 pF, about 2 ps). The bench is schematic level,
    with no wire parasitics (`sim/array/bench_access.cir` header), so a pass
    at this stage is a pre-layout pass and the record does not say otherwise.
 5. **Statistical treatment is unchanged.** Access time is not classified as
@@ -63,21 +73,29 @@ typical clock-to-Q). Should access time get a pass threshold, and what is it?
 ## How the row is graded
 
 - **Testbench**: `sim/array/bench_access.cir`, run through
-  `sim/array/run_array.sh`. It reports clock edge to valid Q for the rising
-  read in the last cycle.
+  `sim/array/run_array.sh`. It reports CLK 50 % to `Q[0]` 90 % (read of 1) and
+  10 % (read of 0) of VDD, per the definition string `cmd_access()` writes
+  into every record.
 - **Grading**: at the `mos_tt`, 25 °C, 1.20 V corner the row passes if the
   reported clock-to-Q is at most 3.05 ns, and fails otherwise. The
   `mos_ss`, 125 °C, 1.08 V ratio to 5.126 ns is reported alongside. Every other
   corner records its value.
-- **Not claimed here**: this record contains no measurement and cites no
-  result. Whether the macro meets 3.05 ns is unknown until the bench is run.
+- **Evidence at this head, not graded here**: two 45-corner access records are
+  committed, `sim/array/records/20261028T135153Z/` and
+  `sim/array/records/20261028T144609Z/` (`corner_count 45`, `any_fail false`).
+  At `mos_tt`, 25 °C, 1.20 V they report `read1_access_ns` 2.0894 and
+  `read0_access_ns` 1.7559. This record does not grade them: it proposes the
+  threshold, and grading happens when it is ratified and the bench is next
+  run under it. They are pre-layout (schematic level, no wire parasitics).
 
 ## Open, verify at first run
 
-- The first access-time result is compared with 3.05 ns as written. A miss
-  is an open result and a new record, not an edit to this one.
-- The comp figures are as read in `spec/sram.md`. They are not re-checked
-  against the Liberty here (#76).
+- The first access-time measurement graded under this record is compared with
+  3.05 ns as written. A miss is an open result and a new record, not an edit
+  to this one.
+- The comp figures are as read in `spec/sram.md`; the 3.05, 5.126 and
+  1.876 ns values were re-derived from the public Liberty at PDK tag `v0.3.0`
+  during review. The bus-arc wording in `comps/sram.md` is #76.
 
 ## What this record changes
 
