@@ -8,7 +8,9 @@ Only the region between the markers is machine-generated.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
+- **#82**: docs(spec): propose physical organization and wire-RC check
+- **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
 ## Very Important
 
@@ -20,50 +22,75 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check
+- **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
+- **#105**: layout: route decoder cell internals
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT
+- **#108**: layout: connect macro pins, signals record, verify and README
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
+- **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
+- **#69**: spec: confirm the 1 ns write-pulse window
+- **#70**: spec: no wire-RC check or physical organization
+- **#71**: spec: write-margin definition under-specified
+- **#72**: spec: internal inconsistencies in sram.md text
+- **#73**: spec: no access-time target value
+- **#74**: spec: no area target, min-clock-pulse, power or retention rows
+- **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified
+- **#105**: layout: route decoder cell internals
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#77**: docs(spec): record two-key review outcome for sram.md
+- **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
+- **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
+- **#81**: docs(spec): pin the write-margin definition in a decision record
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
+- **#82**: docs(spec): propose physical organization and wire-RC check
+- **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#27**: T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check *(curated)*
+- **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist *(curated)*
+- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 *(curated)*
+- **#68**: spec: margins row has no Monte Carlo evidence *(curated)*
+- **#69**: spec: confirm the 1 ns write-pulse window *(curated)*
+- **#70**: spec: no wire-RC check or physical organization *(curated)*
+- **#71**: spec: write-margin definition under-specified *(curated)*
+- **#72**: spec: internal inconsistencies in sram.md text *(curated)*
+- **#73**: spec: no access-time target value *(curated)*
+- **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
+- **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified *(curated)*
+- **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97) *(curated)*
+- **#105**: layout: route decoder cell internals *(curated)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-
-
-- **#33**: Remove env_provenance.py: dead vendored gf180 helper with no callers *(hermit)*
-- **#36**: Remove mint_sim_envelope.py and render_signoff_table.py: unrunnable vendored gf180 sign-off tooling (~660 LOC) *(hermit)*
-- **#41**: Remove vendored design-evidence-tiers.md: klt 0.8.0 bundles it (~1055 LOC) *(hermit)*
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module *(hermit)*
+- **#117**: Remove superseded macro-record scripts generate-macro-routed.sh and generate-macro-rails.sh *(hermit)*
 
 ## Epics
-
-
 
 _None._
 
@@ -71,14 +98,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 3 |
 | Very important | 0 |
-| Important | 1 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
-| PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 1 |
-| Architect / Hermit proposals | 4 |
+| Important | 5 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 10 |
+| PRs awaiting review | 4 |
+| Approved PRs awaiting merge | 3 |
+| Curated | 14 |
+| Architect / Hermit proposals | 2 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->

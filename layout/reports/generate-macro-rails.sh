@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Mint the supply-rails evidence record (issue #92, re-planned in #102): regenerate the macro GDS,
+# socket descriptor and LEF, then write layout/reports/macro-record-rails.json (macro-record.json,
+# macro-record-taps.json and macro-record-routed.json are earlier results and are not rewritten).
+# Run from anywhere:   ./layout/reports/generate-macro-rails.sh
+#
+# Records are append-only evidence: a re-run after a layout or klt change is a
+# new result -- commit it as such and say why in the commit message.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT"
+D=layout/sram_256x32
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+
+uv run --with klayout python3 $D/generate.py
+klt socket-check --socket $D/macro.socket.json $D/macro.gds --format json > "$WORK/socket.json" || true
+klt lef-abstract $D/macro.gds --socket $D/macro.socket.json --macro-name macro \
+  --cell-library sg13g2_stdcell --pdk ihp-sg13g2 --obs-mode coarse -o $D/macro.lef --format json > "$WORK/lef.json"
+klt cells --format json $D/macro.gds > "$WORK/cells.json"
+klt extract --deck sg13g2 $D/macro.gds -o "$WORK/extracted.spice" --format json > "$WORK/extract.json"
+
+(cd $D && uv run --with klayout python3 -I -c 'import json,sys; sys.path.insert(0, "."); import generate as g, rails_check as rc; l,gen,top=g.build(); print(json.dumps(rc.analyse(l,top,gen)))' > "$WORK/rails.json")
+(cd $D && uv run --with klayout python3 -I -c 'import json,sys; sys.path.insert(0, "."); import generate as g, rails_check as rc; l,gen,top=g.build(); print(json.dumps(rc.wordline_gap_clearance(l,top,gen)))' > "$WORK/gap.json")
+python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record-rails.json
+import hashlib, json, subprocess, sys
+w = sys.argv[1]
+D = "layout/sram_256x32"
+sha = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
+cells = {c["name"]: c for c in json.load(open(f"{w}/cells.json"))["cells"]}
+lef = json.load(open(f"{w}/lef.json"))
+sock = json.load(open(f"{w}/socket.json"))
+ext = json.load(open(f"{w}/extract.json"))
+deck = json.loads(subprocess.run(["klt", "deck", "info", "--deck", "sg13g2", "--format", "json"],
+                                 capture_output=True, text=True, check=True).stdout)["decks"][0]
+bulk = {}
+for ln in open(f"{w}/extracted.spice"):
+    t = ln.split()
+    if t and t[0][0] in "Mm" and len(t) > 5:
+        bulk[t[4]] = bulk.get(t[4], 0) + 1
+bulk = {"distinct_bulk_nets": len(bulk), "top": sorted(bulk.items(), key=lambda kv: -kv[1])[:6]}
+sizes = json.load(open(f"{D}/macro.socket.json"))["outline"]
+width, height = sizes["x1"] - sizes["x0"], sizes["y1"] - sizes["y0"]
+area = round(width * height, 1)
+bit = cells["bitcell"]
+count = 128 * 64  # bl_pair holds 128 bitcell instances; macro holds 64 bl_pair via 32 bit_slice
+print(json.dumps({
+    "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+    "record_command": "./layout/reports/generate-macro-rails.sh",
+    "gds": {f"{D}/macro.gds": sha(f"{D}/macro.gds")},
+    "lef": {f"{D}/macro.lef": sha(f"{D}/macro.lef")},
+    "socket": {f"{D}/macro.socket.json": sha(f"{D}/macro.socket.json")},
+    "top_cell": "macro",
+    "organization": "128 rows x 64 columns (mux 2), 32 bit_slice",
+    "bitcell_instances_flattened": count,
+    "bl_pair_bitcell_instances": cells["bl_pair"]["instances"],
+    "bit_slice_instances": cells["bit_slice"]["instances"],
+    "macro_size_um": {"x": round(width, 3), "y": round(height, 3)},
+    "macro_area_um2": area,
+    "array_area_um2": round(count * 2.87 * 3.605, 1),
+    "reference_area_um2": 49488.5,
+    "reference": "shipped sg13g2_sram 256x32 macro, 416.64 x 118.78 um (spec/bitcell-decision.md)",
+    "area_ratio_vs_reference": round(area / 49488.5, 2),
+    "socket_check": {k: sock.get(k) for k in ("status", "pins", "outline") if k in sock},
+    "lef_pin_geometry_sources": sorted({p.get("geometry_source") for p in lef.get("pins", [])}),
+    "lef_obs_mode": "coarse",
+    "edge_and_corner_dummies": "none drawn (ties are in-cell)",
+    "extract": {k: ext.get(k) for k in ("status", "device_count", "device_counts", "net_count", "pin_count")},
+    "netlist_flattened_device_count": 51948,
+    "netlist_flattened_device_counts": {"nfet": 34118, "pfet": 17830},
+    "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net (record: macro-record-taps.json)",
+    "rails_step": "Via1 + Metal2 pad on every tie; Metal2 stub to a Via2/Metal3 pad/Via3 landing on a Metal4 lane (4 um pitch, VDD/VSS interleaved) per floorplan region, placed clear of the signal Metal2/Metal3; lanes run on Metal4 to two Metal5 trunks (VSS inner, VDD outer) right of the array. Array: Metal1 pad + Via1 on the risers; a Metal2 strap at every row seam (even VSS, odd VDD) continues right of the array to its trunk through Via2/Metal3/Via3/Metal4/Via4; seam 0 (above the bit-line stacks) leaves on a Metal4 strap instead",
+    "rails_vs_wordline_gap": json.load(open(f"{w}/gap.json")),
+    "rails_connectivity": json.load(open(f"{w}/rails.json")),
+    "extract_bulk_nets": bulk,
+    "bottom_pins": "D[i]/Q[i] moved 0.5 um outward (just outside the content) so periphery Metal2 keeps spacing to them; macro grew by 0.5 um in y",
+    "trunks": "the Metal5 trunks sit right of the array and widen the macro in x",
+    "vdd_vss_pin_squares": "not connected to the rails here (issue #95)",
+    "not_drawn": ["VDD/VSS pin connection to the rails", "periphery signal routing", "signal pin routing"],
+    "deck": {"name": "sg13g2", "content_hash": deck["content_hash"], "released": deck["released"],
+             "release": deck.get("release")},
+    "klt_version": subprocess.run(["klt", "--version"], capture_output=True, text=True).stdout.strip(),
+}, indent=2))
+PYEOF
+echo "record written to layout/reports/macro-record-rails.json"

@@ -3,6 +3,38 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-01
+
+- **PR #123**: Bump Repo Skills 0.24.7 -> 0.25.1
+
+### 2026-10-31
+
+- **PR #121**: feat: route the decoder nets on main's router, one HIER_ROUTED for eight cells
+- **Issue #119** (closed): Rebase decoder-net routing (PR #116) onto main's leaf-cell router
+
+### 2026-10-30
+
+- **PR #115**: feat: route latch and control nets between leaf cells
+- **Issue #106** (closed): layout: route latch and control block internals
+- **PR #112**: feat: net-aware Metal2/Metal3 router and leaf-cell signal nets with flat-net resolution
+- **Issue #104** (closed): layout: signal router core, flat-net resolution and leaf-cell nets
+- **PR #110**: chore: remove generate-macro.sh, which always refuses to run
+- **Issue #100** (closed): Remove layout/reports/generate-macro.sh: always refuses to run
+- **PR #99**: feat: wire periphery ties and bitcell risers to VDD/VSS rails
+- **Issue #92** (closed): layout: macro supply rails and tie-to-rail connection
+- **PR #91**: fix: clear macro NWell spacing and add full-array DRC evidence for item 3
+- **Issue #29** (closed): T1 item 3 (DRC clean): klt drc on the full macro with coverage disclosed
+- **PR #97**: feat: route macro wordlines and bit lines between array and periphery
+- **Issue #94** (closed): layout: macro array-to-column-path and wordline routing
+- **PR #96**: feat: add per-device body ties to the macro periphery
+- **Issue #93** (closed): layout: macro supply rails and tie-to-rail connection
+- **PR #83**: docs: verify SRAM comp row against primary Liberty/LEF/datasheet
+- **Issue #76** (closed): spec: verify comp data against primary Liberty/LEF
+- **PR #87**: feat: add SG13G2 macro layout generator, GDS, LEF and item 2 attestation
+- **Issue #28** (closed): T1 item 2 (layout): 256x32 macro layout generator, GDS and LEF
+- **PR #86**: feat: add SG13G2 6T bitcell generator with 2x2 tile and DRC/LVS evidence
+- **Issue #27** (closed): T1 item 2 (layout): generated 6T bitcell layout with cell-level DRC/LVS pre-check
+
 ### 2026-10-28
 
 - **PR #65**: refactor: share one run_klt helper across the sim run scripts

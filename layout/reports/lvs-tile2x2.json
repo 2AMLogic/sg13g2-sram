@@ -1,0 +1,206 @@
+{
+  "schema_version": 2,
+  "engine": "klayout",
+  "layout": {
+    "path": "layout/reports/tile2x2-extracted.spice",
+    "scope": "repo"
+  },
+  "reference": "/home/ubuntu/GitHub/sg13g2-sram/.loom/worktrees/issue-27/layout/reports/tile2x2-reference.spice",
+  "top": "SG13G2_SRAM_BITCELL_TILE2X2",
+  "reference_top": "TILE2X2",
+  "reference_conversion": {
+    "form": "subckt-call",
+    "deck": null,
+    "device_map": null
+  },
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": false,
+    "combine_devices_per_circuit": null,
+    "combine_devices_max_attempts": 5,
+    "flatten_layout": false,
+    "flatten_reference": true,
+    "netgen_setup": null,
+    "parameter_tolerance": null,
+    "compare_parameters": null,
+    "power_connectivity": null,
+    "anchor_top_level_pins": null,
+    "strict_top_level_pin_count": false,
+    "compare_mos_flavour": false,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ],
+    "finfet_bulk": null
+  },
+  "hints_applied": null,
+  "constant_nets_applied": null,
+  "status": "match",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'subckt-call', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "excluded_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "unchecked",
+    "reason": "no request.layout.deck was given (the pre-extracted request.layout.netlist form), so nothing establishes this layout's substrate/well-tap convention and no synthesized body net can be told apart from a real one -- this run verified nothing about the device bodies either way",
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
+  "device_parameter_coverage": [],
+  "mismatch_count": 1,
+  "error_count": 0,
+  "category_counts": {
+    "topology.flattened": 1
+  },
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 16,
+      "reference": 16,
+      "matched": 16
+    },
+    "devices": {
+      "layout": 24,
+      "reference": 24,
+      "matched": 24
+    },
+    "pins": {
+      "layout": 8,
+      "reference": 8,
+      "matched": 8
+    }
+  },
+  "device_classes": null,
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.12",
+    "netgen_binary": null,
+    "layout_sha256": "dd6027168bdd7caedd23c9cc3fdf3b56cd5af0ca8f941c4709c731e4d303031d",
+    "reference_sha256": "5ac0673789d2b639a266dfb72b221f6a3c62c3e0402b85e86886bc3e6b0de204",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.8.1.dev738+gd73dc11df57f",
+    "klt_git_commit": "d73dc11df57f28f235fd08120041d05a5d624222",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@d73dc11df57f28f235fd08120041d05a5d624222",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "content_hash": "sha256:dd6027168bdd7caedd23c9cc3fdf3b56cd5af0ca8f941c4709c731e4d303031d",
+      "role": "netlist"
+    },
+    "klayout_version_mismatch": false
+  },
+  "mismatches": [
+    {
+      "category": "topology.flattened",
+      "severity": "warning",
+      "description": "options.flatten_reference flattened the reference netlist before comparing: 2 circuit(s) were collapsed into 1 top-level circuit(s), substituting every subcircuit-call instance in place -- this compare verified topology only after removing the original hierarchy boundaries on this side (see docs/cli/lvs.md, \"topology.flattened\")",
+      "side": "reference",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "BL0",
+      "reference": "BL0",
+      "pin": true
+    },
+    {
+      "layout": "BL1",
+      "reference": "BL1",
+      "pin": true
+    },
+    {
+      "layout": "BLB0",
+      "reference": "BLB0",
+      "pin": true
+    },
+    {
+      "layout": "BLB1",
+      "reference": "BLB1",
+      "pin": true
+    },
+    {
+      "layout": "\\$6",
+      "reference": "Q00",
+      "pin": false
+    },
+    {
+      "layout": "\\$12",
+      "reference": "Q01",
+      "pin": false
+    },
+    {
+      "layout": "\\$4",
+      "reference": "Q10",
+      "pin": false
+    },
+    {
+      "layout": "\\$16",
+      "reference": "Q11",
+      "pin": false
+    },
+    {
+      "layout": "\\$3",
+      "reference": "QB00",
+      "pin": false
+    },
+    {
+      "layout": "\\$15",
+      "reference": "QB01",
+      "pin": false
+    },
+    {
+      "layout": "\\$10",
+      "reference": "QB10",
+      "pin": false
+    },
+    {
+      "layout": "\\$13",
+      "reference": "QB11",
+      "pin": false
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    },
+    {
+      "layout": "WL0",
+      "reference": "WL0",
+      "pin": true
+    },
+    {
+      "layout": "WL1",
+      "reference": "WL1",
+      "pin": true
+    }
+  ]
+}

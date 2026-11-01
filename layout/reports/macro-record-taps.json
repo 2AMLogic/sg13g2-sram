@@ -1,0 +1,68 @@
+{
+  "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
+  "record_command": "./layout/reports/generate-macro.sh",
+  "gds": {
+    "layout/sram_256x32/macro.gds": "33c963621913482a613487e4a20ec2fd17d59747aeb46a3efaaa70cd16dc4c77"
+  },
+  "lef": {
+    "layout/sram_256x32/macro.lef": "a896ba76440a2ea5da7135bc1288621fe20c150defff9c125b9e0c6125512f46"
+  },
+  "socket": {
+    "layout/sram_256x32/macro.socket.json": "52d8fc9ab0c5ebbb28a5c0946717e210b998d939ab0b9ea15eb54e6eb0c0c21e"
+  },
+  "top_cell": "macro",
+  "organization": "128 rows x 64 columns (mux 2), 32 bit_slice",
+  "bitcell_instances_flattened": 8192,
+  "bl_pair_bitcell_instances": 128,
+  "bit_slice_instances": 7,
+  "macro_size_um": {
+    "x": 333.56,
+    "y": 573.045
+  },
+  "macro_area_um2": 191144.9,
+  "array_area_um2": 84757.3,
+  "reference_area_um2": 49488.5,
+  "reference": "shipped sg13g2_sram 256x32 macro, 416.64 x 118.78 um (spec/bitcell-decision.md)",
+  "area_ratio_vs_reference": 3.86,
+  "socket_check": {
+    "status": "pass"
+  },
+  "lef_pin_geometry_sources": [
+    "drawn"
+  ],
+  "lef_obs_mode": "coarse",
+  "edge_and_corner_dummies": "none drawn (ties are in-cell)",
+  "extract": {
+    "status": "extracted",
+    "device_count": 51948,
+    "device_counts": {
+      "nfet": 34118,
+      "pfet": 17830
+    },
+    "net_count": 26617,
+    "pin_count": 10042
+  },
+  "netlist_flattened_device_count": 51948,
+  "netlist_flattened_device_counts": {
+    "nfet": 34118,
+    "pfet": 17830
+  },
+  "tap_step": "one body tie per periphery transistor (n+ Activ in the PMOS well, p+ Activ with pSD for NMOS), Metal1 pad labelled with the netlist bulk net; not yet wired to a rail",
+  "not_drawn": [
+    "supply rails and tie-to-rail connection",
+    "periphery signal routing",
+    "array-to-column-path and wordline routing",
+    "pin routing"
+  ],
+  "deck": {
+    "name": "sg13g2",
+    "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+    "released": true,
+    "release": {
+      "git_tag": "v0.8.0",
+      "git_commit": "c572046be644e0407f693f2410f3abb799d68a3a",
+      "package_version": "0.8.0"
+    }
+  },
+  "klt_version": "klt 0.8.1.dev758+g8ca3f4951d15"
+}

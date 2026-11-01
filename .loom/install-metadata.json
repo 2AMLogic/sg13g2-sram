@@ -1,6 +1,6 @@
 {
-  "loom_version": "0.19.1227",
-  "loom_commit": "3f8d69bdce593a6d9fdb798414fa4453cc018c6b",
+  "loom_version": "0.19.1246",
+  "loom_commit": "c31136eb1f7e2ae8b50b30d212304be50e3d1601",
   "requires_daemon": "0.19.1146",
   "install_date": "2026-10-17",
   "loom_source_remote": "git@github.com:rjwalters/loom.git",
@@ -556,7 +556,6 @@
     ".loom/scripts/tests/test-install-reinstall-safety.sh",
     ".loom/scripts/tests/test-install-source-guard.sh",
     ".loom/scripts/tests/test-install-stash-scope.sh",
-    ".loom/scripts/tests/test-install-sync-labels.sh",
     ".loom/scripts/tests/test-jq-reserved-word-args.sh",
     ".loom/scripts/tests/test-judge-fallback-cap.sh",
     ".loom/scripts/tests/test-judge-payload-drop-guard.sh",
@@ -752,7 +751,6 @@
     ".loom/scripts/version-check-gate.sh",
     ".loom/scripts/warn-operator-gated.sh",
     ".loom/scripts/warn-out-of-set-deps.sh",
-    ".loom/scripts/worktree-return.sh",
     ".loom/scripts/worktree.sh",
     ".agents/skills/loom-guide/SKILL.md",
     ".agents/skills/loom-orphan-stack-replacement/SKILL.md",
@@ -790,7 +788,11 @@
     ".loom/hooks/tests/test-guard-background-subagents.sh",
     ".loom/hooks/guard-destructive-generic.sh",
     ".loom/hooks/guard-worktree-paths.sh",
-    ".loom/hooks/tests/test-guard-worktree-paths.sh"
+    ".loom/hooks/tests/test-guard-worktree-paths.sh",
+    ".loom/scripts/tests/test-champion-merge-risk-self-release.sh",
+    ".loom/scripts/tests/test-guide-park-record-precedence.sh",
+    ".agents/skills/loom-champion/SKILL.md",
+    ".agents/skills/loom-judge-ci-red/SKILL.md"
   ],
-  "last_resync": "2026-10-26"
+  "last_resync": "2026-11-01"
 }
