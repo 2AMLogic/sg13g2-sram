@@ -8,7 +8,6 @@ Only the region between the markers is machine-generated.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
 - **#82**: docs(spec): propose physical organization and wire-RC check
 - **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
@@ -16,14 +15,13 @@ Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a h
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-_None._
+- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 
 ## Important
 
 `loom:important`; taken before unlabelled work.
 
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
-- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 - **#105**: layout: route decoder cell internals
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
 - **#108**: layout: connect macro pins, signals record, verify and README
@@ -46,8 +44,8 @@ Issues currently being built (`loom:building`).
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#73**: spec: no access-time target value
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
-- **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified
 - **#105**: layout: route decoder cell internals
+- **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 
 ## PRs Awaiting Review
 
@@ -62,7 +60,6 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#79**: docs: record Verilog/CDL as target views and Liberty at all 45 corners
 - **#82**: docs(spec): propose physical organization and wire-RC check
 - **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
@@ -79,11 +76,11 @@ Issues carrying `loom:curated`.
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#73**: spec: no access-time target value *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
-- **#75**: spec: Verilog and CDL views are only stretch; Liberty corner count unspecified *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
 - **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97) *(curated)*
 - **#105**: layout: route decoder cell internals *(curated)*
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
+- **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -98,13 +95,13 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 3 |
-| Very important | 0 |
-| Important | 5 |
+| Operator merge-risk holds | 2 |
+| Very important | 1 |
+| Important | 4 |
 | Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 10 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 3 |
+| Approved PRs awaiting merge | 2 |
 | Curated | 14 |
 | Architect / Hermit proposals | 2 |
 | Active epics | 0 |
