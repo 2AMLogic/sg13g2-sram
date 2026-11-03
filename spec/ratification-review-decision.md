@@ -36,7 +36,9 @@ fabricated here.
    `2AMLogic/sg13g2-sram#7` or issue #37. protocol.md §3-§4 was read for the
    release rule, not for whether `release` accepts a merged PR or an issue.
 3. **Whether `spec/sram.md` changed since `2597199`.** Check before the
-   keys run; review the merged text and note any drift.
+   keys run; review the merged text and note any drift. Drift exists:
+   `spec/sram-text-consistency-decision.md` (#72) edits the text; re-run the
+   check against the new commit.
 
 ## Outcome
 
