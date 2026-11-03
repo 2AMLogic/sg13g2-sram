@@ -42,7 +42,6 @@ Issues currently being built (`loom:building`).
 - **#70**: spec: no wire-RC check or physical organization
 - **#71**: spec: write-margin definition under-specified
 - **#72**: spec: internal inconsistencies in sram.md text
-- **#73**: spec: no access-time target value
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#105**: layout: route decoder cell internals
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
@@ -99,7 +98,7 @@ _None._
 | Very important | 1 |
 | Important | 4 |
 | Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 10 |
+| In Progress (`loom:building`) | 9 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 2 |
 | Curated | 14 |
