@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-11-04
 
+- **PR #82**: docs(spec): propose physical organization and wire-RC check
+- **Issue #70** (closed): spec: no wire-RC check or physical organization
 - **PR #85**: docs: propose access-time pass threshold relative to the shipped comp
 - **Issue #73** (closed): spec: no access-time target value
 

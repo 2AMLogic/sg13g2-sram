@@ -38,7 +38,6 @@ Issues currently being built (`loom:building`).
 - **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
 - **#69**: spec: confirm the 1 ns write-pulse window
-- **#70**: spec: no wire-RC check or physical organization
 - **#71**: spec: write-margin definition under-specified
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
@@ -58,7 +57,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#82**: docs(spec): propose physical organization and wire-RC check
+_None._
 
 ## Proposed
 
@@ -68,7 +67,6 @@ Issues carrying `loom:curated`.
 - **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 *(curated)*
 - **#68**: spec: margins row has no Monte Carlo evidence *(curated)*
 - **#69**: spec: confirm the 1 ns write-pulse window *(curated)*
-- **#70**: spec: no wire-RC check or physical organization *(curated)*
 - **#71**: spec: write-margin definition under-specified *(curated)*
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
@@ -95,10 +93,10 @@ _None._
 | Very important | 1 |
 | Important | 4 |
 | Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 9 |
+| In Progress (`loom:building`) | 8 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 13 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 12 |
 | Architect / Hermit proposals | 2 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
