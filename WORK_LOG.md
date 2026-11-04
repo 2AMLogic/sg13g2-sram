@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-04
+
+- **PR #85**: docs: propose access-time pass threshold relative to the shipped comp
+- **Issue #73** (closed): spec: no access-time target value
+
 ### 2026-11-01
 
 - **PR #128**: docs: move Views row to Re-derived in porting plan
