@@ -8,8 +8,7 @@ Only the region between the markers is machine-generated.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#82**: docs(spec): propose physical organization and wire-RC check
-- **#85**: docs: propose access-time pass threshold relative to the shipped comp
+_None._
 
 ## Very Important
 
@@ -60,7 +59,6 @@ PRs waiting on Judge (`loom:review-requested`).
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 - **#82**: docs(spec): propose physical organization and wire-RC check
-- **#85**: docs: propose access-time pass threshold relative to the shipped comp
 
 ## Proposed
 
@@ -73,7 +71,6 @@ Issues carrying `loom:curated`.
 - **#70**: spec: no wire-RC check or physical organization *(curated)*
 - **#71**: spec: write-margin definition under-specified *(curated)*
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
-- **#73**: spec: no access-time target value *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
 - **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97) *(curated)*
@@ -94,14 +91,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 2 |
+| Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 4 |
 | Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 9 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 2 |
-| Curated | 14 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 13 |
 | Architect / Hermit proposals | 2 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
