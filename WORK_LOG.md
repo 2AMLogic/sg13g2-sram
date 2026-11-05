@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-05
+
+- **PR #136**: docs: remove column INVENTORY.md duplicated by attest/item1.json
+- **Issue #135** (closed): Remove design/column/INVENTORY.md: merged into attest/item1.json by #24
+
 ### 2026-11-04
 
 - **PR #82**: docs(spec): propose physical organization and wire-RC check
