@@ -4,7 +4,7 @@ One I/O column of the macro: bit-line precharge/equalize, a 2:1 column mux, a
 latch sense amp, a write driver, and the bitcell tiled on each bit line.
 Schematics are xschem on `sg13_lv_nmos` / `sg13_lv_pmos`, L = 130 nm; each
 `.spice` is derived with `klt netlist --block` (`../README.md`,
-`../netlist.sh`). Inventory: `INVENTORY.md`.
+`../netlist.sh`).
 
 ## Decision: mux 2, 128 cells per bit line
 
