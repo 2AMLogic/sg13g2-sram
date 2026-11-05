@@ -5,7 +5,7 @@ Schematics (xschem) and the SPICE netlists derived from them.
 - `bitcell/`: the 6T bitcell at the reference sizing (hold/read SNM and write
   margin: `sim/bitcell/`).
 - `column/`: one I/O column (precharge, 2:1 mux, sense amp, write driver, cells
-  tiled 128 per bit line); see `column/README.md` and `column/INVENTORY.md`.
+  tiled 128 per bit line); see `column/README.md`.
 - `gates/`: leaf logic (`inv`, `inv_x4`, `nand2/3/4`, `nor2`) shared by the blocks below.
 - `decoder/`: 7-bit row decoder, 128 wordlines (`predec3`, `predec4`, `wl_driver`,
   `wl_drivers`, `row_decoder`).
