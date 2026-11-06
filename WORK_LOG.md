@@ -3,6 +3,10 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-06
+
+- **Issue #102** (closed): Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
+
 ### 2026-11-05
 
 - **PR #136**: docs: remove column INVENTORY.md duplicated by attest/item1.json
