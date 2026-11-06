@@ -14,7 +14,7 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
+- **#105**: layout: route decoder cell internals
 
 ## Important
 
@@ -29,7 +29,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
+_None._
 
 ## In Progress
 
@@ -71,7 +71,6 @@ Issues carrying `loom:curated`.
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
-- **#102**: Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97) *(curated)*
 - **#105**: layout: route decoder cell internals *(curated)*
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
@@ -92,11 +91,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 4 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 8 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 12 |
+| Curated | 11 |
 | Architect / Hermit proposals | 2 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
