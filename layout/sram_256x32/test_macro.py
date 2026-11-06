@@ -17,6 +17,18 @@ import generate as g  # noqa: E402
 LEF = os.path.join(g.HERE, "macro.lef")
 
 
+_BUILT = {}
+
+
+def _built():
+    """One ``g.build()`` per session (it costs minutes), as a fresh copy of the layout each call so a test
+    that damages or flattens it cannot affect another. ``gen`` is shared and read-only."""
+    if not _BUILT:
+        _BUILT["layout"], _BUILT["gen"], _ = g.build()
+    layout = _BUILT["layout"].dup()
+    return layout, _BUILT["gen"], layout.cell("macro")
+
+
 def _bytes(tmp_path, name):
     layout, _, _ = g.build()
     p = str(tmp_path / name)
@@ -33,7 +45,7 @@ def test_committed_gds_is_current(tmp_path):
 
 
 def test_bitcell_count_and_top():
-    layout, _, top = g.build()
+    layout, _, top = _built()
     assert top.name == "macro"
     assert [c.name for c in layout.top_cells()] == ["macro"]
     bit = layout.cell("bitcell")
@@ -45,7 +57,7 @@ def test_bitcell_count_and_top():
 
 
 def test_array_is_mirror_abutted():
-    layout, _, _ = g.build()
+    layout, _, _ = _built()
     pair = layout.cell("bl_pair")
     h = round(g.bc.H_CELL / g.DBU)
     ys = sorted(i.trans.disp.y - (h if i.trans.is_mirror() else 0) for i in pair.each_inst())
@@ -55,7 +67,7 @@ def test_array_is_mirror_abutted():
 
 def test_pins_match_netlist_ports():
     ports = g.parse_netlist(g.NETLIST)["macro"].ports
-    _, gen, _ = g.build()
+    _, gen, _ = _built()
     assert sorted(p["name"] for p in gen.pin_list) == sorted(ports)
 
 
@@ -68,7 +80,7 @@ def test_lef_pins_match_netlist_ports():
 
 
 def test_bus_ends_present():
-    _, gen, _ = g.build()
+    _, gen, _ = _built()
     names = {p["name"] for p in gen.pin_list}
     assert {"A[7]", "A[0]", "D[31]", "D[0]", "Q[31]", "Q[0]"} <= names
 
@@ -80,7 +92,7 @@ _CONN = (("poly", "cont"), ("cont", "m1"), ("m1", "v1"), ("v1", "m2"), ("m2", "v
 def _extract(mutate=None):
     """Flat connectivity of the generated layout (GatPoly-Cont-Metal1-Via1-Metal2-
     Via2-Metal3). ``mutate(layout, top)`` may damage the layout first."""
-    layout, gen, top = g.build()
+    layout, gen, top = _built()
     if mutate:
         mutate(layout, top)
     top.flatten(True)
@@ -161,8 +173,7 @@ def _erase_at(cell, lp, x, y):
 
 def test_wordline_trace_has_teeth():
     def cut(layout, top):
-        gen = g.Gen()
-        gen.macro()  # same coordinates as the layout under test (deterministic)
+        gen = _built()[1]  # the coordinates of the layout under test
         _erase_at(top, g.L_VIA2, g.WL_PAD_X, gen.wl_y(0))
 
     gen, net = _extract(cut)
@@ -172,8 +183,7 @@ def test_wordline_trace_has_teeth():
 
 def test_bitline_trace_has_teeth():
     def cut(layout, top):
-        gen = g.Gen()
-        gen.macro()
+        gen = _built()[1]
         _erase_at(layout.cell("bit_slice"), g.L_VIA1, gen.bl_stripe_x["BL0"], g.BL_VIA_Y)
 
     gen, net = _extract(cut)
@@ -183,7 +193,7 @@ def test_bitline_trace_has_teeth():
 
 def test_every_periphery_device_has_a_body_tie():
     """Each transistor cell carries a tie Activ with a Cont and a Metal1 label for its bulk net."""
-    layout, _, _ = g.build()
+    layout, _, _ = _built()
     li = lambda lp: layout.layer(*lp)
     devs = [c for c in layout.each_cell() if c.name.startswith("sg13_lv_")]
     assert devs
@@ -197,7 +207,7 @@ def test_every_periphery_device_has_a_body_tie():
 
 
 def test_tie_labels_name_the_netlist_bulk():
-    layout, _, _ = g.build()
+    layout, _, _ = _built()
     nets = {i.nets[3] for sc in g.parse_netlist(g.NETLIST).values() for i in sc.insts
             if i.ref in ("sg13_lv_nmos", "sg13_lv_pmos")}
     assert nets == {"VSS", "VDD"}
@@ -212,7 +222,7 @@ def test_tie_labels_name_the_netlist_bulk():
 def _analysis(mutate=None):
     import rails_check
 
-    layout, gen, top = g.build()
+    layout, gen, top = _built()
     if mutate:
         mutate(layout, gen)
     return rails_check.analyse(layout, top, gen), gen
@@ -254,7 +264,7 @@ def test_rail_pitch_does_not_alias_the_wordline_lane_pitch():
 def test_no_rail_shape_below_metal4_in_the_wordline_gap():
     import rails_check
 
-    layout, gen, top = g.build()
+    layout, gen, top = _built()
     res = rails_check.wordline_gap_clearance(layout, top, gen)
     assert res["total"] == 0, res
     # the lanes do cross the gap, on Metal4 only
@@ -266,7 +276,7 @@ def test_no_rail_shape_below_metal4_in_the_wordline_gap():
 def test_gap_clearance_check_has_teeth():
     import rails_check
 
-    layout, gen, top = g.build()
+    layout, gen, top = _built()
     gen.box(layout.cell("rails"), g.L_VIA2, -10.0, 20.0, -9.81, 20.19)
     assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1
 
@@ -411,7 +421,7 @@ def _leaf_nets(layout, gen, name):
 
 
 def test_leaf_cell_nets_are_one_net_each_and_never_short():
-    layout, gen, _ = g.build()
+    layout, gen, _ = _built()
     assert set(gen.leaf_report) == set(g.LEAF_ROUTED)
     n_checked = 0
     for name in g.LEAF_ROUTED:
@@ -426,7 +436,7 @@ def test_leaf_cell_nets_are_one_net_each_and_never_short():
 
 
 def test_leaf_cell_undrawn_nets_are_listed():
-    _, gen, _ = g.build()
+    _, gen, _ = _built()
     # every net of every leaf cell is either drawn, listed as undrawn, or excluded/single-terminal by rule
     for name in g.LEAF_ROUTED:
         rep = gen.leaf_report[name]
@@ -442,7 +452,7 @@ def test_leaf_cell_undrawn_nets_are_listed():
 
 def test_leaf_cell_trace_has_teeth_via1_landing():
     def probe(mutate):
-        layout, gen, _ = g.build()
+        layout, gen, _ = _built()
         if mutate:
             x, y = gen.leaf_terms["nand2"]["Y"][0]
             _erase_at(layout.cell("nand2"), g.L_VIA1, x, y)
@@ -454,8 +464,9 @@ def test_leaf_cell_trace_has_teeth_via1_landing():
 
 
 def test_leaf_cell_trace_has_teeth_via2():
-    layout, gen, _ = g.build()
-    name, v = next((n, vs[0]) for n, vs in sorted(gen.leaf_vias.items()) if vs)
+    layout, gen, _ = _built()
+    # leaf cells only: a hierarchical cell's via list holds its children's vias, drawn in the children
+    name, v = next((n, vs[0]) for n, vs in sorted(gen.leaf_vias.items()) if vs and n in g.LEAF_ROUTED)
     _erase_at(layout.cell(name), g.L_VIA2, v["x"], v["y"])
     ids = _leaf_nets(layout, gen, name)
     assert len(set(ids[v["net"]])) > 1, (name, v)
@@ -467,7 +478,7 @@ _HIER = {}
 
 def _hier_build():
     if not _HIER:
-        _HIER["layout"], _HIER["gen"], _ = g.build()
+        _HIER["layout"], _HIER["gen"], _ = _built()
     return _HIER["layout"], _HIER["gen"]
 
 

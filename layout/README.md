@@ -10,7 +10,7 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Regenerate the bitcell and the 2x2 tile | `uv run --with klayout python3 layout/bitcell/generate.py` |
 | Regenerate, then DRC / extract / LVS / tests | `./layout/verify.sh` |
 | Re-mint the evidence reports | `./layout/reports/generate.sh` |
-| Generator tests | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
+| Generator tests (CI runs these: `layout-tests` in `ci.yml`; the slow macro tests in `layout-macro-tests.yml`, on `main` and PRs touching the macro) | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
 | Re-mint the current macro record (`macro-record-decoder.json`), socket and LEF (~2 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-decoder.sh` |
