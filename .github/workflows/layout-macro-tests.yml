@@ -1,0 +1,34 @@
+name: Layout macro tests
+
+# test_macro.py is slow: a local run was still on its fourth of 34 tests after
+# 25 minutes. It does not fit a per-PR budget, so it runs on pushes to main and
+# on PRs that touch what it reads. Do not skip tests to speed it up.
+on:
+  pull_request:
+    paths:
+      - "layout/sram_256x32/**"
+      - "layout/bitcell/**"
+      - "design/**"
+      - ".github/workflows/layout-macro-tests.yml"
+  push:
+    branches: [main]
+
+jobs:
+  macro-tests:
+    name: layout macro generator tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # klayout pin matches layout/reports/drc-bitcell.json.
+      - name: Install pytest and klayout
+        run: pip install pytest "klayout==0.30.12"
+
+      - name: Macro generator tests
+        working-directory: layout/sram_256x32
+        run: pytest -q test_macro.py --durations=10

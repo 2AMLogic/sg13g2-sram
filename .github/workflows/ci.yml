@@ -10,6 +10,27 @@ env:
   KLT_VERSION: "0.8.0"
 
 jobs:
+  layout-tests:
+    name: layout generator tests (bitcell)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # klayout pin matches layout/reports/drc-bitcell.json. The macro tests
+      # are slow and run in layout-macro-tests.yml.
+      - name: Install pytest and klayout
+        run: pip install pytest "klayout==0.30.12"
+
+      # The LVS test skips itself when klt is not on PATH; it is not installed here.
+      - name: Bitcell generator tests
+        working-directory: layout/bitcell
+        run: pytest -q test_bitcell.py
+
   harness-tests:
     name: vendored harness unit tests
     runs-on: ubuntu-latest
