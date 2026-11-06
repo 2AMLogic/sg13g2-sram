@@ -1,7 +1,8 @@
 name: Layout macro tests
 
 # test_macro.py is slow: a local run was still on its fourth of 34 tests after
-# 25 minutes. It does not fit a per-PR budget, so it runs on pushes to main and
+# 25 minutes (test_macro.py builds the layout once per session; see _built()).
+# It does not fit a per-PR budget, so it runs on pushes to main and
 # on PRs that touch what it reads. Do not skip tests to speed it up.
 on:
   pull_request:
@@ -12,6 +13,9 @@ on:
       - ".github/workflows/layout-macro-tests.yml"
   push:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   macro-tests:
