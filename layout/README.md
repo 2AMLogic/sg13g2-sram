@@ -13,9 +13,16 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Generator tests | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
-| Re-mint the routed-macro record, socket and LEF (~2 min, runs `klt extract`) | `./layout/reports/generate-macro-routed.sh` |
+| Re-mint the current macro record (`macro-record-decoder.json`), socket and LEF (~2 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-decoder.sh` |
 
 `layout/reports/generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and `macro-record-taps.json`, and was removed once it could only refuse to overwrite them. Both records still name it as `record_command`; recover the script with `git show cbf61db:layout/reports/generate-macro.sh`.
+
+The same rule removed the per-stage scripts whose records no longer match the committed GDS/LEF/socket (each ran `generate.py`, rebuilding the current layout, then wrote an older-stage record). The records stay as append-only evidence and still name them as `record_command`; recover a script with `git show <commit>:layout/reports/<name>`:
+
+- `generate-macro-routed.sh`: `git show edf86e5:layout/reports/generate-macro-routed.sh`
+- `generate-macro-rails.sh`: `git show 235e7a3:layout/reports/generate-macro-rails.sh`
+- `generate-macro-leafnets.sh`: `git show bb986a3:layout/reports/generate-macro-leafnets.sh`
+- `generate-macro-latchnets.sh`: `git show a1d6291:layout/reports/generate-macro-latchnets.sh`
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
