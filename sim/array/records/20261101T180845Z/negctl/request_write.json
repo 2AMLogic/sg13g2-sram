@@ -1,0 +1,419 @@
+{
+  "engine": "ngspice",
+  "models": {
+    "pdk": "ihp-sg13g2",
+    "lib": "libs.tech/ngspice/models/cornerMOSlv.lib"
+  },
+  "corners": {
+    "process": [
+      "mos_tt"
+    ],
+    "supply_v": {
+      "vdd": [
+        1.2
+      ]
+    },
+    "temperature_c": [
+      25
+    ]
+  },
+  "netlist": "bench_write.cir",
+  "backend": "batch",
+  "analysis": {
+    "kind": "tran",
+    "args": "5p 3.6n"
+  },
+  "measurements": [
+    {
+      "name": "fl_c",
+      "unit": "V",
+      "spice": ".meas tran fl_c FIND par('v(xc.q0)-v(xc.qb0)') AT=1.95n"
+    },
+    {
+      "name": "ff_c",
+      "unit": "V",
+      "spice": ".meas tran ff_c FIND par('v(xc.q0)-v(xc.qb0)') AT=3.4n"
+    },
+    {
+      "name": "hs_c",
+      "unit": "V",
+      "spice": ".meas tran hs_c FIND par('v(xc.q1)-v(xc.qb1)') AT=3.4n"
+    },
+    {
+      "name": "ldrv_c",
+      "unit": "V",
+      "spice": ".meas tran ldrv_c FIND par('v(xc.bl0)') AT=1.95n"
+    },
+    {
+      "name": "tf_c",
+      "unit": "s",
+      "spice": ".meas tran tf_c WHEN v(xc.q0)=v(xc.qb0) CROSS=1 TD=0.9n"
+    },
+    {
+      "name": "fl_d",
+      "unit": "V",
+      "spice": ".meas tran fl_d FIND par('v(xd.q0)-v(xd.qb0)') AT=1.95n"
+    },
+    {
+      "name": "ff_d",
+      "unit": "V",
+      "spice": ".meas tran ff_d FIND par('v(xd.q0)-v(xd.qb0)') AT=3.4n"
+    },
+    {
+      "name": "hs_d",
+      "unit": "V",
+      "spice": ".meas tran hs_d FIND par('v(xd.q1)-v(xd.qb1)') AT=3.4n"
+    },
+    {
+      "name": "ldrv_d",
+      "unit": "V",
+      "spice": ".meas tran ldrv_d FIND par('v(xd.blb0)') AT=1.95n"
+    },
+    {
+      "name": "tf_d",
+      "unit": "s",
+      "spice": ".meas tran tf_d WHEN v(xd.q0)=v(xd.qb0) CROSS=1 TD=0.9n"
+    },
+    {
+      "name": "d_end_0",
+      "unit": "V",
+      "spice": ".meas tran d_end_0 FIND par('v(q0)-v(qb0)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_0",
+      "unit": "V",
+      "spice": ".meas tran d_fin_0 FIND par('v(q0)-v(qb0)') AT=3.4n"
+    },
+    {
+      "name": "d_end_1",
+      "unit": "V",
+      "spice": ".meas tran d_end_1 FIND par('v(q1)-v(qb1)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_1",
+      "unit": "V",
+      "spice": ".meas tran d_fin_1 FIND par('v(q1)-v(qb1)') AT=3.4n"
+    },
+    {
+      "name": "d_end_2",
+      "unit": "V",
+      "spice": ".meas tran d_end_2 FIND par('v(q2)-v(qb2)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_2",
+      "unit": "V",
+      "spice": ".meas tran d_fin_2 FIND par('v(q2)-v(qb2)') AT=3.4n"
+    },
+    {
+      "name": "d_end_3",
+      "unit": "V",
+      "spice": ".meas tran d_end_3 FIND par('v(q3)-v(qb3)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_3",
+      "unit": "V",
+      "spice": ".meas tran d_fin_3 FIND par('v(q3)-v(qb3)') AT=3.4n"
+    },
+    {
+      "name": "d_end_4",
+      "unit": "V",
+      "spice": ".meas tran d_end_4 FIND par('v(q4)-v(qb4)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_4",
+      "unit": "V",
+      "spice": ".meas tran d_fin_4 FIND par('v(q4)-v(qb4)') AT=3.4n"
+    },
+    {
+      "name": "d_end_5",
+      "unit": "V",
+      "spice": ".meas tran d_end_5 FIND par('v(q5)-v(qb5)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_5",
+      "unit": "V",
+      "spice": ".meas tran d_fin_5 FIND par('v(q5)-v(qb5)') AT=3.4n"
+    },
+    {
+      "name": "d_end_6",
+      "unit": "V",
+      "spice": ".meas tran d_end_6 FIND par('v(q6)-v(qb6)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_6",
+      "unit": "V",
+      "spice": ".meas tran d_fin_6 FIND par('v(q6)-v(qb6)') AT=3.4n"
+    },
+    {
+      "name": "d_end_7",
+      "unit": "V",
+      "spice": ".meas tran d_end_7 FIND par('v(q7)-v(qb7)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_7",
+      "unit": "V",
+      "spice": ".meas tran d_fin_7 FIND par('v(q7)-v(qb7)') AT=3.4n"
+    },
+    {
+      "name": "d_end_8",
+      "unit": "V",
+      "spice": ".meas tran d_end_8 FIND par('v(q8)-v(qb8)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_8",
+      "unit": "V",
+      "spice": ".meas tran d_fin_8 FIND par('v(q8)-v(qb8)') AT=3.4n"
+    },
+    {
+      "name": "d_end_9",
+      "unit": "V",
+      "spice": ".meas tran d_end_9 FIND par('v(q9)-v(qb9)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_9",
+      "unit": "V",
+      "spice": ".meas tran d_fin_9 FIND par('v(q9)-v(qb9)') AT=3.4n"
+    },
+    {
+      "name": "d_end_10",
+      "unit": "V",
+      "spice": ".meas tran d_end_10 FIND par('v(q10)-v(qb10)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_10",
+      "unit": "V",
+      "spice": ".meas tran d_fin_10 FIND par('v(q10)-v(qb10)') AT=3.4n"
+    },
+    {
+      "name": "d_end_11",
+      "unit": "V",
+      "spice": ".meas tran d_end_11 FIND par('v(q11)-v(qb11)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_11",
+      "unit": "V",
+      "spice": ".meas tran d_fin_11 FIND par('v(q11)-v(qb11)') AT=3.4n"
+    },
+    {
+      "name": "d_end_12",
+      "unit": "V",
+      "spice": ".meas tran d_end_12 FIND par('v(q12)-v(qb12)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_12",
+      "unit": "V",
+      "spice": ".meas tran d_fin_12 FIND par('v(q12)-v(qb12)') AT=3.4n"
+    },
+    {
+      "name": "d_end_13",
+      "unit": "V",
+      "spice": ".meas tran d_end_13 FIND par('v(q13)-v(qb13)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_13",
+      "unit": "V",
+      "spice": ".meas tran d_fin_13 FIND par('v(q13)-v(qb13)') AT=3.4n"
+    },
+    {
+      "name": "d_end_14",
+      "unit": "V",
+      "spice": ".meas tran d_end_14 FIND par('v(q14)-v(qb14)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_14",
+      "unit": "V",
+      "spice": ".meas tran d_fin_14 FIND par('v(q14)-v(qb14)') AT=3.4n"
+    },
+    {
+      "name": "d_end_15",
+      "unit": "V",
+      "spice": ".meas tran d_end_15 FIND par('v(q15)-v(qb15)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_15",
+      "unit": "V",
+      "spice": ".meas tran d_fin_15 FIND par('v(q15)-v(qb15)') AT=3.4n"
+    },
+    {
+      "name": "d_end_16",
+      "unit": "V",
+      "spice": ".meas tran d_end_16 FIND par('v(q16)-v(qb16)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_16",
+      "unit": "V",
+      "spice": ".meas tran d_fin_16 FIND par('v(q16)-v(qb16)') AT=3.4n"
+    },
+    {
+      "name": "d_end_17",
+      "unit": "V",
+      "spice": ".meas tran d_end_17 FIND par('v(q17)-v(qb17)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_17",
+      "unit": "V",
+      "spice": ".meas tran d_fin_17 FIND par('v(q17)-v(qb17)') AT=3.4n"
+    },
+    {
+      "name": "d_end_18",
+      "unit": "V",
+      "spice": ".meas tran d_end_18 FIND par('v(q18)-v(qb18)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_18",
+      "unit": "V",
+      "spice": ".meas tran d_fin_18 FIND par('v(q18)-v(qb18)') AT=3.4n"
+    },
+    {
+      "name": "d_end_19",
+      "unit": "V",
+      "spice": ".meas tran d_end_19 FIND par('v(q19)-v(qb19)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_19",
+      "unit": "V",
+      "spice": ".meas tran d_fin_19 FIND par('v(q19)-v(qb19)') AT=3.4n"
+    },
+    {
+      "name": "d_end_20",
+      "unit": "V",
+      "spice": ".meas tran d_end_20 FIND par('v(q20)-v(qb20)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_20",
+      "unit": "V",
+      "spice": ".meas tran d_fin_20 FIND par('v(q20)-v(qb20)') AT=3.4n"
+    },
+    {
+      "name": "d_end_21",
+      "unit": "V",
+      "spice": ".meas tran d_end_21 FIND par('v(q21)-v(qb21)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_21",
+      "unit": "V",
+      "spice": ".meas tran d_fin_21 FIND par('v(q21)-v(qb21)') AT=3.4n"
+    },
+    {
+      "name": "d_end_22",
+      "unit": "V",
+      "spice": ".meas tran d_end_22 FIND par('v(q22)-v(qb22)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_22",
+      "unit": "V",
+      "spice": ".meas tran d_fin_22 FIND par('v(q22)-v(qb22)') AT=3.4n"
+    },
+    {
+      "name": "d_end_23",
+      "unit": "V",
+      "spice": ".meas tran d_end_23 FIND par('v(q23)-v(qb23)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_23",
+      "unit": "V",
+      "spice": ".meas tran d_fin_23 FIND par('v(q23)-v(qb23)') AT=3.4n"
+    },
+    {
+      "name": "d_end_24",
+      "unit": "V",
+      "spice": ".meas tran d_end_24 FIND par('v(q24)-v(qb24)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_24",
+      "unit": "V",
+      "spice": ".meas tran d_fin_24 FIND par('v(q24)-v(qb24)') AT=3.4n"
+    },
+    {
+      "name": "d_end_25",
+      "unit": "V",
+      "spice": ".meas tran d_end_25 FIND par('v(q25)-v(qb25)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_25",
+      "unit": "V",
+      "spice": ".meas tran d_fin_25 FIND par('v(q25)-v(qb25)') AT=3.4n"
+    },
+    {
+      "name": "d_end_26",
+      "unit": "V",
+      "spice": ".meas tran d_end_26 FIND par('v(q26)-v(qb26)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_26",
+      "unit": "V",
+      "spice": ".meas tran d_fin_26 FIND par('v(q26)-v(qb26)') AT=3.4n"
+    },
+    {
+      "name": "d_end_27",
+      "unit": "V",
+      "spice": ".meas tran d_end_27 FIND par('v(q27)-v(qb27)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_27",
+      "unit": "V",
+      "spice": ".meas tran d_fin_27 FIND par('v(q27)-v(qb27)') AT=3.4n"
+    },
+    {
+      "name": "d_end_28",
+      "unit": "V",
+      "spice": ".meas tran d_end_28 FIND par('v(q28)-v(qb28)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_28",
+      "unit": "V",
+      "spice": ".meas tran d_fin_28 FIND par('v(q28)-v(qb28)') AT=3.4n"
+    },
+    {
+      "name": "d_end_29",
+      "unit": "V",
+      "spice": ".meas tran d_end_29 FIND par('v(q29)-v(qb29)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_29",
+      "unit": "V",
+      "spice": ".meas tran d_fin_29 FIND par('v(q29)-v(qb29)') AT=3.4n"
+    },
+    {
+      "name": "d_end_30",
+      "unit": "V",
+      "spice": ".meas tran d_end_30 FIND par('v(q30)-v(qb30)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_30",
+      "unit": "V",
+      "spice": ".meas tran d_fin_30 FIND par('v(q30)-v(qb30)') AT=3.4n"
+    },
+    {
+      "name": "d_end_31",
+      "unit": "V",
+      "spice": ".meas tran d_end_31 FIND par('v(q31)-v(qb31)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_31",
+      "unit": "V",
+      "spice": ".meas tran d_fin_31 FIND par('v(q31)-v(qb31)') AT=3.4n"
+    },
+    {
+      "name": "d_end_32",
+      "unit": "V",
+      "spice": ".meas tran d_end_32 FIND par('v(q32)-v(qb32)') AT=1.95n"
+    },
+    {
+      "name": "d_fin_32",
+      "unit": "V",
+      "spice": ".meas tran d_fin_32 FIND par('v(q32)-v(qb32)') AT=3.4n"
+    }
+  ],
+  "options": {
+    "osdi_preload": [
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/psp103_nqs.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/r3_cmc.osdi",
+      "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi/mosvar.osdi"
+    ],
+    "waveforms": false,
+    "keep_artifacts": false,
+    "timeout_s": 600
+  }
+}

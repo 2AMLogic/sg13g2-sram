@@ -1,0 +1,38 @@
+{
+  "label": "negctl_mask_ignored",
+  "kind": "simulated",
+  "definition": "access = CLK 50 % rise to Q[0] crossing 90 % (read of 1) or 10 % (read of 0) of VDD; write completion = CLK 50 % rise to the cell's Q = QB crossing, and the cell beyond 90 % of VDD from the written rail afterwards",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.200V/25C",
+      "klt_status": "pass",
+      "read1_access_ns": 2.0894,
+      "read0_access_ns": 1.7559,
+      "q_final_read1_first_v": 1.2,
+      "q_final_read0_v": 2.38985e-08,
+      "q_final_read1_v": 1.2,
+      "write1_flip_after_clk_ns": 1.4749,
+      "write1_flip_after_wl_ns": 0.4416,
+      "write0_flip_after_clk_ns": 1.4505,
+      "write0_flip_after_wl_ns": 0.4535,
+      "cell_after_write1_v": 1.2,
+      "cell_after_write0_v": -1.2,
+      "cell_after_masked_write_v": -1.2,
+      "q_final_read_after_mask_v": 6.22647e-08,
+      "checks": {
+        "read1_valid": true,
+        "read0_valid": true,
+        "write1_completed": true,
+        "write0_completed": true,
+        "masked_write_leaves_bit": false
+      },
+      "pass": false
+    }
+  ],
+  "corner_count": 1,
+  "failing_corners": [
+    "mos_tt/1.200V/25C"
+  ],
+  "all_pass": false,
+  "any_fail": true
+}

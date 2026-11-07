@@ -52,12 +52,13 @@ T_WL_RISE_NS = 1.01          # bench_write.cir: 50 % point of the WL rise
 T_END_NS = 1.95              # bench_write.cir: end of the pulse (before the WL fall at 2.03)
 T_FINAL_NS = 3.4
 
-# bench_access.cir: six cycles of 8 ns, CLK high 3 ns; the CLK rising edges (ns) of each cycle.
+# bench_access.cir: eight cycles of 8 ns, CLK high 3 ns; the CLK rising edges (ns) of each cycle.
 # read1 comes first only to put a 1 into the output latch; read1b follows a read of 0, so its Q
-# transition is a clean rise.
+# transition is a clean rise. write0m is a MASKED write of 0 (GWEN low, WEN[0] high, WEN[1..31] low): bit 0 must keep
+# its 1 (read1m reads it back); a macro that ignores the mask flips it (negative control).
 ACCESS_PERIOD_NS = 8.0
 ACCESS_HIGH_NS = 3.0
-ACCESS_CYCLES = ["write1", "read1", "write0", "read0", "write1b", "read1b"]
+ACCESS_CYCLES = ["write1", "read1", "write0", "read0", "write1b", "read1b", "write0m", "read1m"]
 ACCESS_EDGES_NS = {c: 4.0 + ACCESS_PERIOD_NS * i for i, c in enumerate(ACCESS_CYCLES)}
 ACCESS_T_STOP_NS = 4.0 + ACCESS_PERIOD_NS * len(ACCESS_CYCLES)
 ACCESS_ADDRESS = 0x5A        # A[7:1] = 45 selects WL[45]; A[0] = 0 selects column 0 (control: SEL0 = ~A0L)
@@ -111,7 +112,10 @@ def access_measurements() -> list[dict]:
           _when("tq_read0", "q0m", "thr1", "FALL", pre("read0")),
           _meas("qend_read1", "v(q0m)", end("read1")),
           _meas("qend_read0", "v(q0m)", end("read0")),
-          _meas("qend_read1b", "v(q0m)", f"{ACCESS_T_STOP_NS - 1.0:g}n")]
+          _meas("qend_read1b", "v(q0m)", end("read1b")),
+          # masked write: the cell must still hold the 1 written in write1b, and the read after it returns 1
+          _meas("cell_after_write0m", "v(cq)-v(cqb)", end("write0m")),
+          _meas("qend_read1m", "v(q0m)", f"{ACCESS_T_STOP_NS - 1.0:g}n")]
     # write: the cell's storage nodes cross, then settle; wordline timing for reference
     for cyc in ("write1", "write0"):
         m += [_when(f"tflip_{cyc}", "cq", "cqb", "CROSS", pre(cyc)),
@@ -199,17 +203,17 @@ def gen_access(macro_spice: str) -> str:
     a("* Representative macro: the real address latch, control, row decoder, data latch and out latch")
     a("* (full 32-bit banks), and the real bit slice 0 (2 bit-line pairs x 128 cells, precharge, mux,")
     a("* sense amp, write driver) at the selected address. The other 31 I/O are represented by their")
-    a(f"* load only: {N_DUMMY_SLICES} dummy slices (2 precharge, mux, sense amp, write driver on private bit lines)")
-    a(f"* on PRE_B / SEL* / SAE / WE / DL[k] / DOUT[k], and {N_DUMMY_WL_CELLS} bitcells (their access gates) on the selected")
+    a(f"* load only: {N_DUMMY_SLICES} dummy slices (2 precharge, mux, sense amp, mask gate, write driver on private bit lines)")
+    a(f"* on PRE_B / SEL* / SAE / WE / WENL[k] / DL[k] / DOUT[k], and {N_DUMMY_WL_CELLS} bitcells (their access gates) on the selected")
     a(f"* wordline WL[{ACCESS_ROW}]. Wordlines of other rows are not loaded: they do not switch at this address.")
     a("* Schematic level: no wire parasitics.")
     a("*")
     a(f"* Address 0x{ACCESS_ADDRESS:02X}: A[7:1] = {ACCESS_ROW} selects WL[{ACCESS_ROW}], A[0] = 0 selects column 0 (SEL0 high).")
-    a(f"* Six cycles, {ACCESS_PERIOD_NS:g} ns period, CLK high {ACCESS_HIGH_NS:g} ns (rising 50 % at " +
+    a(f"* Eight cycles, {ACCESS_PERIOD_NS:g} ns period, CLK high {ACCESS_HIGH_NS:g} ns (rising 50 % at " +
       ", ".join(f"{ACCESS_EDGES_NS[c] + 0.05:g}" for c in ACCESS_CYCLES) + " ns):")
-    a("*   write 1, read (expects 1), write 0, read (expects 0), write 1, read (expects 1).")
+    a("*   write 1, read (expects 1), write 0, read (expects 0), write 1, read (expects 1), masked write of 0 (WEN[0] high), read (expects 1 still).")
     a("* The first read only puts a 1 into the output latch; the last read follows a read of 0, so its Q rise is")
-    a("* a clean transition. CEN low, GWEN = WEN low in the write cycles; address, data and controls change in the")
+    a("* a clean transition. CEN low, GWEN low in the write cycles, WEN[31:0] low (bit written) except WEN[0] high in the masked write; address, data and controls change in the")
     a("* CLK-low phase (latches transparent), 3 ns before each edge. Every cell starts holding 0 (.ic).")
     a("* All levels scale with VDD (request supply corner).")
     a(".include ../../design/macro/macro.spice")
@@ -226,7 +230,7 @@ def gen_access(macro_spice: str) -> str:
     a("Bclk CLK 0 V = v(pclk)*v(vdd)")
     a("Bclkm clkm 0 V = v(CLK)")
     a("Bcen CEN 0 V = 0")
-    a("* GWEN = WEN: low (write) in cycles 1 and 3, high (read) in cycles 2 and 4")
+    a("* GWEN: low (write) in the write cycles, high (read) in the read cycles")
     def pwl(level):   # level(cycle name) -> 0/1, switching 3 ns before each cycle's edge
         pts, prev = [], None
         for cyc in ACCESS_CYCLES:
@@ -239,9 +243,13 @@ def gen_access(macro_spice: str) -> str:
         return "PWL(" + " ".join(pts) + f" {ACCESS_T_STOP_NS + 5:g}n {prev})"
     a(f"Vpgw pgw 0 {pwl(lambda c: 0 if c.startswith('write') else 1)}")
     a("Bgwen GWEN 0 V = v(pgw)*v(vdd)")
-    a("Bwen  WEN  0 V = v(pgw)*v(vdd)")
+    a("* WEN[0]: high (masked) only in the masked write; WEN[1..31] low in every cycle")
+    a(f"Vpwm pwm 0 {pwl(lambda c: 1 if c == 'write0m' else 0)}")
+    a("Bwen0 WEN[0] 0 V = v(pwm)*v(vdd)")
+    for k in range(1, 32):
+        a(f"Bwen{k} WEN[{k}] 0 V = 0")
     a("* D[0]: 1 for the first write, 0 for the second")
-    a(f"Vpd0 pd0 0 {pwl(lambda c: 0 if c == 'write0' else 1)}")
+    a(f"Vpd0 pd0 0 {pwl(lambda c: 0 if c in ('write0', 'write0m') else 1)}")
     a("Bd0 D[0] 0 V = v(pd0)*v(vdd)")
     for k in range(1, 32):
         a(f"Bd{k} D[{k}] 0 V = 0")
@@ -262,7 +270,9 @@ def gen_access(macro_spice: str) -> str:
         a(f"Xfp1_{k} PRE_B fb1_{k} fbb1_{k} vdd 0 precharge")
         a(f"Xfm_{k} SEL0 SEL0B SEL1 SEL1B fb0_{k} fbb0_{k} fb1_{k} fbb1_{k} fbm_{k} fbbm_{k} vdd 0 column_mux")
         a(f"Xfs_{k} SAE fbm_{k} fbbm_{k} DOUT[{k}] fdoutb_{k} vdd 0 sense_amp")
-        a(f"Xfw_{k} WE DL[{k}] fbm_{k} fbbm_{k} vdd 0 write_driver")
+        a(f"Xfi_{k} WE fweb_{k} vdd 0 inv")
+        a(f"Xfg_{k} fweb_{k} WENL[{k}] fwei_{k} vdd 0 nor2")
+        a(f"Xfw_{k} fwei_{k} DL[{k}] fbm_{k} fbbm_{k} vdd 0 write_driver")
     a("")
     a("* monitors (VCVS, no load) for nets the .meas lines cannot index directly")
     a("Eq0 q0m 0 Q[0] 0 1")
@@ -425,12 +435,15 @@ def verdict_access(m: dict) -> dict:
             row[f"{cyc}_flip_after_clk_ns"] = round((t - tc) * 1e9, 4) if _num(t) and _num(tc) else None
             row[f"{cyc}_flip_after_wl_ns"] = round((t - tw) * 1e9, 4) if _num(t) and _num(tw) else None
         row["cell_after_write1_v"], row["cell_after_write0_v"] = m["cell_after_write1"], m["cell_after_write0"]
+        row["cell_after_masked_write_v"], row["q_final_read_after_mask_v"] = m["cell_after_write0m"], m["qend_read1m"]
         row["checks"] = {
             "read1_valid": row["read1_access_ns"] is not None and row["q_final_read1_v"] > 0.9 * vdd
                            and row["q_final_read1_first_v"] > 0.9 * vdd,
             "read0_valid": row["read0_access_ns"] is not None and row["q_final_read0_v"] < 0.1 * vdd,
             "write1_completed": row["write1_flip_after_clk_ns"] is not None and row["cell_after_write1_v"] > 0.9 * vdd,
             "write0_completed": row["write0_flip_after_clk_ns"] is not None and row["cell_after_write0_v"] < -0.9 * vdd,
+            # WEN[0] high with GWEN low: the 0 on D[0] must not be written
+            "masked_write_leaves_bit": row["cell_after_masked_write_v"] > 0.9 * vdd and row["q_final_read_after_mask_v"] > 0.9 * vdd,
         }
     except (KeyError, TypeError):
         return {"error": "missing or non-numeric measurement", "checks": {}, "pass": False}
