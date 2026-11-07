@@ -1,0 +1,23 @@
+* 6T bitcell hold/read butterfly bench (circuit body for `klt sim`; no .control/.end).
+*
+* The cell is design/bitcell/bitcell.spice (derived from bitcell.sch by
+* `klt netlist`). Each butterfly lobe is measured on the full cell with the
+* storage loop broken by forcing one storage node: instance "a" forces Q=x and
+* reads QB (one VTC), instance "b" forces QB=x and reads Q (the other VTC), so
+* no device is duplicated outside the schematic. x = u * VDD with u swept 0..1
+* by the request, so the same sweep follows every supply corner.
+*   hold: WL = 0, bit lines at VDD
+*   read: WL = VDD, bit lines precharged to VDD
+.include ./bitcell_negctl.spice
+
+Vdd vdd 0 DC 1.2
+Vu  u   0 DC 0
+Bxha qha  0 V = v(u)*v(vdd)
+Bxhb qbhb 0 V = v(u)*v(vdd)
+Bxra qra  0 V = v(u)*v(vdd)
+Bxrb qbrb 0 V = v(u)*v(vdd)
+*               BL  BLB WL  VDD VSS Q    QB
+Xhold_a         vdd vdd 0   vdd 0   qha  qbha bitcell
+Xhold_b         vdd vdd 0   vdd 0   qhb  qbhb bitcell
+Xread_a         vdd vdd vdd vdd 0   qra  qbra bitcell
+Xread_b         vdd vdd vdd vdd 0   qrb  qbrb bitcell

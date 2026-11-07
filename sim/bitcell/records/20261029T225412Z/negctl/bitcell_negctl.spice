@@ -1,0 +1,19 @@
+** sch_path: design/bitcell/bitcell.sch
+
+* 6T SRAM bitcell, reference sizing from spec/bitcell-decision.md evidence 1
+
+.subckt bitcell BL BLB WL VDD VSS Q QB
+*.iopin BL
+*.iopin BLB
+*.ipin WL
+*.iopin VDD
+*.iopin VSS
+*.iopin Q
+*.iopin QB
+XMP0 Q QB VDD VDD sg13_lv_pmos w=0.15u l=0.13u ng=1 m=1
+XMN0 Q QB VSS VSS sg13_lv_nmos w=0.15u l=0.13u ng=1 m=1
+XMP1 QB Q VDD VDD sg13_lv_pmos w=0.15u l=0.13u ng=1 m=1
+XMN1 QB Q VSS VSS sg13_lv_nmos w=0.15u l=0.13u ng=1 m=1
+XMN2 BL WL Q VSS sg13_lv_nmos w=0.60u l=0.13u ng=1 m=1
+XMN3 BLB WL QB VSS sg13_lv_nmos w=0.60u l=0.13u ng=1 m=1
+.ends

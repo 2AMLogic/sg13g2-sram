@@ -9,7 +9,12 @@
 #   3. Negative control at the typical point: pull-downs halved and access devices doubled (beta 0.25); the
 #      read SNM must come out below the reference cell's or the script fails.
 #   4. The 45-corner grid (5 process x 3 temp x 3 supply) for SNM and for write
-#      margin: two `klt sim` requests, submitted to the batch fleet.
+#      margin: two `klt sim` requests, submitted to the batch fleet. The write
+#      request also records the BL = 0 V flip time (tflip_0).
+#   5. Write-pulse sensitivity (spec/write-pulse-width-decision.md, open items):
+#      0.5 / 1 / 2 ns wordline pulse on the worst write-margin corners
+#      (bitcell_post.py SWEEP_CORNERS), three more batch requests. The 45-corner
+#      margin above stays at 1 ns.
 # Hold/read SNM: sim/bitcell/bench_snm.cir (DC butterfly). Write margin:
 # sim/bitcell/bench_write.cir (1 ns wordline pulse, 33 bit-line levels).
 #
@@ -44,7 +49,7 @@ klt netlist "${REPO}/design/bitcell/bitcell.sch" -o "${REPO}/design/bitcell/bitc
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 REC="${HERE}/records/${STAMP}"
 [[ -e "${REC}" ]] && { echo "run_bitcell.sh: ${REC} exists (records are append-only)" >&2; exit 4; }
-mkdir -p "${REC}/reports" "${REC}/curves" "${REC}/negctl"
+mkdir -p "${REC}/reports" "${REC}/curves" "${REC}/negctl" "${REC}/sweep"
 WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
 
 
@@ -65,12 +70,25 @@ run_klt "${REC}/negctl/request_snm.json" negctl_snm
 run_klt "${HERE}/request_snm.json" grid_snm
 run_klt "${HERE}/request_write.json" grid_write
 
+# --- write-pulse sensitivity: 0.5 / 1 / 2 ns on the worst write-margin corners ----------------------
+PULSES=(0.5 1 2)
+for pw in "${PULSES[@]}"; do
+  "${POST[@]}" sweep-request "${HERE}/request_write.json" "${HERE}/bench_write.cir" "${REC}/sweep/pw${pw}ns" "${pw}" "${REPO}/design/bitcell/bitcell.spice"
+  run_klt "${REC}/sweep/pw${pw}ns/request.json" "sweep_write_pw${pw}ns"
+done
+
 # --- post-process and record --------------------------------------------------
 "${POST[@]}" snm "${REC}/reports/typical_snm.json.gz" "${WORK}/typical_snm" "${REC}/curves" typical > "${REC}/typical_snm.json"
 "${POST[@]}" write "${REC}/reports/typical_write.json.gz" typical > "${REC}/typical_write.json"
 "${POST[@]}" snm "${REC}/reports/negctl_snm.json.gz" "${WORK}/negctl_snm" "${REC}/curves" negctl > "${REC}/negctl_snm.json"
 "${POST[@]}" snm "${REC}/reports/grid_snm.json.gz" "${WORK}/grid_snm" "${REC}/curves" grid > "${REC}/grid_snm.json"
 "${POST[@]}" write "${REC}/reports/grid_write.json.gz" grid > "${REC}/grid_write.json"
+SWEEP_ARGS=()
+for pw in "${PULSES[@]}"; do
+  "${POST[@]}" write "${REC}/reports/sweep_write_pw${pw}ns.json.gz" "sweep_pw${pw}ns" --pulse-ns "${pw}" > "${REC}/sweep/write_pw${pw}ns.json"
+  SWEEP_ARGS+=("${pw}=${REC}/sweep/write_pw${pw}ns.json")
+done
+"${POST[@]}" write-sweep write_pulse_sweep "${SWEEP_ARGS[@]}" > "${REC}/write_pulse_sweep.json"
 
 PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
 python3 -I - "${REC}" "${STAMP}" "${PDKTAG}" <<'PY'
@@ -80,6 +98,9 @@ L = lambda n: json.load(open(f"{rec}/{n}.json"))
 env = json.load(gzip.open(f"{rec}/reports/grid_snm.json.gz", "rt"))["environment"]
 remote = env.get("remote", {})
 typ, tw, neg, gs, gw = L("typical_snm"), L("typical_write"), L("negctl_snm"), L("grid_snm"), L("grid_write")
+sweep = L("write_pulse_sweep")
+ft = [(r["flip_time_s"], r["corner_id"]) for r in gw["corners"] if r.get("flip_time_s") is not None]
+ss_hot = next((r for r in gw["corners"] if r["corner_id"] == "mos_ss/1.080V/125C"), {})
 pos = lambda v: v is not None and v > 0
 def worst(rows, key):
     vals = [(r[key], r["corner_id"]) for r in rows if r.get(key) is not None]
@@ -104,8 +125,13 @@ out = {
            "corners_not_strictly_positive": sorted({r["corner_id"] for r in gs["corners"] if not (pos(r.get("hold_snm_v")) and pos(r.get("read_snm_v")))}
                                                    | {r["corner_id"] for r in gw["corners"] if not pos(r.get("write_margin_v"))}),
            "corners_with_errors": errs},
-  "not_established": ["write flip time at mos_ss/1.08 V/125 C (spec/write-pulse-width-decision.md open item)",
-                      "0.5/1/2 ns pulse sensitivity", "Monte Carlo (separate evidence item)", "rail sharing decision"],
+  "write_flip_time": {"what": "BL = 0 V cell, 50 % WL rise to Q = QB, 1 ns pulse (window 1.02 ns at the 50 % points)",
+                      "mos_ss_1.080V_125C_s": ss_hot.get("flip_time_s"), "mos_ss_1.080V_125C_check": ss_hot.get("flip_time_check"),
+                      "slowest_of_45_s": max(ft) if ft else None,
+                      "corners_not_within_pulse": sorted(r["corner_id"] for r in gw["corners"] if r.get("flip_time_check") != "within_pulse")},
+  "write_pulse_sweep": {"pulse_widths_ns": sweep["pulse_widths_ns"], "file": "write_pulse_sweep.json",
+                        "corners": [c["corner_id"] for c in sweep["corners"]]},
+  "not_established": ["Monte Carlo (separate evidence item)", "rail sharing decision"],
 }
 json.dump(out, open(f"{rec}/record.json", "w"), indent=2); open(f"{rec}/record.json", "a").write("\n")
 print(json.dumps(out, indent=2))
