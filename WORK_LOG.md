@@ -5,6 +5,10 @@ triage agent. Newest first.
 
 ### 2026-11-06
 
+- **PR #141**: ci: run layout generator tests in CI
+- **PR #139**: chore: remove superseded per-stage macro-record scripts
+- **Issue #140** (closed): Run the layout generator tests (test_bitcell.py, test_macro.py) in CI
+- **Issue #117** (closed): Remove superseded macro-record scripts generate-macro-routed.sh and generate-macro-rails.sh
 - **Issue #102** (closed): Re-plan supply-rail routing around the wordline fan-out gap (PR #99 vs #94/#97)
 
 ### 2026-11-05

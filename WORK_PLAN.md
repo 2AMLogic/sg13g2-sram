@@ -21,7 +21,6 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
-- **#105**: layout: route decoder cell internals
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
 - **#108**: layout: connect macro pins, signals record, verify and README
 
@@ -78,7 +77,6 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module *(hermit)*
-- **#117**: Remove superseded macro-record scripts generate-macro-routed.sh and generate-macro-rails.sh *(hermit)*
 
 ## Epics
 
@@ -90,12 +88,12 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
-| Important | 4 |
+| Important | 3 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 8 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 11 |
-| Architect / Hermit proposals | 2 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
