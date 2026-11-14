@@ -126,6 +126,22 @@ Records are append-only: each run writes a new `records/<UTC>/` directory.
      --inventory attest/item10.json --check attest/item10.envelope.json
    ```
 
+   This envelope content-hashes `README.md`, `LICENSE` and both CI workflows, so
+   a PR editing any of them stales it and CI's "Item 10 attestation has not
+   drifted" step goes red. Re-sign it with
+
+   ```bash
+   ./attest/mint.sh 10
+   ```
+
+   **Minting must use the pin**, which `attest/mint.sh` enforces by reading
+   `KLT_VERSION` from `.github/workflows/ci.yml` and routing through `uvx`. The
+   host `klt` is a newer, unreleased build: minting with it stamps an
+   unreproducible `provenance.klt_version` into the committed envelope, and its
+   `--format json > …` form also emits a `manifest_entry` block the pinned
+   `--check` rejects. Items 1, 2 and 9 cannot be minted at the pin and the
+   script refuses them with the measured reason.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
