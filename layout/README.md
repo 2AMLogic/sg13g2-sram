@@ -157,8 +157,9 @@ and none to the macro pins. The LEF pins are drawn Metal2 but are not connected 
 the macro is not LVS-able yet. The wordline label on GatPoly text (5/1) sits mid-cell, off the
 poly row, and is not read by `klt extract`; the wordline nets take their names from the driver
 labels. Routing the rest is #95; #30 (LVS) and #31 (power ERC) cannot proceed past it. Unrun
-here: the PDK-native DRC, `klt array-check`, and DRC of the periphery against rules the curated
-deck lacks.
+here: the PDK-native DRC, and DRC of the periphery against rules the curated
+deck lacks. `klt array-check` **has** now been run -- see "Array regularity" below for what it
+does and does not establish.
 
 #### Supply rails (issue #92, re-planned in #102)
 
@@ -235,3 +236,69 @@ width/space, Via1-Via4 width/space, Via/Metal enclosure up to Via4 and the NWell
 rules. Unchecked as a result: TopMetal1/2, MIM, TopVia1/2, the NWell-to-N+ Activ rules (no
 geometry), and every density, antenna and latch-up rule (the deck carries none; `unmodeled_rules`
 lists LU.* and Pad.*). Periphery devices use bitcell-derived rule constants.
+
+### Array regularity (issue #160)
+
+`klt array-check` on the committed `layout/sram_256x32/macro.gds` (8192 bitcells, 128 rows x 64
+columns) -> `layout/reports/array-check-macro.json`, minted by
+`layout/reports/generate-array-check.sh` and re-run by `./layout/verify.sh` step 10.
+
+The check is run with **released `klayout-tools==0.9.1` through `uvx`**, not the host klt and not
+the `klayout-tools==0.8.0` this repo pins for signoff: `array-check` does not exist in 0.8.0
+(`invalid choice: 'array-check'`), it arrived in 0.9.0. The signoff pin is deliberately left alone
+(bumping it would force every `attest/*.envelope.json` to be regenerated), so the repo carries two
+klt pins for different purposes. No workflow invokes `array-check`, so step 10 cannot turn CI red.
+
+**Two abutment configurations are `clean` (`violation_count: 0`):**
+
+- the 32 `bit_slice` columns along x, `--pitch 5.74 --count 32 --tolerance 0.48`
+- the 128 `bitcell` placements of one column along y, `--pitch 3.605 --count 128 --tolerance 0.27`,
+  after `klt clip --cell bl_pair` isolates a column (see the limitation below)
+
+**Those tolerances are measured shared-edge overlap, not slack.** Mirror abutment makes adjacent
+cells *share* an edge by design -- the row seam merges the bitcell VDD/VSS risers and the column
+seam merges the two `bl_pair` halves, both already described under "Supply rails". At
+`--tolerance 0` the same runs report exactly those shared edges as overlaps: 0.27 um / 0.15 um at
+the row seam plus a 0.15 um length error, and 0.48 um at the column seam. A sweep of the row-seam
+value gives 64 violations at 0.15 um and `clean` at 0.27 um. The values are therefore the geometry,
+not a fudge -- but a blanket `--tolerance` is symmetric, so see the coverage limits below.
+
+**The translation-symmetry run is recorded as a characterized result, not a pass.** One clipped
+column under `--translate '0,7.21' --layers '[[1,0],[5,0],[8,0],[10,0]]'` reports **8 residuals**,
+all inside two y bands, and the array interior is residual-free:
+
+| y band (um) | residuals | why it is not a defect |
+|---|---|---|
+| 7.065 .. 7.355 | 5 (1/0 x1, 8/0 x2, 10/0 x2) | the finite-array end: under a +7.21 um shift no partner geometry exists beyond the last mirrored pair, so the edge cannot be symmetric |
+| 461.440 .. 461.585 | 3 (1/0 x1, 8/0 x2) | seam 0, already recorded above as special -- it sits on the bit-line Via1/Via2 stacks below the array, so it is a pad per column plus a Metal4 strap instead of the full-width Metal2 strap every other seam gets |
+
+Layer 5/0 has no residual. `verify.sh` step 10 asserts the count **and** both bands, so a change
+that breaks interior symmetry fails there instead of being absorbed. **Do not raise `--tolerance`
+to make this run report `clean`** -- that would disable the regression guard while appearing to
+pass it; a genuinely changed array mints a new append-only record instead.
+
+**What this does not cover:**
+
+- **No connectivity.** `array-check` is purely geometric -- no PDK deck, no compact models, no
+  SPICE. That the abutting risers are *electrically* joined is `macro-record-decoder.json`, and
+  reference-netlist comparison is #30.
+- **No design rules.** DRC is `drc-macro.json` (above).
+- **Not the array as a whole.** The abutment mode is one-dimensional, so no invocation covers the
+  128 x 64 array in one pass: the two clean runs cover one column along y and the 32 slices along
+  x, and nothing checks the two axes jointly. Pointed at the whole macro with `--cell bitcell` it
+  finds all 8192 placements while measuring length along a single column, making
+  `length == count x pitch` unsatisfiable at any pitch/count, and coincident cross-column
+  placements project as spurious full-cell overlaps. The committed 2x2 tile
+  (`layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds`) is the minimal reproducer and is recorded as
+  such; `klt clip` is the only way to scope the check today.
+- **A tolerance cuts both ways.** The 0.27 um / 0.48 um above would equally mask an *unintended*
+  gap or overlap up to the same size anywhere in the array. The seam values are justified by
+  measurement; the check itself cannot tell an intended shared edge from a defect of equal size.
+- **Periphery excluded.** Only `bitcell`, `bl_pair` and `bit_slice` placements are checked.
+
+**Tool gaps filed upstream** (the friction protocol): `2AMLogic/klayout-tools#5698` covers the
+1-D abutment model on a 2-D array (unsatisfiable at every pitch/count, with full-cell-width false
+overlaps on a geometrically perfect array), the absence of a shared-edge / expected-overlap concept
+distinct from a measurement tolerance, and `array-check --format json` omitting the `provenance`
+block its sibling verbs emit plus leaving `file` unanchored -- which is why the mint script adds
+provenance itself.
