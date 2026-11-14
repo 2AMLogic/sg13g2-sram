@@ -19,15 +19,9 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SIM_DIR="$(cd "${HERE}/.." && pwd)"
-REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/env.sh"
-# shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/run_klt.sh"
-: "${PDK_ROOT:?run_array.sh: no PDK install resolved; see sim/README.md}"
-command -v klt >/dev/null || { echo "run_array.sh: klt not on PATH" >&2; exit 3; }
-POST=(python3 -I "${HERE}/array_post.py")
+source "${HERE}/../harness/common/setup.sh"
+sim_setup --post array_post.py
 TYPICAL=()
 [[ "${1:-}" == "--typical" ]] && TYPICAL=(--typical)
 
@@ -40,12 +34,7 @@ TYPICAL=()
 "${POST[@]}" gen-access "${REPO}/design/macro/macro.spice" "${HERE}/bench_access.cir" --check \
   || { echo "run_array.sh: bench_access.cir is stale (regenerate: array_post.py gen-access)" >&2; exit 5; }
 
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-REC="${HERE}/records/${STAMP}"
-[[ -e "${REC}" ]] && { echo "run_array.sh: ${REC} exists (records are append-only)" >&2; exit 4; }
-mkdir -p "${REC}/reports" "${REC}/curves" "${REC}/negctl"
-WORK="$(mktemp -d)"
-trap 'rm -rf "${WORK}" "${HERE}"/.req_*.json' EXIT
+new_record "${HERE}/records" reports curves negctl
 
 
 # --- negative controls (mos_tt, 1.20 V, 25 C, a grid corner) --------------------------------------------------------
@@ -77,7 +66,7 @@ done
 "${POST[@]}" write "${REC}/reports/negctl_write.json.gz" negctl_weak_driver > "${REC}/negctl_write.json"
 "${POST[@]}" access "${REC}/reports/negctl_access.json.gz" negctl_weak_driver > "${REC}/negctl_access.json"
 
-PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
+PDKTAG="$(pdk_release_tag)"
 python3 -I - "${REC}" "${STAMP}" "${PDKTAG}" "${TYPICAL[*]:-}" <<'PY'
 import gzip, json, sys
 rec, stamp, pdktag, typical = sys.argv[1:5]

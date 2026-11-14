@@ -11,8 +11,17 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
   byte-identical from `2AMLogic/sg13g2-bandgap` (see `../reuse.lock.json`).
   Their echo hints mention `sim/tools/build-osdi.sh` and `sim/env.sh`; the real
   paths are the ones here.
-- `harness/common/run_klt.sh`: the one batch-only `klt sim` wrapper (`run_klt`,
-  exit-code policy, bucket redaction) sourced by every `sim/*/run_*.sh`.
+- `harness/common/setup.sh`: the setup contract every `sim/*/run_*.sh` sources
+  once -- `sim_setup` (paths, the PDK environment, the tool guards, `POST`),
+  `new_record` (the append-only record directory, its subdirectories and the
+  scratch-cleanup trap) and `pdk_release_tag`.
+- `harness/common/run_klt.sh`: the batch-only `klt sim` wrappers (`run_klt` for
+  one request, `run_klt_set` for a `--batch-set`) with one exit-code policy,
+  one fleet-capacity flag set and the bucket redaction; sourced by `sim_setup`
+  unless the caller passes `--no-klt`.
+- `harness/common/test_setup.sh`: PDK-free, simulation-free regression test for
+  both of the above (run by `npm test`); stubs `klt` and `ngspice` and never
+  touches an append-only record directory.
 - `pdk-smoke/`: smoke runner and append-only records under `records/<UTC>/`.
 - `bitcell/`: 6T bitcell hold/read SNM and write margin over the 45 corners
   (`bitcell/README.md`).

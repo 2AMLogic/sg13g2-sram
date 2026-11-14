@@ -3,21 +3,21 @@
   "kind": "generic",
   "status": "pass",
   "t1_item": 9,
-  "summary": "T1 item 9 (Testbenches shipped): 31/31 attestation checks passed (klt signoff --attest)",
+  "summary": "T1 item 9 (Testbenches shipped): 33/33 attestation checks passed (klt signoff --attest)",
   "source": "attest/item9.json",
   "attestation": {
     "producer": "klt signoff --attest",
     "inventory_schema_version": 1,
     "hash_algorithm": "sha256-raw-bytes",
-    "check_count": 31,
-    "passed_count": 31,
+    "check_count": 33,
+    "passed_count": 33,
     "checks": [
       {
         "check": "present",
         "role": "testbench",
         "path": "sim/README.md",
         "passed": true,
-        "content_hash": "sha256:dd69c972180f7aa706ea38b24b550dac45168d415d64808a2f6edb187fcccb7c"
+        "content_hash": "sha256:cff26726bd6e7c084572ff87c501071c77c547ff8e952e4e2ef6b5f4a7f2f4c0"
       },
       {
         "check": "present",
@@ -59,7 +59,7 @@
         "role": "testbench",
         "path": "sim/array/run_array.sh",
         "passed": true,
-        "content_hash": "sha256:8bae5248ba8eb8abebadfde056478aaa1a68b9cbd05b3464415280922d5b8373"
+        "content_hash": "sha256:a6dd396b84a823165097bb95b7994f4def9237f0ec3169bede7e942c9c8c2bb3"
       },
       {
         "check": "present",
@@ -115,7 +115,7 @@
         "role": "testbench",
         "path": "sim/bitcell/run_bitcell.sh",
         "passed": true,
-        "content_hash": "sha256:9e7f2a5428862243ab934141c57a6bfe82b20aa13b64abb766a01bc91d05dcfa"
+        "content_hash": "sha256:28a751dcfa0231a02d83ef8e93b2f3abc196271a066d72114e7138977c6de3fe"
       },
       {
         "check": "present",
@@ -157,7 +157,7 @@
         "role": "testbench",
         "path": "sim/column/run_column.sh",
         "passed": true,
-        "content_hash": "sha256:6bda7ace14897c229b999d7d0b8c5f04b81729fd207b6ab75f2c7c55455e300b"
+        "content_hash": "sha256:60927dd3465c80a3e023deb7c57ba8c58f20267c4144f6f643d8388d3cd42de4"
       },
       {
         "check": "present",
@@ -178,7 +178,21 @@
         "role": "testbench",
         "path": "sim/harness/common/run_klt.sh",
         "passed": true,
-        "content_hash": "sha256:3e8894f11b11ae4c03fe37978970a05e5f0da7ad39ee29192c1a95f898afc60e"
+        "content_hash": "sha256:02098e3456b8e7e2b79c91f8ea565930161a517df5cfc679e9322cf310fdadf9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/harness/common/setup.sh",
+        "passed": true,
+        "content_hash": "sha256:bd69ae437fe25c4e45dcffd4c9a89e188b1e052b563f55ef6ccff1d3486e093b"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/harness/common/test_setup.sh",
+        "passed": true,
+        "content_hash": "sha256:179cb655f5ebb1f599aa8345d18853763ab00ef80902cec5c62875e1924d0074"
       },
       {
         "check": "present",
@@ -241,7 +255,7 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.8.0",
+    "klt_version": "0.9.2.dev1022+g2a9c52b27ce7",
     "klayout_version": null,
     "pdk": null,
     "deck": null,
@@ -250,7 +264,7 @@
         "path": "attest/item9.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:905bbb69f90a48e22daa0f21bfe8c6f3e0a626d16faff63202b818d2eb666672"
+      "content_hash": "sha256:83ac2940522682494f63635bb49ebb5d921c53df87c87e93d77c50210cc02d9f"
     }
   }
 }
