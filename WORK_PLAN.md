@@ -21,6 +21,7 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
+- **#95**: layout: macro periphery signal nets and pin connection
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
 - **#108**: layout: connect macro pins, signals record, verify and README
 
@@ -88,7 +89,7 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
-| Important | 3 |
+| Important | 4 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 8 |
 | PRs awaiting review | 4 |
