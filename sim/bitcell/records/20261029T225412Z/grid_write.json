@@ -1,0 +1,459 @@
+{
+  "label": "grid",
+  "kind": "simulated",
+  "bl_step_v": 0.025,
+  "pulse_ns": 1.0,
+  "decision": "flipped iff Q<QB at end of pulse (1.3n) and 2.5n after it",
+  "corners": [
+    {
+      "corner_id": "mos_tt/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 3.01798e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111100000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.3,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.94544e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.35,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.080V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 3.0113e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111100000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.375,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.200V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.45764e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111100000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.375,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.200V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.45809e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.200V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.57264e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111100000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.45,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.320V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.1143e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111100000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.45,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.320V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.14654e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111110000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.475,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_tt/1.320V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.2786e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111100000000000",
+      "monotonic": true,
+      "write_margin_v": 0.525,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 3.67136e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111100000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.3,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 3.6071e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111110000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.325,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.080V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 3.67458e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.35,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.200V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.90964e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.35,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.200V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.93459e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.200V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 3.07691e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.425,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.320V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.47126e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.425,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.320V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.53262e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111100000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.45,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ss/1.320V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.69355e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.5,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.49168e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111110000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.325,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.46426e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.35,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.080V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.55647e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.200V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.0892e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.200V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.10687e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.425,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.200V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.22303e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111110000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.475,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.320V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 1.83331e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111110000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.475,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.320V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 1.87554e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.5,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_ff/1.320V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.00562e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111110000000000",
+      "monotonic": true,
+      "write_margin_v": 0.55,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 3.5054e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111110000000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.25,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 3.41995e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111000000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.275,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.080V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 3.47353e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111110000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.325,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.200V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.76994e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111110000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.325,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.200V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.78491e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111000000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.35,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.200V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.9178e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.320V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.35432e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.320V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.41065e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.425,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_sf/1.320V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.56322e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111100000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.45,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.080V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.62878e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111100000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.375,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.080V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.5944e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111110000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.4,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.080V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.67788e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.425,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.200V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 2.18787e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111000000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.425,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.200V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 2.2003e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111100000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.45,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.200V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.32523e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.5,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.320V/-40C",
+      "klt_status": "pass",
+      "flip_time_s": 1.92373e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111000000000000",
+      "monotonic": true,
+      "write_margin_v": 0.5,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.320V/25C",
+      "klt_status": "pass",
+      "flip_time_s": 1.9603e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111100000000000",
+      "monotonic": true,
+      "write_margin_v": 0.525,
+      "saturated": false
+    },
+    {
+      "corner_id": "mos_fs/1.320V/125C",
+      "klt_status": "pass",
+      "flip_time_s": 2.08694e-11,
+      "flip_time_check": "within_pulse",
+      "flips": "111111111111111111111111000000000",
+      "monotonic": true,
+      "write_margin_v": 0.575,
+      "saturated": false
+    }
+  ]
+}
