@@ -5,10 +5,17 @@ An SRAM macro on [IHP SG13G2](https://github.com/IHP-GmbH/IHP-Open-PDK), a
 [klayout-tools](https://github.com/2AMLogic/klayout-tools) and the
 open-source xschem + ngspice flow.
 
-**Status: spec proposed, bitcell characterized at schematic level.** The
-target spec is written but not ratified; the 6T bitcell is drawn as a
-schematic and simulated over the 45 PVT corners. No layout, array or
-periphery exists yet.
+**Status: spec proposed, bitcell drawn and characterized, 256 × 32 macro
+placed and partly routed.** The target spec is written but not ratified. The
+6T bitcell is drawn as a schematic, simulated over the 45 PVT corners, and
+laid out: `klt drc` clean and `klt lvs` `match` on both the cell and the 2 × 2
+mirror-abutment tile. The 256 × 32 macro has a reproducible generator, a GDS,
+a LEF and `klt drc` clean, with the array interface, periphery body ties and
+the supply rails wired. It is **not** finished: the periphery signal nets and
+the macro pin connections are not routed, so the macro is not LVS-able yet —
+see [`layout/README.md`](layout/README.md) "What this macro is not" before
+citing it. Macro-level LVS and power ERC (T1 items 4 and 11) are blocked
+behind that routing.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
