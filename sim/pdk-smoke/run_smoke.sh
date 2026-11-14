@@ -14,10 +14,9 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SIM_DIR="$(cd "${HERE}/.." && pwd)"
 # shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/env.sh"
-: "${PDK_ROOT:?run_smoke.sh: no PDK install resolved; see sim/README.md}"
+source "${HERE}/../harness/common/setup.sh"
+sim_setup --no-klt
 MODELS="${PDK_ROOT}/${PDK}/libs.tech/ngspice/models"
 OSDI_DIR="${PDK_ROOT}/${PDK}/libs.tech/ngspice/osdi"
 for m in psp103 psp103_nqs r3_cmc mosvar; do
@@ -25,11 +24,7 @@ for m in psp103 psp103_nqs r3_cmc mosvar; do
 done
 command -v ngspice >/dev/null || { echo "run_smoke.sh: ngspice not on PATH" >&2; exit 3; }
 
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-REC="${HERE}/records/${STAMP}"
-[[ -e "${REC}" ]] && { echo "run_smoke.sh: ${REC} exists (records are append-only)" >&2; exit 4; }
-mkdir -p "${REC}/netlists" "${REC}/logs"
-WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
+new_record "${HERE}/records" netlists logs
 
 # name | corner lib | W | L | polarity sign | Vds | Vgs max
 DEVICES=(
@@ -75,7 +70,7 @@ DECK
 done
 
 OV="$(sed -n 's/^OPENVAF_TAG="\([^"]*\)".*/\1/p' "${SIM_DIR}/harness/common/tools/build-osdi.sh" | head -1)"
-PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
+PDKTAG="$(pdk_release_tag)"
 NGV="$(ngspice --version 2>&1 | grep -m1 -o 'ngspice-[0-9.]*')"
 
 python3 -I - "${REC}" "${WORK}" "${PDKTAG}" "${OV}" "${NGV}" "${STEP_DIV}" "${DEVICES[@]}" <<'PY'

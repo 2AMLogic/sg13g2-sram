@@ -9,25 +9,15 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SIM_DIR="$(cd "${HERE}/.." && pwd)"
-REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/env.sh"
-# shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/run_klt.sh"
-: "${PDK_ROOT:?run_sizing.sh: no PDK install resolved; see sim/README.md}"
-command -v klt >/dev/null || { echo "run_sizing.sh: klt not on PATH" >&2; exit 3; }
-POST=(python3 -I "${HERE}/column_post.py")
+source "${HERE}/../harness/common/setup.sh"
+sim_setup --post column_post.py
 WIDTHS=("$@"); [[ ${#WIDTHS[@]} -gt 0 ]] || WIDTHS=(0.15 0.3 0.5 1.0 2.0 3.0)
 
 "${REPO}/design/netlist.sh" --check >/dev/null \
   || { echo "run_sizing.sh: a design/ netlist drifted from its schematic" >&2; exit 5; }
 
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-REC="${HERE}/sizing/${STAMP}"
-[[ -e "${REC}" ]] && { echo "run_sizing.sh: ${REC} exists (records are append-only)" >&2; exit 4; }
-mkdir -p "${REC}/reports"
-WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
+new_record "${HERE}/sizing" reports
 
 REQS=()
 for W in "${WIDTHS[@]}"; do
@@ -39,16 +29,10 @@ for W in "${WIDTHS[@]}"; do
   REQS+=("${D}/request.json")
 done
 
-rc=0
-klt sim --batch-set "${REQS[@]}" --max-in-flight 2 --capacity-retries 4 -o "${WORK}/out" --format json \
-  > "${REC}/reports/set.json" 2> "${WORK}/set.stderr" || rc=$?
-klt_redact_bucket < "${WORK}/set.stderr" > "${REC}/reports/set.stderr"
-# exit 4 = an errored corner, expected for a driver too weak to flip the cell (no flip time).
-if [[ "${rc}" -ne 0 && "${rc}" -ne 3 && "${rc}" -ne 4 ]]; then
-  echo "run_sizing.sh: klt sim --batch-set failed (exit ${rc}); batch error, no local fallback:" >&2
-  tail -5 "${REC}/reports/set.stderr" >&2
-  exit 6
-fi
+# exit 4 = an errored corner, expected for a driver too weak to flip the cell
+# (no flip time), so it is tolerated -- but only with an envelope to read it
+# from, which is run_klt_set's shared report check.
+run_klt_set set 1 "${REQS[@]}"
 # The per-width reports live in the scratch dir; keep them (the envelope only points there).
 python3 -I - "${REC}" "${REC}/reports/set.json" <<'PY'
 import json, shutil, sys
@@ -59,4 +43,4 @@ for r in json.load(open(env))["requests"]:
 PY
 python3 -I "${HERE}/column_post.py" sizing "sizing-${STAMP}" \
   $(for W in "${WIDTHS[@]}"; do echo "${W}=${REC}/reports/w${W}.json"; done) > "${REC}/summary.json"
-echo "batch-set done (exit ${rc}); envelope: ${REC}/reports/set.json" >&2
+echo "batch-set done (exit ${KLT_LAST_RC}); envelope: ${REC}/reports/set.json" >&2
