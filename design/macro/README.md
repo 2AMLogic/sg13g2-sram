@@ -1,7 +1,8 @@
 # macro
 
 The 256 x 32 macro top (`macro.sch`) and the two array blocks under it. Pins, as in
-`spec/sram.md`: `A[7:0] CEN CLK D[31:0] Q[31:0] GWEN WEN` plus one rail, `VDD`/`VSS`.
+`spec/sram.md`: `A[7:0] CEN CLK D[31:0] Q[31:0] GWEN WEN[31:0]` plus one rail, `VDD`/`VSS`. `WEN[31:0]` is the
+per-bit write mask, active low (`spec/wen-interface-decision.md`).
 
 ## Organization
 
@@ -13,8 +14,8 @@ rejected.
 | Block | Role |
 |---|---|
 | `bl_pair` | the 128 `bitcell`s of one bit-line pair, one per `WL[r]` (vector instance `XB[127:0]`) |
-| `bit_slice` | one I/O bit: 2 `bl_pair`, 2 `precharge` (shared `PRE_B`), `column_mux`, `sense_amp`, `write_driver` |
-| `macro` | `addr_latch`, `control`, `row_decoder`, `data_latch`, 32 `bit_slice` (vector `XS[31:0]`), `out_latch` |
+| `bit_slice` | one I/O bit: 2 `bl_pair`, 2 `precharge` (shared `PRE_B`), `column_mux`, `sense_amp`, `write_driver`, and the mask gate (`inv` + `nor2`: `WE_i = WE & ~WEN`) in front of the driver |
+| `macro` | `addr_latch`, `control`, `row_decoder`, `data_latch` (data and mask), 32 `bit_slice` (vector `XS[31:0]`), `out_latch` |
 
 `bit_slice` reuses the column path blocks and the bitcell unchanged; it does not
 instantiate `column/column.sch`, which hard-wires one selected row (`WL`) and 127 shared
@@ -22,12 +23,13 @@ unselected cells (`WLU`) for the bench.
 
 ## Protocol (first pass; timing closure is item 9)
 
-- `addr_latch`/`data_latch`: transparent while `CLK` is low, hold while it is high, so the
+- `addr_latch`/`data_latch`: `data_latch` latches `D[31:0]` and `WEN[31:0]` (as `WENL[31:0]`); transparent while `CLK` is low, hold while it is high, so the
   inputs are captured at the rising edge.
 - `control`: `ACT = CLK & ~CEN`; `PRE_B = ACT` (precharge during the low phase and when
   disabled); `WLEN = ACT & delayed ACT` (wordline after precharge releases, falls with
-  `CLK`); `SAE = WLEN & delayed WLEN & read`; `WE = WLEN & write`; write = `GWEN` and `WEN`
-  both low. `SEL0/SEL0B/SEL1/SEL1B` decode the latched `A[0]`.
+  `CLK`); `SAE = WLEN & delayed WLEN & read`; `WE = WLEN & write`, where write = `GWEN` low
+  (`control` no longer sees a mask). Each slice gates its own driver: `WE_i = WE & ~WENL[i]`, so bit `i`
+  is written only when `GWEN` and `WEN[i]` are both low; a high `WEN[i]` leaves bit `i` as stored. `SEL0/SEL0B/SEL1/SEL1B` decode the latched `A[0]`.
 - `out_latch`: transparent while `SAE` is high, so `Q` holds the resolved value until the
   next read.
 - `row_decoder`: `A[2:0]` -> `X[8]`, `A[6:3]` -> `Y[16]`, `WL[8j+k] = X[k] & Y[j] & WLEN`.

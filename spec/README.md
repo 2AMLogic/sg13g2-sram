@@ -14,3 +14,4 @@ until an operator approves the PR that landed it.
 | [`signoff-tooling-decision.md`](signoff-tooling-decision.md) | Sign-off envelope and table tooling from `gf180-sram` is not ported |
 | [`ratification-review-decision.md`](ratification-review-decision.md) | Post-hoc two-key review of `sram.md` as merged in #7: keys installed under `ratification/`, review not yet run |
 | [`views-and-liberty-corners-decision.md`](views-and-liberty-corners-decision.md) | Verilog and CDL become target views; Liberty is delivered at all 45 corners |
+| [`wen-interface-decision.md`](wen-interface-decision.md) | The write mask is per-bit `WEN[31:0]`, as in the origin |

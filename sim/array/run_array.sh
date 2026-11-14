@@ -9,7 +9,8 @@
 #   1. design/netlist.sh --check for bitcell and column (netlists match schematics) and bench_access.cir matches macro.spice.
 #   2. Negative controls at the typical point: (a) SNM with beta 0.25 cells must read a lower SNM than the
 #      reference; (b) a 0.15 um write driver must fail the write bench; (c) the same driver must fail the
-#      access bench (the cell never flips, the read returns the old value).
+#      access bench (the cell never flips, the read returns the old value); (d) a macro that ignores the
+#      write mask (every slice's mask gate tied to enable) must fail the access bench's masked write.
 #   3. The three benches over the grid: three `klt sim` requests on the batch fleet.
 #   4. records/<UTC>/ (append-only): reports, per-bench verdicts, record.json.
 #
@@ -58,10 +59,16 @@ COL="${REPO}/design/column/column.spice"
 sed -E '/^XMN[AB][01] /s/w=3\.0u/w=0.15u/' "${REPO}/design/macro/macro.spice" > "${REC}/negctl/macro_weakdrv.spice"
 grep -q 'w=0\.15u' "${REC}/negctl/macro_weakdrv.spice" || { echo "run_array.sh: write-driver weakening matched nothing" >&2; exit 7; }
 "${POST[@]}" negctl-bench "${HERE}/bench_access.cir" "${REC}/negctl/bench_access.cir" --replace macro.spice=./macro_weakdrv.spice
+# mask ignored: each slice's mask-gate input WEN tied to VSS (always enabled)
+sed -E 's/^XWG WEB WEN WEI /XWG WEB VSS WEI /' "${REPO}/design/macro/macro.spice" > "${REC}/negctl/macro_nomask.spice"
+grep -q '^XWG WEB VSS WEI ' "${REC}/negctl/macro_nomask.spice" || { echo "run_array.sh: mask-gate defeat matched nothing" >&2; exit 7; }
+"${POST[@]}" negctl-bench "${HERE}/bench_access.cir" "${REC}/negctl/bench_access_nomask.cir" --replace macro.spice=./macro_nomask.spice
 for b in snm write access; do
   "${POST[@]}" request "${b}" "${REC}/negctl/request_${b}.json" --typical --netlist bench_${b}.cir
   run_klt "${REC}/negctl/request_${b}.json" "negctl_${b}" 1
 done
+"${POST[@]}" request access "${REC}/negctl/request_access_nomask.json" --typical --netlist bench_access_nomask.cir
+run_klt "${REC}/negctl/request_access_nomask.json" "negctl_access_nomask" 1
 
 # --- the grid ---------------------------------------------------------------------------------
 for b in snm write access; do
@@ -76,6 +83,7 @@ done
 "${POST[@]}" snm "${REC}/reports/negctl_snm.json.gz" "${REC}/curves" negctl_beta > "${REC}/negctl_snm.json"
 "${POST[@]}" write "${REC}/reports/negctl_write.json.gz" negctl_weak_driver > "${REC}/negctl_write.json"
 "${POST[@]}" access "${REC}/reports/negctl_access.json.gz" negctl_weak_driver > "${REC}/negctl_access.json"
+"${POST[@]}" access "${REC}/reports/negctl_access_nomask.json.gz" negctl_mask_ignored > "${REC}/negctl_access_nomask.json"
 
 PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
 python3 -I - "${REC}" "${STAMP}" "${PDKTAG}" "${TYPICAL[*]:-}" <<'PY'
@@ -83,7 +91,7 @@ import gzip, json, sys
 rec, stamp, pdktag, typical = sys.argv[1:5]
 L = lambda n: json.load(open(f"{rec}/{n}.json"))
 snm, wr, ac = L("snm"), L("write"), L("access")
-nsnm, nwr, nac = L("negctl_snm"), L("negctl_write"), L("negctl_access")
+nsnm, nwr, nac, nnm = L("negctl_snm"), L("negctl_write"), L("negctl_access"), L("negctl_access_nomask")
 env = json.load(gzip.open(f"{rec}/reports/access.json.gz", "rt"))["environment"]
 remote = env.get("remote", {})
 def jobs(n):
@@ -98,13 +106,14 @@ def slowest(rows, key):
 ref = next((r.get("read_snm_v") for r in snm["corners"] if r["corner_id"] == "mos_tt/1.200V/25C"), None)
 neg = nsnm["corners"][0].get("read_snm_v")
 det = {"beta_cell_lowers_read_snm": isinstance(neg, (int, float)) and isinstance(ref, (int, float)) and neg < ref,
-       "weak_driver_fails_write_bench": nwr["any_fail"], "weak_driver_fails_access_bench": nac["any_fail"]}
+       "weak_driver_fails_write_bench": nwr["any_fail"], "weak_driver_fails_access_bench": nac["any_fail"],
+       "ignored_mask_fails_access_bench": nnm["any_fail"] and any(not c.get("checks", {}).get("masked_write_leaves_bit", True) for c in nnm["corners"])}
 out = {
   "stamp": stamp, "kind": "simulated", "pdk_release_tag": pdktag,
   "scope": "typical point only (--typical)" if typical else "45 corners: 5 process x 3 supply x 3 temperature (spec/sram.md)",
   "organization": "mux 2, 128 cells per bit line, 2 bit-line pairs per I/O; access bench: full control/decode/latches + 1 real bit slice + load of the other 31",
   "engine": {"version_banner": env.get("engine_build", {}).get("version_banner"), "runner_klt_version": remote.get("runner_klt_version"),
-             "batch_job_ids": {n: jobs(n) for n in ("snm", "write", "access", "negctl_snm", "negctl_write", "negctl_access")}},
+             "batch_job_ids": {n: jobs(n) for n in ("snm", "write", "access", "negctl_snm", "negctl_write", "negctl_access", "negctl_access_nomask")}},
   "read_snm_in_situ": {"corners": snm["corner_count"], "worst_v": worst(snm["corners"], "read_snm_v"), "failing_corners": snm["failing_corners"]},
   "write_margin": {"corners": wr["corner_count"], "worst_v": worst(wr["corners"], "write_margin_v"), "failing_corners": wr["failing_corners"]},
   "access": {"corners": ac["corner_count"],
