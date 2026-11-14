@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-14
+
+- **Issue #153** (closed): CI: a README.md edit breaks the item-10 attestation, so the docs lane deadlocks
+- **Issue #105** (closed): layout: route decoder cell internals
+
 ### 2026-11-12
 
 - **PR #148**: Bump Repo Skills 0.25.10 -> 0.26.1
