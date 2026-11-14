@@ -16,32 +16,21 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SIM_DIR="$(cd "${HERE}/.." && pwd)"
-REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/env.sh"
-# shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/run_klt.sh"
-: "${PDK_ROOT:?run_column.sh: no PDK install resolved; see sim/README.md}"
-command -v klt >/dev/null || { echo "run_column.sh: klt not on PATH" >&2; exit 3; }
-POST=(python3 -I "${HERE}/column_post.py")
+source "${HERE}/../harness/common/setup.sh"
+sim_setup --post column_post.py
 
 # bitcell and column only: `design/netlist.sh --check` also flags control/bit_slice/macro from the
 # checkout-specific sym_path/sch_path comment lines of nested blocks, which this bench does not use.
 "${REPO}/design/netlist.sh" --check bitcell/bitcell column/column >/dev/null \
   || { echo "run_column.sh: a design/ netlist drifted from its schematic (regenerate: design/README.md)" >&2; exit 5; }
 
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-REC="${HERE}/records/${STAMP}"
-[[ -e "${REC}" ]] && { echo "run_column.sh: ${REC} exists (records are append-only)" >&2; exit 4; }
-mkdir -p "${REC}/reports" "${REC}/negctl"
-WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
+new_record "${HERE}/records" reports negctl
 
 
 # --- nominal read and write ---------------------------------------------------
 "${POST[@]}" request read "${HERE}/.req_read.json"
 "${POST[@]}" request write "${HERE}/.req_write.json"
-trap 'rm -rf "${WORK}" "${HERE}/.req_read.json" "${HERE}/.req_write.json"' EXIT
 run_klt "${HERE}/.req_read.json" read
 run_klt "${HERE}/.req_write.json" write
 
@@ -62,7 +51,7 @@ run_klt "${REC}/negctl/request_read.json" negctl_read 1
 "${POST[@]}" write "${REC}/reports/negctl_write.json.gz" negctl_weak_write_driver > "${REC}/negctl_write.json"
 "${POST[@]}" read "${REC}/reports/negctl_read.json.gz" negctl_early_sae > "${REC}/negctl_read.json"
 
-PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
+PDKTAG="$(pdk_release_tag)"
 python3 -I - "${REC}" "${STAMP}" "${PDKTAG}" <<'PY'
 import gzip, json, sys
 rec, stamp, pdktag = sys.argv[1:4]

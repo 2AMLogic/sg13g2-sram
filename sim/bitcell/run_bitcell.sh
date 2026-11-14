@@ -27,31 +27,20 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SIM_DIR="$(cd "${HERE}/.." && pwd)"
-REPO="$(cd "${SIM_DIR}/.." && pwd)"
 # shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/env.sh"
-# shellcheck source=/dev/null
-source "${SIM_DIR}/harness/common/run_klt.sh"
-: "${PDK_ROOT:?run_bitcell.sh: no PDK install resolved; see sim/README.md}"
-command -v klt >/dev/null || { echo "run_bitcell.sh: klt not on PATH" >&2; exit 3; }
-POST=(python3 -I "${HERE}/bitcell_post.py")
+source "${HERE}/../harness/common/setup.sh"
+sim_setup --post bitcell_post.py
 
 klt netlist "${REPO}/design/bitcell/bitcell.sch" -o "${REPO}/design/bitcell/bitcell.spice" \
   --block --check --rcfile "${REPO}/design/xschemrc" --pdk "${PDK}" --pdk-root "${PDK_ROOT}" >/dev/null \
   || { echo "run_bitcell.sh: bitcell.spice drifted from bitcell.sch (regenerate: design/README.md)" >&2; exit 5; }
 
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-REC="${HERE}/records/${STAMP}"
-[[ -e "${REC}" ]] && { echo "run_bitcell.sh: ${REC} exists (records are append-only)" >&2; exit 4; }
-mkdir -p "${REC}/reports" "${REC}/curves" "${REC}/negctl"
-WORK="$(mktemp -d)"; trap 'rm -rf "${WORK}"' EXIT
+new_record "${HERE}/records" reports curves negctl
 
 
 # --- typical point -----------------------------------------------------------
 "${POST[@]}" typical-request "${HERE}/request_snm.json" "${HERE}/.typ_snm.json" --netlist bench_snm.cir
 "${POST[@]}" typical-request "${HERE}/request_write.json" "${HERE}/.typ_write.json" --netlist bench_write.cir
-trap 'rm -rf "${WORK}" "${HERE}/.typ_snm.json" "${HERE}/.typ_write.json"' EXIT
 run_klt "${HERE}/.typ_snm.json" typical_snm
 run_klt "${HERE}/.typ_write.json" typical_write
 
@@ -72,7 +61,7 @@ run_klt "${HERE}/request_write.json" grid_write
 "${POST[@]}" snm "${REC}/reports/grid_snm.json.gz" "${WORK}/grid_snm" "${REC}/curves" grid > "${REC}/grid_snm.json"
 "${POST[@]}" write "${REC}/reports/grid_write.json.gz" grid > "${REC}/grid_write.json"
 
-PDKTAG="$(grep -o '"release_tag": *"[^"]*"' "${SIM_DIR}/pdk.json" | head -1 | cut -d'"' -f4)"
+PDKTAG="$(pdk_release_tag)"
 python3 -I - "${REC}" "${STAMP}" "${PDKTAG}" <<'PY'
 import gzip, json, sys
 rec, stamp, pdktag = sys.argv[1:4]
