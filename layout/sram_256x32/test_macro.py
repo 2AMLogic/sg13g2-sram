@@ -6,6 +6,7 @@ leaf-cell signal routing (flat-net resolution, router, per-cell connectivity).
 """
 
 import os
+import random
 import re
 import sys
 
@@ -393,6 +394,42 @@ def test_router_keeps_spacing_between_nets():
         # nets are separate polygons at least M2.b / M3.b apart
         for x, y in (("A", "B"), ("A", "C"), ("B", "C")):
             assert regions[x][l].merged().separation_check(regions[y][l].merged(), g.dbu(g.M2_SPACE)).count() == 0, (x, y, l)
+
+
+def _path_cost(path):
+    """Cost of a router path under the generator's own model: ``VIA_COST`` to change layer, 1 along the layer's
+    preferred direction (Metal2 vertical, Metal3 horizontal), ``WRONG_WAY`` against it."""
+    return sum(g.VIA_COST if l != l2 else (1 if (i == i2) == (l == 0) else g.WRONG_WAY)
+               for (l, i, j), (l2, i2, j2) in zip(path, path[1:]))
+
+
+def test_router_aimed_and_unaimed_searches_agree():
+    """``MazeRouter.connect`` serves both of ``route_net``'s modes from one search. Aimed with ``toward`` it is an A*
+    whose Manhattan heuristic never overestimates a lattice path (the cheapest step costs 1), so for a single goal it
+    must agree with the unaimed Dijkstra on whether the goal is reachable and on what a cheapest path there costs."""
+    start, goal, routable = (4, 4), (52, 52), 0
+    for seed in range(12):
+        rnd = random.Random(seed)
+        # one obstacle map, two fresh routers: only the search differs between the pair
+        bars = [(rnd.randrange(2), rnd.randrange(6, 50), rnd.randrange(6, 50), rnd.randrange(2, 9)) for _ in range(20)]
+        pair = []
+        for _ in range(2):
+            mz = g.MazeRouter(0, 0, 3000, 3000)
+            s = g.STEP * g.DBU
+            for l, bi, bj, n in bars:
+                mz.block(l, bi * s, bj * s, (bi + n) * s, bj * s + g.M2_W)
+            mz.pad(0, start, 1)
+            mz.pad(0, goal, 1)
+            pair.append(mz)
+        unaimed = pair[0].connect(1, {(0, *start)}, {(0, *goal)})
+        aimed = pair[1].connect(1, {(0, *start)}, {(0, *goal)}, toward=goal)
+        assert (unaimed is None) == (aimed is None), seed
+        if unaimed is None:
+            continue
+        routable += 1
+        assert unaimed[0] == aimed[0] == (0, *start) and unaimed[-1] == aimed[-1] == (0, *goal), seed
+        assert _path_cost(unaimed) == _path_cost(aimed), (seed, _path_cost(unaimed), _path_cost(aimed))
+    assert routable >= 8, f"only {routable}/12 obstacle maps were routable: the comparison is not being exercised"
 
 
 # ---- leaf-cell nets on the generated layout (issue #104) ----------------------------
