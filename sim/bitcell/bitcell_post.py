@@ -23,80 +23,18 @@ Everything printed is labelled `simulated`.
 """
 from __future__ import annotations
 
-import gzip
 import json
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "lib" / "common"))
-import snm_extract  # noqa: E402
+import snm_extract  # noqa: E402,F401  (re-exported for the tests)
+from post_common import (  # noqa: E402,F401
+    columns as _columns, load_report, signed_snm, square_snm, write_csv as _write_csv)
 
 BL_STEP_V = 0.025
 N_LEVELS = 33
-
-
-def square_snm(p1: list[tuple[float, float]], p2: list[tuple[float, float]]) -> float | None:
-    """Largest inscribed-square side of the butterfly of two VTCs, in volts.
-
-    p1 = (Q, QB) samples of VTC 1, p2 = (QB, Q) samples of VTC 2. In the Q-QB
-    plane the curves are C1 = {(q, f1(q))} and C2 = {(f2(qb), qb)}. Rotating by
-    45 deg (u = (X-Y)/sqrt2, v = (X+Y)/sqrt2) makes the vertical gap between
-    them at one u the diagonal of an inscribed square, so each eye's side is
-    max(+-gap)/sqrt2 (Seevinck). The gap is piecewise linear, so its extremes
-    sit at the knots of either curve. Returns min over the two eyes, or None
-    when no gap was measurable. It does not decide bistability: use signed_snm().
-    Same method as klt sim's
-    native `snm` measurement, which the fleet runner does not support yet.
-    """
-    r2 = 2.0 ** 0.5
-    c1 = [((x - y) / r2, (x + y) / r2) for x, y in p1]
-    c2 = sorted((((x - y) / r2, (x + y) / r2) for y, x in p2))
-    c1.sort()
-
-    def interp(c, at):
-        if at < c[0][0] or at > c[-1][0]:
-            return None
-        lo, hi = 0, len(c) - 1
-        while hi - lo > 1:
-            mid = (lo + hi) // 2
-            if c[mid][0] <= at:
-                lo = mid
-            else:
-                hi = mid
-        (u0, v0), (u1, v1) = c[lo], c[hi]
-        return v0 if u1 == u0 else v0 + (v1 - v0) * (at - u0) / (u1 - u0)
-
-    gaps = []
-    for u in sorted({q[0] for q in c1} | {q[0] for q in c2}):
-        a, b = interp(c1, u), interp(c2, u)
-        if a is not None and b is not None:
-            gaps.append(a - b)
-    if not gaps:
-        return None
-    upper, lower = max(gaps) / r2, max(-g for g in gaps) / r2
-    return min(upper, lower) if min(upper, lower) > 0 else None
-
-
-def signed_snm(p1, p2) -> tuple[float | None, float | None]:
-    """(snm, vgap). snm is the inscribed-square side when the cell is bistable;
-    when snm_extract.py finds no three fixed points (monostable) it is that
-    script's signed bistability deficit (< 0), so a failing corner is counted.
-    vgap is snm_extract.py's vertical-gap value (over-reads), None on error."""
-    try:
-        vgap = min(snm_extract.snm(p1, p2))
-    except ValueError:
-        return square_snm(p1, p2), None
-    if vgap <= 0:
-        return vgap, vgap
-    return square_snm(p1, p2), vgap
-
-
-def load_report(path: str) -> dict:
-    p = Path(path)
-    opener = gzip.open if p.suffix == ".gz" else open
-    with opener(p, "rt") as f:
-        return json.load(f)
 
 
 def cmd_typical_request(src: str, dst: str, netlist: str | None) -> None:
@@ -116,20 +54,6 @@ def cmd_negctl_bench(bench: str, dst: str, cell: str) -> None:
             line = f".include {cell}"
         out.append(line)
     open(dst, "w").write("\n".join(out) + "\n")
-
-
-def _columns(wave_json: str) -> dict[str, list[float]]:
-    d = json.load(open(wave_json))
-    names = [v["name"] for v in d["variables"]]
-    cols = {n: [] for n in names}
-    for row in d["points"]:
-        for n, v in zip(names, row):
-            cols[n].append(v)
-    return cols
-
-
-def _write_csv(path: Path, x: list[float], y: list[float]) -> None:
-    path.write_text("".join(f"{a:.9g} {b:.9g}\n" for a, b in zip(x, y)))
 
 
 def cmd_snm(report: str, art_root: str, curves_dir: str, label: str) -> dict:

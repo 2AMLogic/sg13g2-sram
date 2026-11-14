@@ -19,6 +19,7 @@
     "sim/bitcell/test_bitcell_post.py",
     "sim/bitcell/README.md",
     "sim/lib/common/snm_extract.py",
+    "sim/lib/common/post_common.py",
     "sim/column/bench_read.cir",
     "sim/column/bench_write.cir",
     "sim/column/column_post.py",
