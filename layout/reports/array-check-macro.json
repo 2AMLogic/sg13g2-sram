@@ -1,0 +1,423 @@
+{
+  "schema_version": 1,
+  "record_command": "./layout/reports/generate-array-check.sh",
+  "issue": 160,
+  "check": "klt array-check -- structural regularity of the committed array",
+  "array": {
+    "top_cell": "macro",
+    "bitcell_placements": 8192,
+    "rows": 128,
+    "columns": 64,
+    "hierarchy": "macro -> 32 x bit_slice (x pitch 5.74 um) -> 2 x bl_pair (x=0 R0, x=5.74 M90) -> 128 x bitcell (mirrored-pair y pitch 7.21 um, alternating R0/M0)"
+  },
+  "status": "characterized",
+  "summary": {
+    "clean": [
+      "macro-slice-abutment",
+      "macro-column-abutment"
+    ],
+    "characterized": [
+      "column-translation-symmetry",
+      "tile2x2-abutment-limitation"
+    ],
+    "abutment_configurations_clean": 2,
+    "symmetry_residuals": 8
+  },
+  "not_covered": [
+    "Connectivity: array-check is purely geometric. It says nothing about whether the abutting risers are electrically joined -- that is macro-record-decoder.json and #30 (LVS).",
+    "Design rules: no DRC. layout/reports/drc-macro.json is the DRC record.",
+    "The array as a whole: the abutment check is one-dimensional, so no invocation covers the 128 x 64 array in one pass. The two clean runs cover one column along y and the 32 slices along x; nothing checks the two axes jointly (klayout-tools#5698).",
+    "A blanket --tolerance is symmetric: the 0.27 um / 0.48 um above would equally mask a real gap or overlap up to the same size at a seam. The tolerances are justified by measurement, not by the check.",
+    "The periphery: only bitcell, bl_pair and bit_slice placements are checked."
+  ],
+  "upstream_tool_gaps": {
+    "2AMLogic/klayout-tools#5698": "1-D abutment model for a 2-D array; no shared-edge/expected-overlap concept distinct from a measurement tolerance; `array-check --format json` omits the provenance block its sibling verbs emit"
+  },
+  "invocations": [
+    {
+      "name": "macro-slice-abutment",
+      "intent": "the 32 bit_slice columns abut along x at the slice pitch",
+      "command": "klt array-check layout/sram_256x32/macro.gds --cell bit_slice --pitch 5.74 --count 32 --direction x --tolerance 0.48 --format json",
+      "input": "layout/sram_256x32/macro.gds",
+      "input_content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
+      "tolerance_rationale": "0.48 um is the measured shared-edge overlap of the column seam -- the mirror abutment of the two bl_pair halves shares that edge by design (layout/README.md, 'Supply rails'). At --tolerance 0 the same run reports that 0.48 um as an overlap. It is not slack.",
+      "expectation": "clean",
+      "result": {
+        "schema_version": 1,
+        "file": "layout/sram_256x32/macro.gds",
+        "layers": null,
+        "cell": "bit_slice",
+        "mirror_axis": null,
+        "at_um": null,
+        "translate_um": null,
+        "tolerance_um": 0.48,
+        "pitch_um": 5.74,
+        "count": 32,
+        "direction": "x",
+        "dbu_um": 0.001,
+        "status": "clean",
+        "violation_count": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "macro-column-abutment",
+      "intent": "the 128 bitcells of one column abut along y at the mirrored-pair half pitch",
+      "command": "klt clip layout/sram_256x32/macro.gds --cell bl_pair -o <work>/bl_pair.gds && klt array-check <work>/bl_pair.gds --cell bitcell --pitch 3.605 --count 128 --direction y --tolerance 0.27 --format json",
+      "input": "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds",
+      "input_content_hash": "sha256:9b1bcec0f9c3a5482fa562e96068894d6a9a612367663ec357a263877fb89067",
+      "input_derived_from": {
+        "layout/sram_256x32/macro.gds": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec"
+      },
+      "tolerance_rationale": "0.27 um is the measured shared-edge overlap of the row seam, where the mirror abutment merges the bitcell VDD/VSS risers (layout/README.md, 'Supply rails'). At --tolerance 0 the run reports 0.27 um / 0.15 um seam overlaps and a 0.15 um length error; a sweep gives 64 violations at 0.15 and clean at 0.27. It is not slack.",
+      "expectation": "clean",
+      "result": {
+        "schema_version": 1,
+        "file": "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds",
+        "layers": null,
+        "cell": "bitcell",
+        "mirror_axis": null,
+        "at_um": null,
+        "translate_um": null,
+        "tolerance_um": 0.27,
+        "pitch_um": 3.605,
+        "count": 128,
+        "direction": "y",
+        "dbu_um": 0.001,
+        "status": "clean",
+        "violation_count": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "column-translation-symmetry",
+      "intent": "one column is invariant under a one-mirrored-pair (+7.21 um) y translation",
+      "command": "klt clip layout/sram_256x32/macro.gds --cell bl_pair -o <work>/bl_pair.gds && klt array-check <work>/bl_pair.gds --cell bl_pair --translate '0,7.21' --layers '[[1,0],[5,0],[8,0],[10,0]]' --format json",
+      "input": "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds",
+      "input_content_hash": "sha256:9b1bcec0f9c3a5482fa562e96068894d6a9a612367663ec357a263877fb89067",
+      "input_derived_from": {
+        "layout/sram_256x32/macro.gds": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec"
+      },
+      "expectation": "characterized: 8 residuals in exactly two y bands, both explained below. NOT a pass, and NOT to be tolerance-tuned away -- raising --tolerance until this reports clean would mask a future break of interior symmetry. The residual count and the two bands are the regression guard.",
+      "characterization": {
+        "residual_count": 8,
+        "y_bands_um": [
+          [
+            7.065,
+            7.355
+          ],
+          [
+            461.44,
+            461.585
+          ]
+        ],
+        "by_layer": {
+          "1/0": 2,
+          "8/0": 4,
+          "10/0": 2,
+          "5/0": 0
+        },
+        "why_not_a_defect": [
+          "y 7.065..7.355 is the finite-array end: under a +7.21 um shift no partner geometry exists beyond the last mirrored pair, so the edge cannot be symmetric. An infinite array would have no residual here.",
+          "y 461.440..461.585 is seam 0, which layout/README.md already records as special: it sits on the bit-line Via1/Via2 stacks below the array, so it is a pad per column plus a Metal4 strap instead of the full-width Metal2 strap every other seam gets.",
+          "The array interior is residual-free: no residual lies between the two bands."
+        ]
+      },
+      "result": {
+        "schema_version": 1,
+        "file": "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds",
+        "layers": [
+          [
+            1,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            10,
+            0
+          ]
+        ],
+        "cell": "bl_pair",
+        "mirror_axis": null,
+        "at_um": null,
+        "translate_um": [
+          0.0,
+          7.21
+        ],
+        "tolerance_um": 0.0,
+        "pitch_um": null,
+        "count": null,
+        "direction": null,
+        "dbu_um": 0.001,
+        "status": "violated",
+        "violation_count": 8,
+        "violations": [
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 1/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "1/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 0.0,
+              "bottom": 7.065,
+              "right": 2.87,
+              "top": 7.105,
+              "width": 2.87,
+              "height": 0.04
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 1/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "1/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 0.0,
+              "bottom": 461.545,
+              "right": 2.87,
+              "top": 461.58500000000004,
+              "width": 2.87,
+              "height": 0.04
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 10/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "10/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 0.0,
+              "bottom": 7.065,
+              "right": 1.29,
+              "top": 7.355,
+              "width": 1.29,
+              "height": 0.29
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 10/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "10/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 1.58,
+              "bottom": 7.065,
+              "right": 2.87,
+              "top": 7.355,
+              "width": 1.29,
+              "height": 0.29
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 8/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "8/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 0.155,
+              "bottom": 7.065,
+              "right": 0.355,
+              "top": 7.21,
+              "width": 0.2,
+              "height": 0.145
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 8/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "8/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 0.155,
+              "bottom": 461.44,
+              "right": 0.355,
+              "top": 461.58500000000004,
+              "width": 0.2,
+              "height": 0.145
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 8/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "8/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 2.515,
+              "bottom": 7.065,
+              "right": 2.715,
+              "top": 7.21,
+              "width": 0.2,
+              "height": 0.145
+            }
+          },
+          {
+            "rule": "array.symmetry_residual",
+            "description": "layer 8/0 differs under translation by (0.0, 7.21) um",
+            "check": "symmetry",
+            "kind": "translation",
+            "layer": "8/0",
+            "cell": "bl_pair",
+            "bbox": {
+              "left": 2.515,
+              "bottom": 461.44,
+              "right": 2.715,
+              "top": 461.58500000000004,
+              "width": 0.2,
+              "height": 0.145
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "tile2x2-abutment-limitation",
+      "intent": "minimal reproducer of the one-dimensional abutment model, on the committed 2x2 mirror tile (4 bitcell_leaf placements, 2 x 2)",
+      "command": "klt array-check layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds --cell bitcell_leaf --pitch 2.87 --count 2 --direction x --format json",
+      "input": "layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds",
+      "input_content_hash": "sha256:47bd8c76698e37e9e5c540c173cad8128f9b789112457b20029a3a5123d7cc1d",
+      "expectation": "violated: a tool limitation, not a layout defect. The check counts every placement in the 2-D tile (4) against the per-row count (2), measures array length across both rows (6.22 um != 2 x 2.87 um), and projects the two y-stacked placements onto x as spurious full-cell 3.35 um overlaps. The same shape at 128 x 64 scale is why the whole-array abutment check is not expressible. Filed upstream as klayout-tools#5698.",
+      "result": {
+        "schema_version": 1,
+        "file": "layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds",
+        "layers": null,
+        "cell": "bitcell_leaf",
+        "mirror_axis": null,
+        "at_um": null,
+        "translate_um": null,
+        "tolerance_um": 0.0,
+        "pitch_um": 2.87,
+        "count": 2,
+        "direction": "x",
+        "dbu_um": 0.001,
+        "status": "violated",
+        "violation_count": 5,
+        "violations": [
+          {
+            "rule": "array.abutment",
+            "description": "4 placement(s) of bitcell_leaf found, expected 2",
+            "check": "abutment",
+            "kind": "count",
+            "layer": null,
+            "cell": "sg13g2_sram_bitcell_tile2x2",
+            "bbox": {
+              "left": -0.24,
+              "bottom": -0.075,
+              "right": 3.11,
+              "top": 3.74,
+              "width": 3.35,
+              "height": 3.815
+            },
+            "measured_um": 4.0,
+            "expected_um": 2.0
+          },
+          {
+            "rule": "array.abutment",
+            "description": "array length 6.22 um != count x pitch 5.74 um",
+            "check": "abutment",
+            "kind": "length",
+            "layer": null,
+            "cell": "sg13g2_sram_bitcell_tile2x2",
+            "bbox": {
+              "left": -0.24,
+              "bottom": -0.075,
+              "right": 5.98,
+              "top": 7.285,
+              "width": 6.22,
+              "height": 7.36
+            },
+            "measured_um": 6.22,
+            "expected_um": 5.74
+          },
+          {
+            "rule": "array.abutment",
+            "description": "3.35 um overlap between consecutive placements",
+            "check": "abutment",
+            "kind": "overlap",
+            "layer": null,
+            "cell": "sg13g2_sram_bitcell_tile2x2",
+            "bbox": {
+              "left": -0.24,
+              "bottom": -0.075,
+              "right": 3.11,
+              "top": 7.285,
+              "width": 3.35,
+              "height": 7.36
+            },
+            "measured_um": 3.35,
+            "expected_um": 0.0
+          },
+          {
+            "rule": "array.abutment",
+            "description": "0.48 um overlap between consecutive placements",
+            "check": "abutment",
+            "kind": "overlap",
+            "layer": null,
+            "cell": "sg13g2_sram_bitcell_tile2x2",
+            "bbox": {
+              "left": 2.63,
+              "bottom": -0.075,
+              "right": 3.11,
+              "top": 7.285,
+              "width": 0.48,
+              "height": 7.36
+            },
+            "measured_um": 0.48,
+            "expected_um": 0.0
+          },
+          {
+            "rule": "array.abutment",
+            "description": "3.35 um overlap between consecutive placements",
+            "check": "abutment",
+            "kind": "overlap",
+            "layer": null,
+            "cell": "sg13g2_sram_bitcell_tile2x2",
+            "bbox": {
+              "left": 2.63,
+              "bottom": -0.075,
+              "right": 5.98,
+              "top": 7.285,
+              "width": 3.35,
+              "height": 7.36
+            },
+            "measured_um": 3.35,
+            "expected_um": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "provenance": {
+    "klt_version": "0.9.1",
+    "klt_reinstall_spec": "uvx --from klayout-tools==0.9.1 klt",
+    "klayout_version": "0.30.13",
+    "pdk": null,
+    "deck": null,
+    "note": "array-check is deck-independent (purely geometric: no PDK deck, no compact models, no SPICE). klt emits no provenance block for this verb, so this block is added by ./layout/reports/generate-array-check.sh from `klt env-provenance emit`; its host_id/os/python_version fields are dropped so the record reproduces on any host.",
+    "inputs": {
+      "layout/sram_256x32/macro.gds": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
+      "layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds": "sha256:47bd8c76698e37e9e5c540c173cad8128f9b789112457b20029a3a5123d7cc1d",
+      "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds": "sha256:9b1bcec0f9c3a5482fa562e96068894d6a9a612367663ec357a263877fb89067"
+    }
+  }
+}

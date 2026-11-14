@@ -4,7 +4,10 @@
 #
 #     ./layout/verify.sh
 #
-# Needs klt (>= 0.8.0, sg13g2 deck) and uv on PATH. Nothing here writes into sim/.
+# Needs klt (>= 0.8.0, sg13g2 deck) and uv on PATH for steps 1-9. Step 10 needs klt >= 0.9.0,
+# which first carries `array-check`; it does not use the host klt at all but pins
+# klayout-tools==0.9.1 through `uvx`, matching layout/reports/array-check-macro.json. Nothing
+# here writes into sim/.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -96,3 +99,73 @@ if rec["rails_vs_wordline_gap"]["total"] != 0:
     sys.exit("FAIL: macro-record-decoder.json reports a rail shape below Metal4 in the wordline gap")
 print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
 PYEOF
+
+hr "10. macro: array regularity (klt array-check; pinned klt 0.9.1 -- the host/signoff 0.8.0 lacks the verb)"
+AC=layout/reports/array-check-macro.json
+ACK=(uvx --from klayout-tools==0.9.1 klt)
+"${ACK[@]}" clip $D/macro.gds --cell bl_pair -o "$WORK/bl_pair.gds" > /dev/null
+# The two abutment configurations are assertions: a non-clean status fails the step. Their
+# tolerances are the measured shared-edge overlap of mirror abutment, not slack -- read the
+# tolerance_rationale in the record before touching them.
+for spec in "$D/macro.gds|bit_slice|5.74|32|x|0.48" "$WORK/bl_pair.gds|bitcell|3.605|128|y|0.27"; do
+  IFS='|' read -r f cell pitch count dir tol <<<"$spec"
+  # array-check exits 3 on `violated` -- a successful run with findings. Capture it rather than
+  # letting `set -e` abort the step before the diagnostic below prints.
+  rc=0
+  "${ACK[@]}" array-check "$f" --cell "$cell" --pitch "$pitch" --count "$count" \
+    --direction "$dir" --tolerance "$tol" --format json > "$WORK/abutment.json" || rc=$?
+  if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ]; then
+    echo "FAIL: klt array-check exited $rc on $cell along $dir"; exit "$rc"
+  fi
+  st="$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$WORK/abutment.json")"
+  if [ "$st" = "clean" ]; then
+    echo "PASS: abutment $cell along $dir at pitch $pitch x $count (tolerance $tol) is clean"
+  else
+    echo "FAIL: abutment $cell along $dir reports status '$st', expected clean"; exit 1
+  fi
+done
+# The symmetry run is a *characterized* result, not a pass: 8 residuals at the finite-array end and
+# at seam 0, both documented. Assert the recorded count and y bands so a change that breaks interior
+# symmetry fails here instead of being absorbed. Do NOT raise --tolerance to make this report clean.
+"${ACK[@]}" array-check "$WORK/bl_pair.gds" --cell bl_pair --translate '0,7.21' \
+  --layers '[[1,0],[5,0],[8,0],[10,0]]' --format json > "$WORK/symmetry.json" || true
+python3 -I - "$WORK/symmetry.json" "$AC" <<'SYMEOF'
+import json, sys
+got = json.load(open(sys.argv[1]))
+rec = json.load(open(sys.argv[2]))
+inv = next(i for i in rec["invocations"] if i["name"] == "column-translation-symmetry")
+want = inv["characterization"]
+bands = [tuple(b) for b in want["y_bands_um"]]
+if got["violation_count"] != want["residual_count"]:
+    sys.exit(f"FAIL: {got['violation_count']} symmetry residuals, record says {want['residual_count']}"
+             " -- interior symmetry may have changed; mint a new record deliberately,"
+             " do not retune tolerance")
+stray = [v["bbox"] for v in got["violations"]
+         if not any(lo - 1e-6 <= v["bbox"]["bottom"] and v["bbox"]["top"] <= hi + 1e-6
+                    for lo, hi in bands)]
+if stray:
+    sys.exit(f"FAIL: {len(stray)} symmetry residual(s) outside the recorded y bands {bands}: {stray}")
+print(f"PASS: {got['violation_count']} symmetry residuals, all within the recorded y bands {bands}"
+      " (finite-array end + seam 0)")
+SYMEOF
+# scan exits 3 when it finds a home-directory-shaped absolute path; report that rather than
+# letting `set -e` abort the step silently.
+if "${ACK[@]}" env-provenance scan "$AC" > /dev/null; then
+  echo "PASS: no home-directory-shaped absolute path in $AC"
+else
+  echo "FAIL: $AC carries a home-directory-shaped absolute path:"
+  "${ACK[@]}" env-provenance scan "$AC" || true
+  exit 1
+fi
+python3 -I - "$AC" <<'HASHEOF'
+import hashlib, json, sys
+rec = json.load(open(sys.argv[1]))
+for path, want in rec["provenance"]["inputs"].items():
+    if path.startswith("(derived)"):
+        continue
+    got = "sha256:" + hashlib.sha256(open(path, "rb").read()).hexdigest()
+    if got != want:
+        sys.exit(f"FAIL: {path} differs from array-check-macro.json"
+                 " -- the array changed, so mint a new record (records are append-only)")
+print("PASS: array-check-macro.json pins the committed GDS inputs")
+HASHEOF
