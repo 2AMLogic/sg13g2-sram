@@ -289,6 +289,7 @@ def test_obstacle_clear_rejects_other_net_and_signal_shapes():
     obs.add("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))
     assert not obs.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # interior overlap
     assert not obs.clear("VDD", kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M2.b
+    assert not obs.clear("VDD", kdb.DBox(1.21, 0.0, 2.0, 0.2))  # 0.21 away: still inside the 0.22 check margin
     assert obs.clear("VDD", kdb.DBox(1.23, 0.0, 2.0, 0.2))  # past the check margin it is clear
     sig = g.Obstacles()
     sig.add(None, kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a signal shape blocks every net
@@ -316,7 +317,9 @@ def test_obstacle_clear3_and_cross_layer_independence():
     obs = g.Obstacles()
     obs.add_m3(kdb.DBox(0.0, 0.0, 1.0, 0.2))
     assert not obs.clear3(kdb.DBox(0.5, 0.05, 1.5, 0.25))
-    assert obs.clear3(kdb.DBox(1.23, 0.0, 2.0, 0.2))
+    assert not obs.clear3(kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M3.b
+    assert not obs.clear3(kdb.DBox(1.21, 0.0, 2.0, 0.2))  # 0.21 away: still inside the 0.22 check margin
+    assert obs.clear3(kdb.DBox(1.23, 0.0, 2.0, 0.2))  # past the check margin it is clear
     assert any(obs.m3.values())
     assert obs.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # the Metal3 hash does not gate the Metal2 check
 
