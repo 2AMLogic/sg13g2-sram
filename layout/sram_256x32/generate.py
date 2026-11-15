@@ -55,7 +55,7 @@ and the nets the router could not join.
 Decoder nets (issue #105)
 -------------------------
 ``route_hier`` also joins, inside ``predec3``, ``predec4``, ``wl_drivers`` and ``row_decoder``, the nets between their
-child cells (``wl_driver`` is a routed leaf cell), with the same router and ``connect_to``; the children of the first
+child cells (``wl_driver`` is a routed leaf cell), with the same router, aimed by ``toward``; the children of the first
 three are leaf cells, those of ``row_decoder`` are cells that ``route_hier`` already routed. A hierarchically routed cell
 hands the cell above what a leaf cell does (``export_hier``: its Metal2 / Metal3 per net, body ties, Via2s, landings), so
 the nesting needs no second mechanism. The wordline Metal2 stubs and Metal3 tracks that ``route_wordlines`` draws later
@@ -388,24 +388,29 @@ class MazeRouter:
         i, j = node
         self._mark(layer, i * STEP - h, j * STEP - h, i * STEP + h, j * STEP + h, net)
 
-    def _free(self, layer: int, i: int, j: int, net: int) -> bool:
-        return self.inside(i, j) and self.owner[layer][i - self.i0][j - self.j0] in (0, net)
+    def connect(self, net: int, tree: set[tuple[int, int, int]], goals: set[tuple[int, int, int]],
+                toward: tuple[int, int] | None = None):
+        """Cheapest path from any (layer, i, j) of ``tree`` to a goal (layer, i, j); None if there is none.
 
-    def connect(self, net: int, tree: set[tuple[int, int, int]], goals: set[tuple[int, int, int]]):
-        """Cheapest path from any (layer, i, j) of ``tree`` to a goal (layer, i, j); None if there is none."""
+        ``toward`` (an (i, j) node) turns the search into an A* aimed at it rather than one spreading in every
+        direction, for a net of many terminals: the Manhattan distance to a node never overestimates a path to it (a
+        lattice step costs at least 1), so the path found is still a cheapest one. Left at ``None`` the heuristic is
+        0 and this *is* Dijkstra over the goal set."""
         import heapq
 
-        dist: dict[tuple, int] = {}
+        aimed = toward is not None
+        gi, gj = toward if aimed else (0, 0)
+        dist: dict[tuple, int] = {n: 0 for n in tree}
         prev: dict[tuple, tuple] = {}
-        heap = [(0, *n) for n in sorted(tree)]
-        for n in tree:
-            dist[n] = 0
+        # Heap entries are (d + heuristic, d, layer, i, j). Unaimed the heuristic is 0, so the second element ties
+        # wherever the first does and the pop order is the (d, layer, i, j) one a plain Dijkstra heap would give.
+        heap = [((abs(i - gi) + abs(j - gj)) if aimed else 0, 0, l, i, j) for l, i, j in sorted(tree)]
         heapq.heapify(heap)
         owner, i0, i1, j0, j1 = self.owner, self.i0, self.i1, self.j0, self.j1
         via_near = self.via_near
         big = 1 << 30
         while heap:
-            d, l, i, j = heapq.heappop(heap)
+            _, d, l, i, j = heapq.heappop(heap)
             if d > dist.get((l, i, j), big):
                 continue
             if (l, i, j) in goals:
@@ -430,49 +435,8 @@ class MazeRouter:
                 if d + c < dist.get(n2, big):
                     dist[n2] = d + c
                     prev[n2] = (l, i, j)
-                    heapq.heappush(heap, (d + c, l2, i2, j2))
-        return None
-
-    def connect_to(self, net: int, tree: set[tuple[int, int, int]], goal: tuple[int, int]):
-        """``connect`` to one goal node (either layer) with A*: the Manhattan distance to it never overestimates a path
-        (a lattice step costs at least 1), so a net of many terminals searches only toward the next one."""
-        import heapq
-
-        gi, gj = goal
-        dist: dict[tuple, int] = {n: 0 for n in tree}
-        prev: dict[tuple, tuple] = {}
-        heap = [(abs(i - gi) + abs(j - gj), 0, *n) for n in sorted(tree) for l, i, j in [n]]
-        heapq.heapify(heap)
-        owner, i0, i1, j0, j1 = self.owner, self.i0, self.i1, self.j0, self.j1
-        via_near = self.via_near
-        big = 1 << 30
-        while heap:
-            _, d, l, i, j = heapq.heappop(heap)
-            if d > dist.get((l, i, j), big):
-                continue
-            if (i, j) == goal and l == 0:
-                path = [(l, i, j)]
-                while path[-1] in prev:
-                    path.append(prev[path[-1]])
-                return path[::-1]
-            ch, cv = (WRONG_WAY, 1) if l == 0 else (1, WRONG_WAY)
-            own = owner[l]
-            nxt = []
-            for c, i2, j2 in ((ch, i + 1, j), (ch, i - 1, j), (cv, i, j + 1), (cv, i, j - 1)):
-                if i0 <= i2 <= i1 and j0 <= j2 <= j1:
-                    o = own[i2 - i0][j2 - j0]
-                    if o == 0 or o == net:
-                        nxt.append((c, l, i2, j2))
-            if (i, j) not in via_near:
-                o = owner[1 - l][i - i0][j - j0]
-                if o == 0 or o == net:
-                    nxt.append((VIA_COST, 1 - l, i, j))
-            for c, l2, i2, j2 in nxt:
-                n2 = (l2, i2, j2)
-                if d + c < dist.get(n2, big):
-                    dist[n2] = d + c
-                    prev[n2] = (l, i, j)
-                    heapq.heappush(heap, (d + c + abs(i2 - gi) + abs(j2 - gj), d + c, l2, i2, j2))
+                    h = (abs(i2 - gi) + abs(j2 - gj)) if aimed else 0
+                    heapq.heappush(heap, (d + c + h, d + c, l2, i2, j2))
         return None
 
     def commit(self, net: int, path: list[tuple[int, int, int]]) -> None:
@@ -506,7 +470,7 @@ class MazeRouter:
         while todo:
             if directed:
                 near = min(sorted(todo), key=lambda t: min(abs(t[0] - n[1]) + abs(t[1] - n[2]) for n in tree))
-                path = self.connect_to(net, tree, near)
+                path = self.connect(net, tree, {(0, *near)}, toward=near)
             else:
                 path = self.connect(net, tree, {(0, *t) for t in todo})
             if path is None:
