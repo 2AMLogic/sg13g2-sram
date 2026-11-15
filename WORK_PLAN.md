@@ -36,8 +36,6 @@ _None._
 Human-approved issues ready for implementation (`loom:issue`).
 
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
-- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net
-- **#176**: test_obstacle_clear3_and_cross_layer_independence does not pin clear3's M3.b spacing margin
 
 ## In Progress
 
@@ -50,9 +48,9 @@ Issues currently being built (`loom:building`).
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
-- **#171**: new_record's cleanup trap uses a directory-wide .*.json glob, so two run scripts sharing a sim/ directory can delete each other's in-flight scratch request
+- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
-- **#173**: MazeRouter.connect: guard that `toward` is consistent with `goals`
+- **#184**: Obstacle margin assertions pin clear/clear3 to (0.21, 0.23], not exactly 0.22
 
 ## PRs Awaiting Review
 
@@ -62,13 +60,13 @@ PRs waiting on Judge (`loom:review-requested`).
 - **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
 - **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
 - **#81**: docs(spec): pin the write-margin definition in a decision record
-- **#180**: fix: scope new_record's cleanup trap to the caller's declared scratch requests
+- **#185**: test: pin obstacle clear-side probes to the 0.22 margin boundary
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#179**: fix: reject an aimed MazeRouter.connect whose goal set is not the singleton toward
+_None._
 
 ## Proposed
 
@@ -85,10 +83,8 @@ Issues carrying `loom:curated`.
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net *(curated)*
-- **#171**: new_record's cleanup trap uses a directory-wide .*.json glob, so two run scripts sharing a sim/ directory can delete each other's in-flight scratch request *(curated)*
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit *(curated)*
-- **#173**: MazeRouter.connect: guard that `toward` is consistent with `goals` *(curated)*
-- **#176**: test_obstacle_clear3_and_cross_layer_independence does not pin clear3's M3.b spacing margin *(curated)*
+- **#184**: Obstacle margin assertions pin clear/clear3 to (0.21, 0.23], not exactly 0.22 *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -105,11 +101,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 8 |
-| Ready (`loom:issue`) | 3 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 10 |
 | PRs awaiting review | 5 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 15 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 13 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->

@@ -5,6 +5,13 @@ triage agent. Newest first.
 
 ### 2026-11-15
 
+- **PR #183**: test: pin obstacle M2/M3 spacing margins with boundary assertions
+- **PR #180**: fix: scope new_record's cleanup trap to the caller's declared scratch requests
+- **PR #179**: fix: reject an aimed MazeRouter.connect whose goal set is not the singleton toward
+- **Issue #182** (closed): attest/mint.sh refuses to re-mint items 1/9; its blocker lifted in klayout-tools 0.9.2
+- **Issue #176** (closed): test_obstacle_clear3_and_cross_layer_independence does not pin clear3's M3.b spacing margin
+- **Issue #173** (closed): MazeRouter.connect: guard that `toward` is consistent with `goals`
+- **Issue #171** (closed): new_record's cleanup trap uses a directory-wide .*.json glob, so two run scripts sharing a sim/ directory can delete each other's in-flight scratch request
 - **PR #170**: layout: remove 6 dead rule constants from the layout generators
 - **PR #175**: docs: align README status, maturity ladder and repro steps with the signoff record
 - **PR #174**: refactor: extract the rails obstacle model and unify the tie-to-lane search
