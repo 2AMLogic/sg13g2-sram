@@ -395,8 +395,12 @@ class MazeRouter:
         ``toward`` (an (i, j) node) turns the search into an A* aimed at it rather than one spreading in every
         direction, for a net of many terminals: the Manhattan distance to a node never overestimates a path to it (a
         lattice step costs at least 1), so the path found is still a cheapest one. Left at ``None`` the heuristic is
-        0 and this *is* Dijkstra over the goal set."""
+        0 and this *is* Dijkstra over the goal set. ``toward`` aims at *the one* goal: that heuristic is admissible
+        only for the node it aims at, so an aimed call must pass ``goals == {(0, *toward)}`` — with other goals in
+        the set a first-popped goal can cost more than the cheapest path, and the call is rejected."""
         import heapq
+
+        assert toward is None or goals == {(0, *toward)}, (toward, goals)
 
         aimed = toward is not None
         gi, gj = toward if aimed else (0, 0)
