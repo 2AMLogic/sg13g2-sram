@@ -162,7 +162,7 @@ PIN_PITCH = 1.0  # um between left-edge pins
 
 # ---- inter-block routing (rule values from `klt deck rules --deck sg13g2`) ----
 V1 = 0.19  # V1.a: Via1 is a fixed 0.19 square
-V1_SPACE = 0.22  # V1.b
+# V1.b spacing (0.22) is not enforced by the generator (unlike V2_SPACE, which is); klt drc checks it
 M1_ENC_V1 = 0.01  # V1.c: Metal1 enclosure of Via1
 M1_V1_PAD = V1 + 2 * M1_ENC_V1  # 0.21: Metal1 landing pad for a Via1 on a 0.20 wire
 M2_W = 0.20  # M2.a
@@ -172,7 +172,6 @@ V2_SPACE = 0.22  # V2.b
 M3_W = 0.20  # M3.a
 M3_SPACE = 0.21  # M3.b
 # Metal2/3 wires are 0.20 wide, so a Via (0.19) is enclosed by 0.005 per side (V2.c 0.005)
-M2_ENC_V2 = 0.005
 TRACK_PITCH = M3_W + M3_SPACE  # 0.41: private Metal3 track pitch (M2: same widths)
 LANE_PITCH = 0.42  # Metal2 lane pitch in the wordline gap (>= M2_W + M2_SPACE)
 TRACK_OFFSET = 0.5  # first private track above its decoder terminal row

@@ -85,21 +85,17 @@ CO = 0.16  # Cnt.a: Cont is a fixed 0.16 square
 CO_ENC_ACT = 0.07  # Cnt.c
 CO_ENC_POLY = 0.07  # Cnt.d
 CO_ENC_M1 = 0.05  # M1.c1 end-of-line enclosure of Cont
-CO_POLY_TO_ACT = 0.14  # Cnt.e: Cont on GatPoly to Activ
 PAD = CO + 2 * CO_ENC_ACT  # 0.30: Activ pad holding one contact
 GAP = 0.08  # pad edge to gate edge: > Gat.d 0.07 (field poly to Activ); Cnt.f 0.11 met via CO_ENC_ACT
 GATE_ENDCAP = 0.18  # Gat.c: GatPoly extension past Activ
 POLY_SPACE = 0.18  # Gat.b
-POLY_TO_ACT = 0.07  # Gat.d
 ACT_SPACE = 0.21  # Act.b
 M1_W = 0.20  # >= M1.a 0.16
 M1_STRAP_W = 0.16  # M1.a
-M1_SPACE = 0.18  # M1.b
 PSD_ENC_ACT = 0.18  # pSD.c / pSD.d
 PSD_TO_NACT = 0.30  # pSD.e class: pSD to n+ Activ, kept at 0.30
 NW_ENC_PACT = 0.31  # NW.c
 NW_ENC_NACT = 0.24  # NW.e
-NW_TO_NACT = 0.31  # NW.d
 
 # ---------------------------------------------------------------------------
 # Device sizing -- design/bitcell/bitcell.spice (sg13_lv_nmos / sg13_lv_pmos).
