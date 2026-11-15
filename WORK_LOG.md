@@ -3,8 +3,22 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-15
+
+- **PR #162**: refactor(router): one maze search for both of route_net's modes
+- **PR #158**: docs: roadmap as of 2026-11-13
+- **Issue #154** (closed): Unify MazeRouter.connect and connect_to: ~30 lines of the search loop are duplicated verbatim
+
 ### 2026-11-14
 
+- **PR #169**: docs: state WORK_PLAN.md snapshot semantics in header prose
+- **PR #168**: feat(attest): add pinned mint script for item 10 attestation envelope
+- **PR #166**: test(layout): record klt array-check on the macro array and assert it in verify.sh
+- **PR #164**: refactor(sim): fold duplicated run-script scaffolding into harness/common
+- **Issue #160** (closed): layout: run klt array-check on the macro and commit the report
+- **Issue #157** (closed): Consolidate the duplicated setup, record-dir and batch-submit scaffolding across sim/*/run_*.sh
+- **Issue #156** (closed): WORK_PLAN.md header calls a stale snapshot "current" label state (the generator is measured correct)
+- **Issue #155** (closed): Add a pinned mint script for the attest/ attestation envelopes
 - **Issue #153** (closed): CI: a README.md edit breaks the item-10 attestation, so the docs lane deadlocks
 - **Issue #105** (closed): layout: route decoder cell internals
 
