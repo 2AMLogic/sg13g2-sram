@@ -5,6 +5,12 @@ triage agent. Newest first.
 
 ### 2026-11-15
 
+- **PR #170**: layout: remove 6 dead rule constants from the layout generators
+- **PR #175**: docs: align README status, maturity ladder and repro steps with the signoff record
+- **PR #174**: refactor: extract the rails obstacle model and unify the tie-to-lane search
+- **Issue #167** (closed): Remove 6 dead rule constants from the layout generators: 3 restate a value a live constant's comment already carries
+- **Issue #161** (closed): docs: README status says no layout exists; bring it in line with the signoff record
+- **Issue #163** (closed): Gen.rails is 222 lines of closure scope: tie-to-lane search written twice, tie_maze takes 16 parameters to borrow it
 - **PR #162**: refactor(router): one maze search for both of route_net's modes
 - **PR #158**: docs: roadmap as of 2026-11-13
 - **Issue #154** (closed): Unify MazeRouter.connect and connect_to: ~30 lines of the search loop are duplicated verbatim
