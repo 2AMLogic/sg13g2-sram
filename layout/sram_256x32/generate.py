@@ -579,6 +579,46 @@ class RailState:
     used: dict[tuple[int, str], set[float]] = field(default_factory=dict)
 
 
+def in_wl_gap(x0: float, x1: float) -> bool:
+    """An x-span intersecting the open wordline fan-out gap (0 to -WL_FANOUT_GAP): nothing below Metal4 may
+    enter it, though a wire edge may reach its boundary."""
+    return x1 > -WL_FANOUT_GAP and x0 < 0
+
+
+def lane_positions(regions: list[kdb.Box], trunk_x: dict[str, float],
+                   seam_pads: dict[str, list[float]]) -> dict[tuple[int, str], list[float]]:
+    """Metal4 lane y positions per (region, net): per region, VDD at y0 + 0.6 + j * pitch, VSS half a pitch above.
+    A lane keeps clear of every strap pad (Metal4 pad at a trunk) inside its x-range and of the other net's lanes;
+    it moves (nearest free spot) rather than the pitch."""
+    hp = VIA_PAD / 2
+    lanes: dict[tuple[int, str], list[float]] = {}
+    for ri, rb in enumerate(regions):
+        y0, y1 = rb.bottom * DBU, rb.top * DBU
+        span = {n: (min(rb.left * DBU, trunk_x[n] - hp), max(rb.right * DBU, trunk_x[n] + hp)) for n in trunk_x}
+        pads = {n: [y for m in trunk_x if span[n][0] <= trunk_x[m] + hp and trunk_x[m] - hp <= span[n][1]
+                    for y in seam_pads[m]] for n in trunk_x}
+        lanes[(ri, "VDD")], lanes[(ri, "VSS")] = [], []
+        for j in range(int((y1 - 0.3 - y0) // RAIL_LANE_PITCH) + 1):
+            for net, off in (("VDD", 0.6), ("VSS", 0.6 + RAIL_LANE_PITCH / 2)):
+                nominal = y0 + off + j * RAIL_LANE_PITCH
+                if nominal > y1 - 0.3:
+                    continue
+                other = "VSS" if net == "VDD" else "VDD"
+                for d in [0.0] + [s_ * 0.1 * i for i in range(1, 16) for s_ in (1, -1)]:
+                    y = nominal + d
+                    if y0 + 0.3 > y or y > y1 - 0.3:
+                        continue
+                    if any(abs(y - o) < LANE_W / 2 + hp + M3_SPACE for o in pads[net]):
+                        continue
+                    if any(abs(y - o) < LANE_W + M3_SPACE for o in lanes[(ri, other)]):
+                        continue
+                    break
+                else:
+                    raise AssertionError(f"no lane position near y={nominal} in region {ri}")
+                lanes[(ri, net)].append(round(y, 3))
+    return lanes
+
+
 # ---------------------------------------------------------------------------
 # Layout helpers
 # ---------------------------------------------------------------------------
@@ -1539,36 +1579,25 @@ class Gen:
         for t, tp in zip(ties, tie_pads):
             obs.add(t["net"], tp)
 
-        # Metal4 lanes: per region, VDD at y0 + 0.6 + j * pitch, VSS half a pitch above. A lane keeps clear of every
-        # strap pad (Metal4 pad at a trunk) inside its x-range and of the other net's lanes; it moves (nearest free
-        # spot) rather than the pitch.
-        lanes: dict[tuple[int, str], list[float]] = {}
-        for ri, rb in enumerate(regions):
-            y0, y1 = rb.bottom * DBU, rb.top * DBU
-            span = {n: (min(rb.left * DBU, trunk_x[n] - hp), max(rb.right * DBU, trunk_x[n] + hp)) for n in trunk_x}
-            pads = {n: [y for m in trunk_x if span[n][0] <= trunk_x[m] + hp and trunk_x[m] - hp <= span[n][1]
-                        for y in seam_pads[m]] for n in trunk_x}
-            lanes[(ri, "VDD")], lanes[(ri, "VSS")] = [], []
-            for j in range(int((y1 - 0.3 - y0) // RAIL_LANE_PITCH) + 1):
-                for net, off in (("VDD", 0.6), ("VSS", 0.6 + RAIL_LANE_PITCH / 2)):
-                    nominal = y0 + off + j * RAIL_LANE_PITCH
-                    if nominal > y1 - 0.3:
-                        continue
-                    other = "VSS" if net == "VDD" else "VDD"
-                    for d in [0.0] + [s_ * 0.1 * i for i in range(1, 16) for s_ in (1, -1)]:
-                        y = nominal + d
-                        if y0 + 0.3 > y or y > y1 - 0.3:
-                            continue
-                        if any(abs(y - o) < LANE_W / 2 + hp + M3_SPACE for o in pads[net]):
-                            continue
-                        if any(abs(y - o) < LANE_W + M3_SPACE for o in lanes[(ri, other)]):
-                            continue
-                        break
-                    else:
-                        raise AssertionError(f"no lane position near y={nominal} in region {ri}")
-                    lanes[(ri, net)].append(round(y, 3))
+        # Metal4 lanes: per region, per net (see lane_positions)
+        lanes = lane_positions(regions, trunk_x, seam_pads)
         self.tie_wiring: list[dict] = []
         state = RailState(rc)
+
+        def tie_candidates(net: str, ri: int, x: float, y: float):
+            """(ly, xs, dx) candidates for a tie's stub: its net's lanes nearest-first (eight), the sideways offset
+            nearest-first on a 0.2 um grid within +-6 um; the guards shared by the Metal2 and Metal3 paths (the lane
+            pad stays inside the macro; the Via2 keeps V2.b / M3.b to the other Via2s on the same lane) applied once."""
+            for ly in sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]:
+                for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
+                    xs = round(x + dx, 3)
+                    if xs - hp < self.pre_rail_bb.left * DBU:
+                        continue  # the lane pad stays inside the macro (rails extend it to the right only)
+                    # Via2 (and its Metal3 pad) keep V2.b / M3.b to the other Via2 on the same lane
+                    if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
+                        continue
+                    yield ly, xs, dx
+
         for t in ties:
             net, x, y = t["net"], t["x"], t["y"]
             ri = next((i for i, rb in enumerate(regions) if rb.contains(kdb.Point(dbu(x), dbu(y)))), None)
@@ -1577,37 +1606,28 @@ class Gen:
             # sideways at the tie's own height (Metal2 horizontal, then vertical)
             chosen = None
             hw = STUB_W / 2
-            for ly in sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]:
+            for ly, xs, dx in tie_candidates(net, ri, x, y):
                 lo, hi = min(y, ly), max(y, ly)
-                for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
-                    # a stub beside its own pad must clear it by M2.b (otherwise the joint is a notch or a sliver)
-                    if dx and abs(dx) < hp + M2_SPACE + STUB_W / 2 + 0.01:
-                        continue
-                    xs = round(x + dx, 3)
-                    if xs - hp < self.pre_rail_bb.left * DBU:
-                        continue  # the lane pad stays inside the macro (rails extend it to the right only)
-                    # Via2 (and its Metal3 pad) keep V2.b / M3.b to the other Via2 on the same lane
-                    if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
-                        continue
-                    if not obs.clear3(kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)):
-                        continue
-                    # vertical first (up/down from the pad, then along the lane's height), else sideways first
-                    for variant in (0, 1):
-                        if variant == 0:  # horizontal at the tie's height, vertical at xs
-                            parts = [kdb.DBox(xs - hw, lo - hp, xs + hw, hi + hp)]
-                            if dx:
-                                parts.append(kdb.DBox(min(x, xs) - hp, y - hw, max(x, xs) + hp, y + hw))
-                        else:  # vertical at the tie's x, horizontal at the lane height
-                            if not dx or abs(ly - y) < hp + M2_SPACE + STUB_W / 2 + 0.01:
-                                continue
-                            parts = [kdb.DBox(x - hw, lo - hp, x + hw, hi + hp),
-                                     kdb.DBox(min(x, xs) - hp, ly - hw, max(x, xs) + hp, ly + hw)]
-                        if any(pt.right > -WL_FANOUT_GAP and pt.left < 0 for pt in parts + [kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]):
-                            continue  # nothing below Metal4 in the wordline gap
-                        if all(obs.clear(net, pt) for pt in parts):
-                            chosen = (ly, xs, parts)
-                            break
-                    if chosen:
+                # a stub beside its own pad must clear it by M2.b (otherwise the joint is a notch or a sliver)
+                if dx and abs(dx) < hp + M2_SPACE + STUB_W / 2 + 0.01:
+                    continue
+                if not obs.clear3(kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)):
+                    continue
+                # vertical first (up/down from the pad, then along the lane's height), else sideways first
+                for variant in (0, 1):
+                    if variant == 0:  # horizontal at the tie's height, vertical at xs
+                        parts = [kdb.DBox(xs - hw, lo - hp, xs + hw, hi + hp)]
+                        if dx:
+                            parts.append(kdb.DBox(min(x, xs) - hp, y - hw, max(x, xs) + hp, y + hw))
+                    else:  # vertical at the tie's x, horizontal at the lane height
+                        if not dx or abs(ly - y) < hp + M2_SPACE + STUB_W / 2 + 0.01:
+                            continue
+                        parts = [kdb.DBox(x - hw, lo - hp, x + hw, hi + hp),
+                                 kdb.DBox(min(x, xs) - hp, ly - hw, max(x, xs) + hp, ly + hw)]
+                    if any(in_wl_gap(pt.left, pt.right) for pt in parts + [kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]):
+                        continue  # nothing below Metal4 in the wordline gap
+                    if all(obs.clear(net, pt) for pt in parts):
+                        chosen = (ly, xs, parts)
                         break
                 if chosen:
                     break
@@ -1615,26 +1635,18 @@ class Gen:
                 # the Metal2 around the tie is taken by cell routing (issue #104): leave on Metal3 instead, from a
                 # Via2 on the tie's own Metal2 pad to a Via3 on the lane
                 chosen3 = None
-                for ly in sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]:
+                for ly, xs, dx in tie_candidates(net, ri, x, y):
                     lo, hi = min(y, ly), max(y, ly)
-                    for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
-                        if dx and (abs(dx) < hp + M3_SPACE + STUB_W / 2 + 0.01 or abs(ly - y) < hp + M3_SPACE + STUB_W / 2 + 0.01):
-                            continue  # a sideways run keeps M3.b to its own pads (otherwise a sliver between them)
-                        xs = round(x + dx, 3)
-                        if xs - hp < self.pre_rail_bb.left * DBU:
-                            continue
-                        if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
-                            continue
-                        parts = [kdb.DBox(x - hp, y - hp, x + hp, y + hp), kdb.DBox(xs - hw, lo - hw, xs + hw, hi + hw),
-                                 kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]
-                        if dx:
-                            parts.append(kdb.DBox(min(x, xs) - hw, y - hw, max(x, xs) + hw, y + hw))
-                        if any(pt.right > -WL_FANOUT_GAP and pt.left < 0 for pt in parts):
-                            continue  # nothing below Metal4 in the wordline gap
-                        if all(obs.clear3(pt) for pt in parts):
-                            chosen3 = (ly, xs, parts)
-                            break
-                    if chosen3:
+                    if dx and (abs(dx) < hp + M3_SPACE + STUB_W / 2 + 0.01 or abs(ly - y) < hp + M3_SPACE + STUB_W / 2 + 0.01):
+                        continue  # a sideways run keeps M3.b to its own pads (otherwise a sliver between them)
+                    parts = [kdb.DBox(x - hp, y - hp, x + hp, y + hp), kdb.DBox(xs - hw, lo - hw, xs + hw, hi + hw),
+                             kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]
+                    if dx:
+                        parts.append(kdb.DBox(min(x, xs) - hw, y - hw, max(x, xs) + hw, y + hw))
+                    if any(in_wl_gap(pt.left, pt.right) for pt in parts):
+                        continue  # nothing below Metal4 in the wordline gap
+                    if all(obs.clear3(pt) for pt in parts):
+                        chosen3 = (ly, xs, parts)
                         break
                 if chosen3:
                     ly, xs, parts = chosen3
@@ -1724,7 +1736,7 @@ class Gen:
         for ly in lanes:
             for i in range(mz.i0, mz.i1 + 1):
                 gx, gy = i * STEP * DBU, round(ly / (STEP * DBU)) * STEP * DBU
-                if abs(gy - ly) > 0.055 or gx < rb_x[0] + 0.3 or (gx + hp > -WL_FANOUT_GAP and gx - hp < 0):
+                if abs(gy - ly) > 0.055 or gx < rb_x[0] + 0.3 or in_wl_gap(gx - hp, gx + hp):
                     continue
                 if any(abs(gx - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
                     continue
