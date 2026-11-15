@@ -282,6 +282,44 @@ def test_gap_clearance_check_has_teeth():
     assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1
 
 
+# ---- the rails obstacle model (issue #163) ---------------------------------------
+def test_obstacle_clear_rejects_other_net_and_signal_shapes():
+    obs = g.Obstacles()
+    obs.add("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))
+    assert not obs.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # interior overlap
+    assert not obs.clear("VDD", kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M2.b
+    assert obs.clear("VDD", kdb.DBox(1.23, 0.0, 2.0, 0.2))  # past the check margin it is clear
+    sig = g.Obstacles()
+    sig.add(None, kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a signal shape blocks every net
+    assert not sig.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))
+    assert not sig.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))
+
+
+def test_obstacle_clear_same_net_merge_and_sliver():
+    obs = g.Obstacles()
+    obs.add("VSS", kdb.DBox(0.8, 0.0, 1.8, 0.2))
+    assert obs.clear("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))  # merged: the overlap is a full stub width deep
+    obs2 = g.Obstacles()
+    obs2.add("VSS", kdb.DBox(0.9, 0.0, 1.9, 0.2))
+    assert not obs2.clear("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a 0.1 um-deep corner overlap is a sliver under M2.a
+
+
+def test_obstacle_hash_spans_its_grid_cells():
+    obs = g.Obstacles()
+    obs.add("VDD", kdb.DBox(4.9, 4.9, 5.1, 5.1))  # straddles the 5 um grid line
+    assert {(0, 0), (1, 0), (0, 1), (1, 1)} <= set(obs.m2)
+    assert not obs.clear("VSS", kdb.DBox(5.0, 5.0, 5.5, 5.2))
+
+
+def test_obstacle_clear3_and_cross_layer_independence():
+    obs = g.Obstacles()
+    obs.add_m3(kdb.DBox(0.0, 0.0, 1.0, 0.2))
+    assert not obs.clear3(kdb.DBox(0.5, 0.05, 1.5, 0.25))
+    assert obs.clear3(kdb.DBox(1.23, 0.0, 2.0, 0.2))
+    assert any(obs.m3.values())
+    assert obs.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # the Metal3 hash does not gate the Metal2 check
+
+
 # ---- flat-net resolution (issue #104) -------------------------------------------
 def _device_count(nl, name):
     n = 0
