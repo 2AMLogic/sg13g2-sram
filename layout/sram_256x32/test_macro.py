@@ -11,6 +11,7 @@ import re
 import sys
 
 import klayout.db as kdb
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import generate as g  # noqa: E402
@@ -468,6 +469,24 @@ def test_router_aimed_and_unaimed_searches_agree():
         assert unaimed[0] == aimed[0] == (0, *start) and unaimed[-1] == aimed[-1] == (0, *goal), seed
         assert _path_cost(unaimed) == _path_cost(aimed), (seed, _path_cost(unaimed), _path_cost(aimed))
     assert routable >= 8, f"only {routable}/12 obstacle maps were routable: the comparison is not being exercised"
+
+
+def test_router_rejects_aimed_search_at_more_than_one_goal():
+    """``connect``'s ``toward`` aims an A* whose Manhattan heuristic is admissible only for the one node it aims at:
+    with ``WRONG_WAY`` steps on the lattice, a goal set holding more than ``toward`` alone can pop a
+    costlier-than-cheapest goal first (start (4, 4), goals {(0, 4, 12), (0, 8, 4)}, toward (8, 4): aimed cost 16 vs
+    optimal 8), silently. The aimed mode therefore asserts ``goals == {(0, *toward)}``; the unaimed Dijkstra over
+    any goal set, on either layer, is unaffected, as is the aimed singleton the generator itself calls."""
+    start = (4, 4)
+    mz = g.MazeRouter(0, 0, 3000, 3000)
+    with pytest.raises(AssertionError):
+        mz.connect(1, {(0, *start)}, {(0, 4, 12), (0, 8, 4)}, toward=(8, 4))
+    with pytest.raises(AssertionError):
+        mz.connect(1, {(0, *start)}, {(0, 20, 20)}, toward=(30, 30))
+    assert mz.connect(1, {(0, *start)}, {(0, 8, 4)}, toward=(8, 4)) is not None
+    assert mz.connect(1, {(0, *start)}, {(0, 4, 12), (0, 8, 4)}) is not None
+    assert mz.connect(1, {(0, *start)}, {(1, 4, 12), (1, 8, 4)}) is not None
+    assert mz.connect(1, {(0, *start)}, {(0, 20, 20)}) is not None
 
 
 # ---- leaf-cell nets on the generated layout (issue #104) ----------------------------
