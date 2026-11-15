@@ -35,7 +35,7 @@ klt netlist "${REPO}/design/bitcell/bitcell.sch" -o "${REPO}/design/bitcell/bitc
   --block --check --rcfile "${REPO}/design/xschemrc" --pdk "${PDK}" --pdk-root "${PDK_ROOT}" >/dev/null \
   || { echo "run_bitcell.sh: bitcell.spice drifted from bitcell.sch (regenerate: design/README.md)" >&2; exit 5; }
 
-new_record "${HERE}/records" reports curves negctl
+new_record --scratch .typ_snm.json --scratch .typ_write.json "${HERE}/records" reports curves negctl
 
 
 # --- typical point -----------------------------------------------------------
