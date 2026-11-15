@@ -25,7 +25,7 @@ sim_setup --post column_post.py
 "${REPO}/design/netlist.sh" --check bitcell/bitcell column/column >/dev/null \
   || { echo "run_column.sh: a design/ netlist drifted from its schematic (regenerate: design/README.md)" >&2; exit 5; }
 
-new_record "${HERE}/records" reports negctl
+new_record --scratch .req_read.json --scratch .req_write.json "${HERE}/records" reports negctl
 
 
 # --- nominal read and write ---------------------------------------------------
