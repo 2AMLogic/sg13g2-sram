@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-11-15
 
+- **PR #185**: test: pin obstacle clear-side probes to the 0.22 margin boundary
+- **Issue #184** (closed): Obstacle margin assertions pin clear/clear3 to (0.21, 0.23], not exactly 0.22
 - **PR #183**: test: pin obstacle M2/M3 spacing margins with boundary assertions
 - **PR #180**: fix: scope new_record's cleanup trap to the caller's declared scratch requests
 - **PR #179**: fix: reject an aimed MazeRouter.connect whose goal set is not the singleton toward
