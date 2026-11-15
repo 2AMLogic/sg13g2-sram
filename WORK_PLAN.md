@@ -36,6 +36,7 @@ _None._
 Human-approved issues ready for implementation (`loom:issue`).
 
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT
+- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net
 
 ## In Progress
 
@@ -48,9 +49,7 @@ Issues currently being built (`loom:building`).
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
-- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
-- **#184**: Obstacle margin assertions pin clear/clear3 to (0.21, 0.23], not exactly 0.22
 
 ## PRs Awaiting Review
 
@@ -60,7 +59,6 @@ PRs waiting on Judge (`loom:review-requested`).
 - **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
 - **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
 - **#81**: docs(spec): pin the write-margin definition in a decision record
-- **#185**: test: pin obstacle clear-side probes to the 0.22 margin boundary
 
 ## Approved (Awaiting Merge)
 
@@ -84,7 +82,6 @@ Issues carrying `loom:curated`.
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net *(curated)*
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit *(curated)*
-- **#184**: Obstacle margin assertions pin clear/clear3 to (0.21, 0.23], not exactly 0.22 *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -101,11 +98,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 8 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 10 |
-| PRs awaiting review | 5 |
+| Ready (`loom:issue`) | 2 |
+| In Progress (`loom:building`) | 8 |
+| PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 13 |
+| Curated | 12 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
