@@ -114,7 +114,7 @@ Records are append-only: each run writes a new `records/<UTC>/` directory.
    the pinned klt (see `manifests/README.md`):
 
    ```bash
-   uvx --from "klayout-tools==0.8.0" klt signoff --manifest manifests/sg13g2-sram.json \
+   uvx --from "klayout-tools==0.9.2" klt signoff --manifest manifests/sg13g2-sram.json \
      --format json > manifests/sg13g2-sram.signoff.json
    ```
 
@@ -122,7 +122,7 @@ Records are append-only: each run writes a new `records/<UTC>/` directory.
    `npm test` runs the PDK-free checks; the envelope is re-checked with
 
    ```bash
-   uvx --from "klayout-tools==0.8.0" klt signoff --attest 10 \
+   uvx --from "klayout-tools==0.9.2" klt signoff --attest 10 \
      --inventory attest/item10.json --check attest/item10.envelope.json
    ```
 
