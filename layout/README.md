@@ -13,7 +13,7 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Generator tests (CI runs these: `layout-tests` in `ci.yml`; the slow macro tests in `layout-macro-tests.yml`, on `main` and PRs touching the macro) | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
-| Re-mint the current macro record (`macro-record-decoder.json`), socket and LEF (~2 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-decoder.sh` |
+| Re-mint the current macro record (`macro-record-fanout.json`), the macro DRC record, socket and LEF (runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-fanout.sh` |
 
 `layout/reports/generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and `macro-record-taps.json`, and was removed once it could only refuse to overwrite them. Both records still name it as `record_command`; recover the script with `git show cbf61db:layout/reports/generate-macro.sh`.
 
@@ -23,6 +23,7 @@ The same rule removed the per-stage scripts whose records no longer match the co
 - `generate-macro-rails.sh`: `git show 235e7a3:layout/reports/generate-macro-rails.sh`
 - `generate-macro-leafnets.sh`: `git show bb986a3:layout/reports/generate-macro-leafnets.sh`
 - `generate-macro-latchnets.sh`: `git show a1d6291:layout/reports/generate-macro-latchnets.sh`
+- `generate-macro-decoder.sh`: `git show 4e5fd29:layout/reports/generate-macro-decoder.sh`
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
@@ -150,15 +151,69 @@ It is **partly routed**. The array interface (wordlines, bit lines) is wired; ev
 periphery transistor carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
 with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`); and
 every tie and every bitcell VDD/VSS riser reaches a VDD or VSS rail (#88 step 2, #92, re-planned
-in #102; `macro-record-rails.json`). The `VDD`/`VSS` pin squares are **not connected to the
-rails** and there is still no signal wiring inside the periphery (a net with several device
-terminals in one cell, such as `BL` on both precharge PMOS drains, is reached at one of them)
-and none to the macro pins. The LEF pins are drawn Metal2 but are not connected to the logic, so
-the macro is not LVS-able yet. The wordline label on GatPoly text (5/1) sits mid-cell, off the
-poly row, and is not read by `klt extract`; the wordline nets take their names from the driver
-labels. Routing the rest is #95; #30 (LVS) and #31 (power ERC) cannot proceed past it. Unrun
-here: the PDK-native DRC, `klt array-check`, and DRC of the periphery against rules the curated
-deck lacks.
+in #102; `macro-record-rails.json`). The periphery's signal nets are routed inside the leaf cells
+(#104), inside the latch, control and decoder blocks (#106, #105) and **between the blocks**
+(#107, below). The `VDD`/`VSS` pin squares are **not connected to the rails** and no signal net
+reaches a macro pin: the LEF pins are drawn Metal2 and touch nothing, so the macro is **not
+LVS-able yet** (#108). Also undrawn: `BLM` and `BLBM` between `bit_slice`'s column mux, sense
+amplifier and write driver -- inside the slice, so outside #107's scope, and claimed by no child
+of #95 -- and `column_mux`'s own `BLBM`. The wordline label on GatPoly text (5/1) sits mid-cell,
+off the poly row, and is not read by `klt extract`; the wordline nets take their names from the
+driver labels. #30 (LVS) and #31 (power ERC) cannot proceed past #108. Unrun here: the PDK-native
+DRC, `klt array-check`, and DRC of the periphery against rules the curated deck lacks.
+
+#### Signal fan-out between the blocks (issue #107)
+
+The 84 nets of `.subckt macro` with a terminal in two or more placed blocks or slices
+(`inter_block_nets`) are wired: `PRE_B SEL0 SEL0B SEL1 SEL1B SAE WE` from the control block to all
+32 slices (`SAE` to the output latch as well), `WLEN` to the row decoder, `CLK` across the address
+latch, control block and data latch, `CENL GWENL WENL AL[0]` from the address latch to the control
+block, `AL[7:1]` from the address latch to the row decoder, and the per-slice `DL[i]` (data latch
+to slice *i*) and `DOUT[i]` (slice *i* to output latch).
+
+Every terminal is first brought to an **escape pin** on the edge of its own cell, so the macro
+level is a reserved-track channel router rather than a maze over the whole macro:
+
+- **Slice escapes**: the nine ports the macro connects come down to Metal2 pins at reserved
+  offsets (`PIN_LANE` 0.45 um apart, >= M2.a + M2.b) on the slice's bottom edge, `SLICE_ESCAPE_H`
+  5 um below the column path. `bit_slice` is one cell placed 32 times, so this is drawn once and
+  slice *i*'s pins are at a known x; every shape of the neighbouring slices is an obstacle, which
+  is what keeps a wire M2.b from its own mirror image. `SLICE_MARGIN` went from 0.4 to 0.8 um:
+  that is the room those nine escapes need beside the column-path cells, and it is why the column
+  path is 88.8 um tall instead of 55.4.
+- **Block escapes**: `route_hier` brings each block's listed ports out to a pin the maze picks on
+  one edge -- Metal3 off a left edge (address latch, control, data latch, output latch), Metal2
+  off a bottom one (row decoder) -- on the layer the macro level carries on in, so the two wires
+  merge into one shape and no via sits on a cell boundary. Metal3 runs almost unobstructed across
+  these blocks, which is the room the escapes use.
+- **Channel**: one horizontal Metal3 trunk per net (72 of them) at `TRACK_PITCH` 0.41 um in the
+  band between the slice pins and the data latch; the latch blocks are placed `channel_h` below
+  the slices instead of `BLOCK_GAP`.
+- **Lanes**: one vertical Metal2 lane per net and side at `PIN_LANE`. The *west* lanes sit left of
+  the address latch, the one column that is clear from the channel up to the row decoder; the
+  *gap* lanes sit in the wordline fan-out gap below the array, which no wordline shape reaches
+  (they are all above y = 0).
+- **Decoder approach**: one Metal3 track per net in the `DECODER_APPROACH` 5 um band between the
+  control block's top and the row decoder, which spans the whole decoder width.
+
+A lane and a trunk cross on different layers, which is what lets 72 nets share the channel; the
+only vias are where a net turns, each on its own lane or its own trunk, so the pitch alone
+guarantees V2.b and the spacing is checkable without extraction
+(`test_fanout_tracks_and_lanes_keep_the_deck_spacing`).
+
+`DOUTB[i]` is **dangling by design**: the sense amplifier's complementary output has no terminal
+outside slice *i* anywhere in the macro (read off `macro.spice` via `flat_nets`, confirmed by
+`test_doutb_is_dangling_by_design`), so there is nothing to route it to. It is not escaped from
+the slice either.
+
+**Check** (`test_macro.py`, `./layout/verify.sh` steps 7 and 9, record
+`layout/reports/macro-record-fanout.json` minted by `layout/reports/generate-macro-fanout.sh`): a
+flat Metal1-Metal3 extraction probes **every Metal1 device terminal** of every one of the 84 nets,
+in every block and all 32 slices (`PRE_B` alone has 65 probes: the control driver plus both
+precharges of each slice); each net is one cluster, no two nets share one, and none is shorted to
+a wordline or a bit line. Teeth: cutting the Via2 where `PRE_B`'s trunk meets slice 31 separates
+slice 31 and leaves slice 0 connected, and the same cut at slice 0 the other way round; cutting
+`DOUT[31]`'s leaves `DL[0]`, `DL[31]` and `DOUT[0]` connected.
 
 #### Supply rails (issue #92, re-planned in #102)
 
@@ -200,11 +255,10 @@ wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply 
 Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: periphery signal
 routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
-The latest record (issue #105, `layout/reports/macro-record-decoder.json`, minted by
-`layout/reports/generate-macro-decoder.sh`) adds the nets between the child cells of `predec3`, `predec4`,
-`wl_drivers` and `row_decoder`, routed with the same router as the latch and control nets (#106), so one
-`HIER_ROUTED` covers all eight cells (87 nets, none undrawn; supply and wordline nets excluded); the macro DRC is
-still clean. Fan-out between blocks and pins are not drawn.
+The latest record (issue #107, `layout/reports/macro-record-fanout.json`, minted by
+`layout/reports/generate-macro-fanout.sh`) adds the fan-out between the blocks described above, on top of the
+nets inside the decoder cells (#105, `macro-record-decoder.json`) and inside the latch and control cells
+(#106). Pin routing is not drawn (#108).
 
 The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
 put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the

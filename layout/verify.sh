@@ -77,22 +77,28 @@ hr "8. macro: DRC of the full array (klt drc --deck sg13g2; coverage gaps are in
 klt drc --deck sg13g2 --top macro $D/macro.gds
 klt drc --check layout/reports/drc-macro.json
 
-hr "9. macro: the latest (decoder-net) record matches the committed layout; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
+hr "9. macro: the latest (inter-block fan-out) record matches the committed layout; every in-scope net is wired; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
 python3 - <<'PYEOF'
 import hashlib, json, sys
-rec = json.load(open("layout/reports/macro-record-decoder.json"))
+rec = json.load(open("layout/reports/macro-record-fanout.json"))
 for key in ("gds", "lef", "socket"):
     for path, want in rec[key].items():
         got = hashlib.sha256(open(path, "rb").read()).hexdigest()
         if got != want:
-            sys.exit(f"FAIL: {path} differs from macro-record-decoder.json")
+            sys.exit(f"FAIL: {path} differs from macro-record-fanout.json")
 c = rec["rails_connectivity"]
 ok = (c["ties_on_own_rail"] == c["ties_expected"] and c["ties_floating"] == 0 and c["ties_on_other_rail"] == 0
       and c["vdd_vss_short_polygons"] == 0
       and all(v["on_rail"] == v["expected"] and v["on_other_rail"] == 0 for v in c["bitcell_risers"].values()))
 if not ok:
-    sys.exit("FAIL: macro-record-decoder.json reports a floating tie, a stray rail or a short")
+    sys.exit("FAIL: macro-record-fanout.json reports a floating tie, a stray rail or a short")
 if rec["rails_vs_wordline_gap"]["total"] != 0:
-    sys.exit("FAIL: macro-record-decoder.json reports a rail shape below Metal4 in the wordline gap")
-print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
+    sys.exit("FAIL: macro-record-fanout.json reports a rail shape below Metal4 in the wordline gap")
+f = rec["inter_block_fanout"]
+if f["escape_undrawn"]:
+    sys.exit(f"FAIL: macro-record-fanout.json reports an undrawn escape: {f['escape_undrawn']}")
+if f["net_count"] != 84 or sorted(f["nets_wired"]) != f["nets_wired"]:
+    sys.exit(f"FAIL: macro-record-fanout.json wires {f['net_count']} inter-block nets, expected 84")
+print(f"PASS: record matches the files; {f['net_count']} inter-block nets wired on {f['trunk_tracks']} trunks; "
+      f"{c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
 PYEOF

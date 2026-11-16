@@ -587,3 +587,137 @@ def test_decoder_trace_has_teeth_via2():
 
     after = _hier_split("predec3", g.L_VIA2, pick)
     assert any(len(c) > 1 for c in after.values())
+
+
+# ---- the macro-level fan-out between the blocks (issue #107) ---------------------
+def _slice_probes(gen, net_name, i):
+    """The probe points of ``net_name`` that lie in slice ``i``."""
+    w = 2 * g.bc.W_CELL
+    return [p for p in gen.fanout_probes()[net_name] if i * w <= p[0] < (i + 1) * w]
+
+
+def _block_probes(gen, net_name, block):
+    bb = gen.cells[block].bbox().moved(*gen.place_of[g.TOP][block]).to_dtype(g.DBU)
+    return [p for p in gen.fanout_probes()[net_name] if bb.contains(kdb.DPoint(*p))]
+
+
+def test_fanout_wires_every_inter_block_net():
+    """The nets wired by ``route_fanout`` are exactly the nets of ``.subckt macro`` with a terminal in two or more
+    placed blocks or slices -- nothing in that set is left out, and nothing outside it is invented."""
+    _, gen, _ = _built()
+    want = set(gen.inter_block_nets())
+    assert want == set(gen.fanout_report["nets"]) == set(gen.fanout_probes())
+    # the acceptance list of the issue, spelled out
+    assert {"PRE_B", "SEL0", "SEL0B", "SEL1", "SEL1B", "SAE", "WE", "WLEN"} <= want
+    assert {"CENL", "GWENL", "WENL"} <= want and {f"AL[{k}]" for k in range(8)} <= want
+    assert {f"DL[{i}]" for i in range(g.SLICES)} <= want
+    assert {f"DOUT[{i}]" for i in range(g.SLICES)} <= want
+    assert len(want) == 8 + 3 + 8 + 1 + 2 * g.SLICES  # + CLK
+    # PRE_B reaches both precharges of every slice as well as the control block's driver
+    assert len(gen.fanout_probes()["PRE_B"]) == 1 + 2 * g.SLICES
+
+
+def test_fanout_nets_are_one_net_each_and_never_short():
+    """Every inter-block net is one extracted net at its Metal1 device terminals in every block and slice, and no
+    two of them (nor any of them and a wordline or bit line) share a cluster."""
+    gen, net = _extract()
+    ids = {}
+    for n, pts in gen.fanout_probes().items():
+        cl = {net("m1", x, y) for x, y in pts}
+        assert None not in cl and len(cl) == 1, (n, len(pts), sorted(cl, key=str))
+        ids[n] = cl.pop()
+    assert len(set(ids.values())) == len(ids), "two inter-block nets share a cluster"
+    arr = {a for a, _ in _wl_ids(gen, net, [0, 63, 127]).values()}
+    arr |= {a for a, _ in _bl_ids(gen, net, [0, 63]).values()}
+    assert not (set(ids.values()) & arr), "an inter-block net is shorted to the array interface"
+
+
+def test_fanout_trace_has_teeth_across_the_whole_array():
+    """Teeth for the span of the array: cutting the Via2 where a global net's trunk meets slice 31 must separate
+    slice 31 from the control block and leave slice 0 connected, and the same cut at slice 0 the other way."""
+    def cut(i):
+        def f(layout, top):
+            gen = _built()[1]
+            x = g.snap(i * 2 * g.bc.W_CELL + gen.fanout_report["slice_pins"]["PRE_B"])
+            _erase_at(top, g.L_VIA2, x, gen.fanout_report["trunks"]["PRE_B"])
+        return f
+
+    def joined(gen, net):
+        src = net("m1", *_block_probes(gen, "PRE_B", "control")[0])
+        return [src is not None and all(net("m1", *p) == src for p in _slice_probes(gen, "PRE_B", i))
+                for i in (0, 31)]
+
+    gen, net = _extract()
+    assert joined(gen, net) == [True, True]
+    gen, net = _extract(cut(31))
+    assert joined(gen, net) == [True, False]
+    gen, net = _extract(cut(0))
+    assert joined(gen, net) == [False, True]
+
+
+def test_per_slice_data_nets_trace_to_both_ends_of_the_array():
+    """``DL[i]`` and ``DOUT[i]`` are per-slice nets that cross the macro: check the two end slices, with teeth."""
+    def cut(layout, top):
+        gen = _built()[1]
+        x = g.snap(31 * 2 * g.bc.W_CELL + gen.fanout_report["slice_pins"]["DOUT"])
+        _erase_at(top, g.L_VIA2, x, gen.fanout_report["trunks"]["DOUT[31]"])
+
+    def ends(gen, net):
+        out = []
+        for i in (0, 31):
+            for n, blk in ((f"DL[{i}]", "data_latch"), (f"DOUT[{i}]", "out_latch")):
+                a = net("m1", *_block_probes(gen, n, blk)[0])
+                out.append(a is not None and all(net("m1", *p) == a for p in _slice_probes(gen, n, i)))
+        return out
+
+    gen, net = _extract()
+    assert ends(gen, net) == [True] * 4
+    gen, net = _extract(cut)
+    assert ends(gen, net) == [True, True, True, False]  # only DOUT[31] is cut
+
+
+def test_doutb_is_dangling_by_design():
+    """``DOUTB[i]`` is the sense amplifier's complementary output: its only terminals in the whole macro are
+    inside slice ``i``, so the slice-level route is all it can have. Read off ``macro.spice``, not extraction."""
+    flat = g.flat_nets(g.parse_netlist(g.NETLIST))
+    _, gen, _ = _built()
+    for i in (0, 7, 31):
+        n = f"DOUTB[{i}]"
+        assert not flat[n]["excluded"]
+        assert {t[0] for t in flat[n]["terminals"]} == {f"XS[{i}]/XSA"}, flat[n]["terminals"]
+        assert n not in gen.inter_block_nets() and n not in gen.fanout_report["nets"]
+    assert gen.fanout_report["dangling_by_design"] == [f"DOUTB[{i}]" for i in range(g.SLICES)]
+    assert "DOUTB" not in gen.escape_pins["bit_slice"]  # not escaped from the slice either
+
+
+def test_block_escape_pins_are_on_one_edge_and_keep_their_spacing():
+    _, gen, _ = _built()
+    for name, (side, ports) in sorted(g.BLOCK_ESCAPES.items()):
+        pins = gen.escape_pins[name]
+        assert set(pins) == set(ports), (name, set(pins) ^ set(ports))
+        want_layer, along = (1, 1) if side == "left" else (0, 0)
+        assert {p[2] for p in pins.values()} == {want_layer}, name
+        assert len({round(p[1 - along], 3) for p in pins.values()}) == 1, (name, "pins are not on one edge")
+        co = sorted(p[along] for p in pins.values())
+        assert all(round(b - a, 3) >= round(g.M2_W + g.M2_SPACE, 3) for a, b in zip(co, co[1:])), name
+
+
+def test_fanout_tracks_and_lanes_keep_the_deck_spacing():
+    """The channel is a reserved-track router, so its pitch is checkable without extraction."""
+    _, gen, _ = _built()
+    r = gen.fanout_report
+    for key in ("trunks", "decoder_approach"):
+        ys = sorted(r[key].values())
+        assert len(ys) == len(set(ys)), key
+        assert all(round(b - a, 3) >= round(g.M3_W + g.M3_SPACE, 3) for a, b in zip(ys, ys[1:])), key
+    for key in ("west_lanes", "gap_lanes"):
+        xs = sorted(r[key].values())
+        assert len(xs) == len(set(xs)), key
+        assert all(round(b - a, 3) >= round(g.M2_W + g.M2_SPACE, 3) for a, b in zip(xs, xs[1:])), key
+    pins = sorted(r["slice_pins"].values())
+    assert len(pins) == len(g.SLICE_PORTS)
+    assert all(round(b - a, 3) >= round(g.M2_W + g.M2_SPACE, 3) for a, b in zip(pins, pins[1:]))
+    # ... and a slice pin keeps M2.b from the same pin one slice pitch away
+    assert round(2 * g.bc.W_CELL - (max(pins) - min(pins)), 3) >= round(g.M2_W + g.M2_SPACE, 3)
+    # the channel is the gap the latch block was moved down by, to the track it holds
+    assert r["channel_h"] == round(2 * g.CHANNEL_MARGIN + len(r["trunks"]) * g.TRACK_PITCH, 3)
