@@ -3,6 +3,40 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-15
+
+- **PR #185**: test: pin obstacle clear-side probes to the 0.22 margin boundary
+- **Issue #184** (closed): Obstacle margin assertions pin clear/clear3 to (0.21, 0.23], not exactly 0.22
+- **PR #183**: test: pin obstacle M2/M3 spacing margins with boundary assertions
+- **PR #180**: fix: scope new_record's cleanup trap to the caller's declared scratch requests
+- **PR #179**: fix: reject an aimed MazeRouter.connect whose goal set is not the singleton toward
+- **Issue #182** (closed): attest/mint.sh refuses to re-mint items 1/9; its blocker lifted in klayout-tools 0.9.2
+- **Issue #176** (closed): test_obstacle_clear3_and_cross_layer_independence does not pin clear3's M3.b spacing margin
+- **Issue #173** (closed): MazeRouter.connect: guard that `toward` is consistent with `goals`
+- **Issue #171** (closed): new_record's cleanup trap uses a directory-wide .*.json glob, so two run scripts sharing a sim/ directory can delete each other's in-flight scratch request
+- **PR #170**: layout: remove 6 dead rule constants from the layout generators
+- **PR #175**: docs: align README status, maturity ladder and repro steps with the signoff record
+- **PR #174**: refactor: extract the rails obstacle model and unify the tie-to-lane search
+- **Issue #167** (closed): Remove 6 dead rule constants from the layout generators: 3 restate a value a live constant's comment already carries
+- **Issue #161** (closed): docs: README status says no layout exists; bring it in line with the signoff record
+- **Issue #163** (closed): Gen.rails is 222 lines of closure scope: tie-to-lane search written twice, tie_maze takes 16 parameters to borrow it
+- **PR #162**: refactor(router): one maze search for both of route_net's modes
+- **PR #158**: docs: roadmap as of 2026-11-13
+- **Issue #154** (closed): Unify MazeRouter.connect and connect_to: ~30 lines of the search loop are duplicated verbatim
+
+### 2026-11-14
+
+- **PR #169**: docs: state WORK_PLAN.md snapshot semantics in header prose
+- **PR #168**: feat(attest): add pinned mint script for item 10 attestation envelope
+- **PR #166**: test(layout): record klt array-check on the macro array and assert it in verify.sh
+- **PR #164**: refactor(sim): fold duplicated run-script scaffolding into harness/common
+- **Issue #160** (closed): layout: run klt array-check on the macro and commit the report
+- **Issue #157** (closed): Consolidate the duplicated setup, record-dir and batch-submit scaffolding across sim/*/run_*.sh
+- **Issue #156** (closed): WORK_PLAN.md header calls a stale snapshot "current" label state (the generator is measured correct)
+- **Issue #155** (closed): Add a pinned mint script for the attest/ attestation envelopes
+- **Issue #153** (closed): CI: a README.md edit breaks the item-10 attestation, so the docs lane deadlocks
+- **Issue #105** (closed): layout: route decoder cell internals
+
 ### 2026-11-12
 
 - **PR #148**: Bump Repo Skills 0.25.10 -> 0.26.1

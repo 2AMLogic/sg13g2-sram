@@ -55,7 +55,7 @@ and the nets the router could not join.
 Decoder nets (issue #105)
 -------------------------
 ``route_hier`` also joins, inside ``predec3``, ``predec4``, ``wl_drivers`` and ``row_decoder``, the nets between their
-child cells (``wl_driver`` is a routed leaf cell), with the same router and ``connect_to``; the children of the first
+child cells (``wl_driver`` is a routed leaf cell), with the same router, aimed by ``toward``; the children of the first
 three are leaf cells, those of ``row_decoder`` are cells that ``route_hier`` already routed. A hierarchically routed cell
 hands the cell above what a leaf cell does (``export_hier``: its Metal2 / Metal3 per net, body ties, Via2s, landings), so
 the nesting needs no second mechanism. The wordline Metal2 stubs and Metal3 tracks that ``route_wordlines`` draws later
@@ -198,7 +198,7 @@ PIN_PITCH = 1.0  # um between left-edge pins
 
 # ---- inter-block routing (rule values from `klt deck rules --deck sg13g2`) ----
 V1 = 0.19  # V1.a: Via1 is a fixed 0.19 square
-V1_SPACE = 0.22  # V1.b
+# V1.b spacing (0.22) is not enforced by the generator (unlike V2_SPACE, which is); klt drc checks it
 M1_ENC_V1 = 0.01  # V1.c: Metal1 enclosure of Via1
 M1_V1_PAD = V1 + 2 * M1_ENC_V1  # 0.21: Metal1 landing pad for a Via1 on a 0.20 wire
 M2_W = 0.20  # M2.a
@@ -208,7 +208,6 @@ V2_SPACE = 0.22  # V2.b
 M3_W = 0.20  # M3.a
 M3_SPACE = 0.21  # M3.b
 # Metal2/3 wires are 0.20 wide, so a Via (0.19) is enclosed by 0.005 per side (V2.c 0.005)
-M2_ENC_V2 = 0.005
 TRACK_PITCH = M3_W + M3_SPACE  # 0.41: private Metal3 track pitch (M2: same widths)
 LANE_PITCH = 0.42  # Metal2 lane pitch in the wordline gap (>= M2_W + M2_SPACE)
 TRACK_OFFSET = 0.5  # first private track above its decoder terminal row
@@ -453,24 +452,33 @@ class MazeRouter:
         i, j = node
         self._mark(layer, i * STEP - h, j * STEP - h, i * STEP + h, j * STEP + h, net)
 
-    def _free(self, layer: int, i: int, j: int, net: int) -> bool:
-        return self.inside(i, j) and self.owner[layer][i - self.i0][j - self.j0] in (0, net)
+    def connect(self, net: int, tree: set[tuple[int, int, int]], goals: set[tuple[int, int, int]],
+                toward: tuple[int, int] | None = None):
+        """Cheapest path from any (layer, i, j) of ``tree`` to a goal (layer, i, j); None if there is none.
 
-    def connect(self, net: int, tree: set[tuple[int, int, int]], goals: set[tuple[int, int, int]]):
-        """Cheapest path from any (layer, i, j) of ``tree`` to a goal (layer, i, j); None if there is none."""
+        ``toward`` (an (i, j) node) turns the search into an A* aimed at it rather than one spreading in every
+        direction, for a net of many terminals: the Manhattan distance to a node never overestimates a path to it (a
+        lattice step costs at least 1), so the path found is still a cheapest one. Left at ``None`` the heuristic is
+        0 and this *is* Dijkstra over the goal set. ``toward`` aims at *the one* goal: that heuristic is admissible
+        only for the node it aims at, so an aimed call must pass ``goals == {(0, *toward)}`` — with other goals in
+        the set a first-popped goal can cost more than the cheapest path, and the call is rejected."""
         import heapq
 
-        dist: dict[tuple, int] = {}
+        assert toward is None or goals == {(0, *toward)}, (toward, goals)
+
+        aimed = toward is not None
+        gi, gj = toward if aimed else (0, 0)
+        dist: dict[tuple, int] = {n: 0 for n in tree}
         prev: dict[tuple, tuple] = {}
-        heap = [(0, *n) for n in sorted(tree)]
-        for n in tree:
-            dist[n] = 0
+        # Heap entries are (d + heuristic, d, layer, i, j). Unaimed the heuristic is 0, so the second element ties
+        # wherever the first does and the pop order is the (d, layer, i, j) one a plain Dijkstra heap would give.
+        heap = [((abs(i - gi) + abs(j - gj)) if aimed else 0, 0, l, i, j) for l, i, j in sorted(tree)]
         heapq.heapify(heap)
         owner, i0, i1, j0, j1 = self.owner, self.i0, self.i1, self.j0, self.j1
         via_near = self.via_near
         big = 1 << 30
         while heap:
-            d, l, i, j = heapq.heappop(heap)
+            _, d, l, i, j = heapq.heappop(heap)
             if d > dist.get((l, i, j), big):
                 continue
             if (l, i, j) in goals:
@@ -495,49 +503,8 @@ class MazeRouter:
                 if d + c < dist.get(n2, big):
                     dist[n2] = d + c
                     prev[n2] = (l, i, j)
-                    heapq.heappush(heap, (d + c, l2, i2, j2))
-        return None
-
-    def connect_to(self, net: int, tree: set[tuple[int, int, int]], goal: tuple[int, int]):
-        """``connect`` to one goal node (either layer) with A*: the Manhattan distance to it never overestimates a path
-        (a lattice step costs at least 1), so a net of many terminals searches only toward the next one."""
-        import heapq
-
-        gi, gj = goal
-        dist: dict[tuple, int] = {n: 0 for n in tree}
-        prev: dict[tuple, tuple] = {}
-        heap = [(abs(i - gi) + abs(j - gj), 0, *n) for n in sorted(tree) for l, i, j in [n]]
-        heapq.heapify(heap)
-        owner, i0, i1, j0, j1 = self.owner, self.i0, self.i1, self.j0, self.j1
-        via_near = self.via_near
-        big = 1 << 30
-        while heap:
-            _, d, l, i, j = heapq.heappop(heap)
-            if d > dist.get((l, i, j), big):
-                continue
-            if (i, j) == goal and l == 0:
-                path = [(l, i, j)]
-                while path[-1] in prev:
-                    path.append(prev[path[-1]])
-                return path[::-1]
-            ch, cv = (WRONG_WAY, 1) if l == 0 else (1, WRONG_WAY)
-            own = owner[l]
-            nxt = []
-            for c, i2, j2 in ((ch, i + 1, j), (ch, i - 1, j), (cv, i, j + 1), (cv, i, j - 1)):
-                if i0 <= i2 <= i1 and j0 <= j2 <= j1:
-                    o = own[i2 - i0][j2 - j0]
-                    if o == 0 or o == net:
-                        nxt.append((c, l, i2, j2))
-            if (i, j) not in via_near:
-                o = owner[1 - l][i - i0][j - j0]
-                if o == 0 or o == net:
-                    nxt.append((VIA_COST, 1 - l, i, j))
-            for c, l2, i2, j2 in nxt:
-                n2 = (l2, i2, j2)
-                if d + c < dist.get(n2, big):
-                    dist[n2] = d + c
-                    prev[n2] = (l, i, j)
-                    heapq.heappush(heap, (d + c + abs(i2 - gi) + abs(j2 - gj), d + c, l2, i2, j2))
+                    h = (abs(i2 - gi) + abs(j2 - gj)) if aimed else 0
+                    heapq.heappush(heap, (d + c + h, d + c, l2, i2, j2))
         return None
 
     def connect_edge(self, net: int, tree: set[tuple[int, int, int]], goals: set[tuple[int, int, int]],
@@ -628,7 +595,7 @@ class MazeRouter:
             goals = {(0, *t) for t in todo} | {(1, *t) for t in todo if t in arrive}
             if directed:
                 near = min(sorted(todo), key=lambda t: min(abs(t[0] - n[1]) + abs(t[1] - n[2]) for n in tree))
-                path = self.connect_to(net, tree, near)
+                path = self.connect(net, tree, {(0, *near)}, toward=near)
             else:
                 path = self.connect(net, tree, goals)
             if path is None:
@@ -660,6 +627,107 @@ def route_orders(names: list[str], size: dict[str, int]) -> list[list[str]]:
         for k in range(1, len(base)):
             orders.append(base[k:] + base[:k])
     return orders
+
+
+OBST_HASH_PITCH = 5.0  # um cell size of the supply-rail obstacle spatial hash
+
+
+class Obstacles:
+    """Metal2/Metal3 obstacle hashes of one macro, indexed by an ``OBST_HASH_PITCH``-um grid, with the
+    DRC-spacing model the supply-rail stubs are checked against: ``clear`` is the Metal2 rule (M2.b plus a
+    0.01 margin to every other net's shape, or to a same-net shape not merging with the candidate; a corner
+    overlap of two same-net shapes narrower than the stub is a sliver under M2.a), ``clear3`` the Metal3 rule
+    (M3.b plus the same margin). Signal shapes are stored under net ``None`` and block every net."""
+
+    def __init__(self) -> None:
+        self.m2: dict[tuple[int, int], list[tuple[str | None, kdb.DBox]]] = {}
+        self.m3: dict[tuple[int, int], list[kdb.DBox]] = {}
+
+    @staticmethod
+    def cells_of(b: kdb.DBox):
+        for gx in range(int(b.left // OBST_HASH_PITCH), int(b.right // OBST_HASH_PITCH) + 1):
+            for gy in range(int(b.bottom // OBST_HASH_PITCH), int(b.top // OBST_HASH_PITCH) + 1):
+                yield gx, gy
+
+    def add(self, net: str | None, b: kdb.DBox) -> None:
+        item = (net, b)
+        for c in self.cells_of(b):
+            self.m2.setdefault(c, []).append(item)
+
+    def add_m3(self, b: kdb.DBox) -> None:
+        for c in self.cells_of(b):
+            self.m3.setdefault(c, []).append(b)
+
+    def clear(self, net: str, b: kdb.DBox) -> bool:
+        e = b.enlarged(M2_SPACE + 0.01, M2_SPACE + 0.01)
+        for c in self.cells_of(e):
+            for n, ob in self.m2.get(c, ()):
+                if e.overlaps(ob) and (n != net or not b.touches(ob)):
+                    return False  # other net, or same net but neither merged nor 0.21 apart
+                if n == net and e.overlaps(ob) and b.touches(ob):
+                    ov = b & ob
+                    if not ov.empty() and min(ov.width(), ov.height()) < STUB_W - 0.001:
+                        return False  # a corner overlap of two same-net shapes is a sliver narrower than M2.a
+        return True
+
+    def clear3(self, b: kdb.DBox) -> bool:
+        e = b.enlarged(M3_SPACE + 0.01, M3_SPACE + 0.01)
+        return not any(e.overlaps(ob) for c in self.cells_of(e) for ob in self.m3.get(c, ()))
+
+
+@dataclass
+class RailState:
+    """Draw target and bookkeeping the supply-rail tie searches share: the rails cell shapes are added to,
+    the Via2s already committed per (region, net, lane) x position, and the lanes already serving a tie."""
+
+    rc: kdb.Cell
+    via2_at: dict[tuple[int, str, float], list[float]] = field(default_factory=dict)
+    used: dict[tuple[int, str], set[float]] = field(default_factory=dict)
+
+
+def in_wl_gap(x0: float, x1: float) -> bool:
+    """An x-span intersecting the open wordline fan-out gap (0 to -WL_FANOUT_GAP): nothing below Metal4 may
+    enter it, though a wire edge may reach its boundary."""
+    return x1 > -WL_FANOUT_GAP and x0 < 0
+
+
+def lane_positions(regions: list[kdb.Box], trunk_x: dict[str, float],
+                   seam_pads: dict[str, list[float]]) -> tuple[dict[tuple[int, str], list[float]],
+                                                               dict[tuple[int, str], list[float]]]:
+    """Metal4 lane y positions per (region, net), and the strap pads per (region, net) a free lane must avoid:
+    per region, VDD at y0 + 0.6 + j * pitch, VSS half a pitch above. A lane keeps clear of every strap pad
+    (Metal4 pad at a trunk) inside its x-range and of the other net's lanes; it moves (nearest free spot) rather
+    than the pitch."""
+    hp = VIA_PAD / 2
+    lanes: dict[tuple[int, str], list[float]] = {}
+    pads_of: dict[tuple[int, str], list[float]] = {}
+    for ri, rb in enumerate(regions):
+        y0, y1 = rb.bottom * DBU, rb.top * DBU
+        span = {n: (min(rb.left * DBU, trunk_x[n] - hp), max(rb.right * DBU, trunk_x[n] + hp)) for n in trunk_x}
+        pads = {n: [y for m in trunk_x if span[n][0] <= trunk_x[m] + hp and trunk_x[m] - hp <= span[n][1]
+                    for y in seam_pads[m]] for n in trunk_x}
+        lanes[(ri, "VDD")], lanes[(ri, "VSS")] = [], []
+        for j in range(int((y1 - 0.3 - y0) // RAIL_LANE_PITCH) + 1):
+            for net, off in (("VDD", 0.6), ("VSS", 0.6 + RAIL_LANE_PITCH / 2)):
+                nominal = y0 + off + j * RAIL_LANE_PITCH
+                if nominal > y1 - 0.3:
+                    continue
+                other = "VSS" if net == "VDD" else "VDD"
+                for d in [0.0] + [s_ * 0.1 * i for i in range(1, 16) for s_ in (1, -1)]:
+                    y = nominal + d
+                    if y0 + 0.3 > y or y > y1 - 0.3:
+                        continue
+                    if any(abs(y - o) < LANE_W / 2 + hp + M3_SPACE for o in pads[net]):
+                        continue
+                    if any(abs(y - o) < LANE_W + M3_SPACE for o in lanes[(ri, other)]):
+                        continue
+                    break
+                else:
+                    raise AssertionError(f"no lane position near y={nominal} in region {ri}")
+                lanes[(ri, net)].append(round(y, 3))
+        for net in trunk_x:
+            pads_of[(ri, net)] = pads[net]
+    return lanes, pads_of
 
 
 # ---------------------------------------------------------------------------
@@ -2110,6 +2178,27 @@ class Gen:
             it.next()
         return out
 
+    def notch_free(self, obs: Obstacles, net: str, x: float, y: float, parts: list[kdb.DBox]) -> bool:
+        """Whether ``parts`` add no sub-M2.b gap or notch to the Metal2 of their own net around (x, y).
+
+        ``Obstacles.clear`` tests one part against one shape at a time and lets two shapes of a net merge, which is
+        right -- but a run that leaves a tie's pad and comes back under it merges *and* leaves a re-entrant corner
+        narrower than M2.b, and that is a violation just as a gap is. Compared against the same check without
+        ``parts``, so a flaw that is already there is not blamed on them."""
+        win = kdb.DBox(x - 3.0, y - 3.0, x + 3.0, y + 3.0)
+        mine = kdb.Region()
+        for c in obs.cells_of(win):
+            for n, b in obs.m2.get(c, ()):
+                if n == net and win.overlaps(b):
+                    mine.insert(kdb.Box(dbu(b.left), dbu(b.bottom), dbu(b.right), dbu(b.top)))
+        added = kdb.Region([kdb.Box(dbu(pt.left), dbu(pt.bottom), dbu(pt.right), dbu(pt.top)) for pt in parts])
+
+        def flaws(rg: kdb.Region) -> int:
+            rg = rg.merged()
+            return rg.notch_check(dbu(M2_SPACE)).count() + rg.space_check(dbu(M2_SPACE)).count()
+
+        return flaws(mine + added) <= flaws(mine)
+
     def rails(self, top: kdb.Cell, regions: list[kdb.Box], arr_w: int) -> None:
         """Supply rails. Metal4 lanes run in free tracks, Metal5 trunks sit right of the array; nothing but
         Metal4 crosses the wordline fan-out gap, whose Metal2/Metal3 lanes and tracks belong to the signals."""
@@ -2150,101 +2239,35 @@ class Gen:
 
         ties = self.ties(top)
         tie_pads = [kdb.DBox(t["x"] - hp, t["y"] - hp, t["x"] + hp, t["y"] + hp) for t in ties]
-        # Metal2 / Metal3 obstacles in a 5 um hash: [(net-or-None, DBox)]. Signals are net None.
-        obst: dict[tuple[int, int], list[tuple[str | None, kdb.DBox]]] = {}
-        obst3: dict[tuple[int, int], list[kdb.DBox]] = {}
-
-        def put(h: dict, item, b: kdb.DBox) -> None:
-            for gx in range(int(b.left // 5), int(b.right // 5) + 1):
-                for gy in range(int(b.bottom // 5), int(b.top // 5) + 1):
-                    h.setdefault((gx, gy), []).append(item)
-
-        def add_obst(net: str | None, b: kdb.DBox) -> None:
-            put(obst, (net, b), b)
-
-        def cells_of(b: kdb.DBox):
-            for gx in range(int(b.left // 5), int(b.right // 5) + 1):
-                for gy in range(int(b.bottom // 5), int(b.top // 5) + 1):
-                    yield gx, gy
-
-        def clear(net: str, b: kdb.DBox) -> bool:
-            e = b.enlarged(M2_SPACE + 0.01, M2_SPACE + 0.01)
-            for c in cells_of(e):
-                for n, ob in obst.get(c, ()):
-                    if e.overlaps(ob) and (n != net or not b.touches(ob)):
-                        return False  # other net, or same net but neither merged nor 0.21 apart
-                    if n == net and e.overlaps(ob) and b.touches(ob):
-                        ov = b & ob
-                        if not ov.empty() and min(ov.width(), ov.height()) < STUB_W - 0.001:
-                            return False  # a corner overlap of two same-net shapes is a sliver narrower than M2.a
-            return True
-
-        def clear3(b: kdb.DBox) -> bool:
-            e = b.enlarged(M3_SPACE + 0.01, M3_SPACE + 0.01)
-            return not any(e.overlaps(ob) for c in cells_of(e) for ob in obst3.get(c, ()))
-
-        def notch_free(net: str, x: float, y: float, parts: list[kdb.DBox]) -> bool:
-            """Whether ``parts`` add no sub-M2.b gap or notch to the Metal2 of their own net around (x, y).
-
-            ``clear`` tests one part against one shape at a time and lets two shapes of a net merge, which is
-            right -- but a run that leaves a tie's pad and comes back under it merges *and* leaves a re-entrant
-            corner narrower than M2.b, and that is a violation just as a gap is. Compared against the same
-            check without ``parts``, so a flaw that is already there is not blamed on them."""
-            win = kdb.DBox(x - 3.0, y - 3.0, x + 3.0, y + 3.0)
-            mine = kdb.Region()
-            for c in cells_of(win):
-                for n, b in obst.get(c, ()):
-                    if n == net and win.overlaps(b):
-                        mine.insert(kdb.Box(dbu(b.left), dbu(b.bottom), dbu(b.right), dbu(b.top)))
-            added = kdb.Region([kdb.Box(dbu(pt.left), dbu(pt.bottom), dbu(pt.right), dbu(pt.top)) for pt in parts])
-
-            def flaws(rg: kdb.Region) -> int:
-                rg = rg.merged()
-                return rg.notch_check(dbu(M2_SPACE)).count() + rg.space_check(dbu(M2_SPACE)).count()
-
-            return flaws(mine + added) <= flaws(mine)
+        # Metal2 / Metal3 obstacles in a spatial hash: [(net-or-None, DBox)]. Signals are net None.
+        obs = Obstacles()
 
         for ob in self.signal_boxes(top, L_METAL2, tie_pads):
-            add_obst(None, ob)
+            obs.add(None, ob)
         for ob in self.signal_boxes(top, L_METAL3, []):
-            put(obst3, ob, ob)
+            obs.add_m3(ob)
         for t, tp in zip(ties, tie_pads):
-            add_obst(t["net"], tp)
+            obs.add(t["net"], tp)
 
-        # Metal4 lanes: per region, VDD at y0 + 0.6 + j * pitch, VSS half a pitch above. A lane keeps clear of every
-        # strap pad (Metal4 pad at a trunk) inside its x-range and of the other net's lanes; it moves (nearest free
-        # spot) rather than the pitch.
-        lanes: dict[tuple[int, str], list[float]] = {}
-        pads_of: dict[tuple[int, str], list[float]] = {}
-        for ri, rb in enumerate(regions):
-            y0, y1 = rb.bottom * DBU, rb.top * DBU
-            span = {n: (min(rb.left * DBU, trunk_x[n] - hp), max(rb.right * DBU, trunk_x[n] + hp)) for n in trunk_x}
-            pads = {n: [y for m in trunk_x if span[n][0] <= trunk_x[m] + hp and trunk_x[m] - hp <= span[n][1]
-                        for y in seam_pads[m]] for n in trunk_x}
-            lanes[(ri, "VDD")], lanes[(ri, "VSS")] = [], []
-            for j in range(int((y1 - 0.3 - y0) // RAIL_LANE_PITCH) + 1):
-                for net, off in (("VDD", 0.6), ("VSS", 0.6 + RAIL_LANE_PITCH / 2)):
-                    nominal = y0 + off + j * RAIL_LANE_PITCH
-                    if nominal > y1 - 0.3:
-                        continue
-                    other = "VSS" if net == "VDD" else "VDD"
-                    for d in [0.0] + [s_ * 0.1 * i for i in range(1, 16) for s_ in (1, -1)]:
-                        y = nominal + d
-                        if y0 + 0.3 > y or y > y1 - 0.3:
-                            continue
-                        if any(abs(y - o) < LANE_W / 2 + hp + M3_SPACE for o in pads[net]):
-                            continue
-                        if any(abs(y - o) < LANE_W + M3_SPACE for o in lanes[(ri, other)]):
-                            continue
-                        break
-                    else:
-                        raise AssertionError(f"no lane position near y={nominal} in region {ri}")
-                    lanes[(ri, net)].append(round(y, 3))
-            for net in trunk_x:
-                pads_of[(ri, net)] = pads[net]
+        # Metal4 lanes and strap pads: per region, per net (see lane_positions)
+        lanes, pads_of = lane_positions(regions, trunk_x, seam_pads)
         self.tie_wiring: list[dict] = []
-        used: dict[tuple[int, str], set[float]] = {}
-        via2_at: dict[tuple[int, str, float], list[float]] = {}
+        state = RailState(rc)
+
+        def tie_candidates(net: str, ri: int, x: float, y: float):
+            """(ly, xs, dx) candidates for a tie's stub: its net's lanes nearest-first (eight), the sideways offset
+            nearest-first on a 0.2 um grid within +-6 um; the guards shared by the Metal2 and Metal3 paths (the lane
+            pad stays inside the macro; the Via2 keeps V2.b / M3.b to the other Via2s on the same lane) applied once."""
+            for ly in sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]:
+                for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
+                    xs = round(x + dx, 3)
+                    if xs - hp < self.pre_rail_bb.left * DBU:
+                        continue  # the lane pad stays inside the macro (rails extend it to the right only)
+                    # Via2 (and its Metal3 pad) keep V2.b / M3.b to the other Via2 on the same lane
+                    if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
+                        continue
+                    yield ly, xs, dx
+
         for t in ties:
             net, x, y = t["net"], t["x"], t["y"]
             ri = next((i for i, rb in enumerate(regions) if rb.contains(kdb.Point(dbu(x), dbu(y)))), None)
@@ -2253,62 +2276,48 @@ class Gen:
             # sideways at the tie's own height (Metal2 horizontal, then vertical)
             chosen = None
             hw = STUB_W / 2
-
-            def try_m2(ly, net=net, x=x, y=y, ri=ri, hw=hw):
-                """A Metal2 stub from this tie's pad to the Metal4 lane at ``ly``, or None if none is clear."""
+            def m2_parts(ly: float, xs: float) -> list[kdb.DBox] | None:
+                """The Metal2 shapes of a stub from the tie pad (x, y) to a Via3 at (xs, ly), or None if neither
+                variant stays clear of the wordline gap and this net's own Metal2: vertical first (up/down from
+                the pad, then along the lane's height), else sideways first."""
                 lo, hi = min(y, ly), max(y, ly)
+                for variant in (0, 1):
+                    if variant == 0:  # horizontal at the tie's height, vertical at xs
+                        parts = [kdb.DBox(xs - hw, lo - hp, xs + hw, hi + hp)]
+                        if xs != x:
+                            parts.append(kdb.DBox(min(x, xs) - hp, y - hw, max(x, xs) + hp, y + hw))
+                    else:  # vertical at the tie's x, horizontal at the lane height
+                        if xs == x or abs(ly - y) < hp + M2_SPACE + STUB_W / 2 + 0.01:
+                            continue
+                        parts = [kdb.DBox(x - hw, lo - hp, x + hw, hi + hp),
+                                 kdb.DBox(min(x, xs) - hp, ly - hw, max(x, xs) + hp, ly + hw)]
+                    if any(in_wl_gap(pt.left, pt.right) for pt in parts + [kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]):
+                        continue  # nothing below Metal4 in the wordline gap
+                    if all(obs.clear(net, pt) for pt in parts):
+                        return parts
+                return None
+
+            def m2_search(ly: float) -> tuple[float, float, list[kdb.DBox]] | None:
+                """The nearest-clear Metal2 stub from this tie's pad to the lane at ``ly``, or None: sideways
+                offsets nearest-first on a 0.2 um grid; a stub beside its own pad must clear it by M2.b
+                (otherwise the joint is a notch or a sliver), and the Via2 (and its Metal3 pad) keep V2.b /
+                M3.b to the other Via2s on the same lane."""
                 for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
-                    # a stub beside its own pad must clear it by M2.b (otherwise the joint is a notch or a sliver)
                     if dx and abs(dx) < hp + M2_SPACE + STUB_W / 2 + 0.01:
                         continue
                     xs = round(x + dx, 3)
                     if xs - hp < self.pre_rail_bb.left * DBU:
                         continue  # the lane pad stays inside the macro (rails extend it to the right only)
-                    # Via2 (and its Metal3 pad) keep V2.b / M3.b to the other Via2 on the same lane
-                    if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in via2_at.get((ri, net, ly), ())):
+                    if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
                         continue
-                    if not clear3(kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)):
+                    if not obs.clear3(kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)):
                         continue
-                    # vertical first (up/down from the pad, then along the lane's height), else sideways first
-                    for variant in (0, 1):
-                        if variant == 0:  # horizontal at the tie's height, vertical at xs
-                            parts = [kdb.DBox(xs - hw, lo - hp, xs + hw, hi + hp)]
-                            if dx:
-                                parts.append(kdb.DBox(min(x, xs) - hp, y - hw, max(x, xs) + hp, y + hw))
-                        else:  # vertical at the tie's x, horizontal at the lane height
-                            if not dx or abs(ly - y) < hp + M2_SPACE + STUB_W / 2 + 0.01:
-                                continue
-                            parts = [kdb.DBox(x - hw, lo - hp, x + hw, hi + hp),
-                                     kdb.DBox(min(x, xs) - hp, ly - hw, max(x, xs) + hp, ly + hw)]
-                        if any(pt.right > -WL_FANOUT_GAP and pt.left < 0 for pt in parts + [kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]):
-                            continue  # nothing below Metal4 in the wordline gap
-                        if all(clear(net, pt) for pt in parts):
-                            return (ly, xs, parts)
+                    parts = m2_parts(ly, xs)
+                    if parts:
+                        return ly, xs, parts
                 return None
 
-            def try_m3(ly, net=net, x=x, y=y, ri=ri, hw=hw):
-                """The same, on Metal3 from a Via2 on the tie's own pad to a Via3 on the lane: for a tie whose
-                Metal2 is taken by cell routing (issue #104)."""
-                lo, hi = min(y, ly), max(y, ly)
-                for dx in sorted([round(0.2 * i, 3) for i in range(-30, 31)], key=abs):
-                    if dx and (abs(dx) < hp + M3_SPACE + STUB_W / 2 + 0.01 or abs(ly - y) < hp + M3_SPACE + STUB_W / 2 + 0.01):
-                        continue  # a sideways run keeps M3.b to its own pads (otherwise a sliver between them)
-                    xs = round(x + dx, 3)
-                    if xs - hp < self.pre_rail_bb.left * DBU:
-                        continue
-                    if any(0 < abs(xs - ox) < VIA_PAD + M3_SPACE for ox in via2_at.get((ri, net, ly), ())):
-                        continue
-                    parts = [kdb.DBox(x - hp, y - hp, x + hp, y + hp), kdb.DBox(xs - hw, lo - hw, xs + hw, hi + hw),
-                             kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]
-                    if dx:
-                        parts.append(kdb.DBox(min(x, xs) - hw, y - hw, max(x, xs) + hw, y + hw))
-                    if any(pt.right > -WL_FANOUT_GAP and pt.left < 0 for pt in parts):
-                        continue  # nothing below Metal4 in the wordline gap
-                    if all(clear3(pt) for pt in parts):
-                        return (ly, xs, parts)
-                return None
-
-            def free_lane(ly, net=net, ri=ri):
+            def free_lane(ly: float) -> bool:
                 """Whether a new Metal4 lane may sit at ``ly`` in this region: inside it with the same 0.3 um
                 margin, clear of the strap pads of its net, and LANE_W + M3.b from every lane already there."""
                 rb = regions[ri]
@@ -2319,32 +2328,39 @@ class Gen:
                 return all(abs(ly - o) >= LANE_W + M3_SPACE
                            for n2 in trunk_x for o in lanes[(ri, n2)])
 
-            near = sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]
-            for ly in near:
-                chosen = try_m2(ly)
+            for ly in sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]:
+                chosen = m2_search(ly)
                 if chosen:
                     break
             if chosen is None:
                 chosen3 = None
-                for ly in near:
-                    chosen3 = try_m3(ly)
-                    if chosen3:
+                for ly, xs, dx in tie_candidates(net, ri, x, y):
+                    lo, hi = min(y, ly), max(y, ly)
+                    if dx and (abs(dx) < hp + M3_SPACE + STUB_W / 2 + 0.01 or abs(ly - y) < hp + M3_SPACE + STUB_W / 2 + 0.01):
+                        continue  # a sideways run keeps M3.b to its own pads (otherwise a sliver between them)
+                    parts = [kdb.DBox(x - hp, y - hp, x + hp, y + hp), kdb.DBox(xs - hw, lo - hw, xs + hw, hi + hw),
+                             kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)]
+                    if dx:
+                        parts.append(kdb.DBox(min(x, xs) - hw, y - hw, max(x, xs) + hw, y + hw))
+                    if any(in_wl_gap(pt.left, pt.right) for pt in parts):
+                        continue  # nothing below Metal4 in the wordline gap
+                    if all(obs.clear3(pt) for pt in parts):
+                        chosen3 = (ly, xs, parts)
                         break
                 if chosen3:
                     ly, xs, parts = chosen3
                     for pt in parts:
                         self.box(rc, L_METAL3, pt.left, pt.bottom, pt.right, pt.top)
-                        put(obst3, pt, pt)
+                        obs.add_m3(pt)
                     via(None, L_VIA2, L_METAL3, x, y)
                     via(None, L_VIA3, L_METAL4, xs, ly)
-                    via2_at.setdefault((ri, net, ly), []).append(xs)
-                    used.setdefault((ri, net), set()).add(ly)
+                    state.via2_at.setdefault((ri, net, ly), []).append(xs)
+                    state.used.setdefault((ri, net), set()).add(ly)
                     self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
                                             "stub": "Metal3"})
                     continue
                 if self.tie_maze(net, x, y, ri, rb_x=(regions[ri].left * DBU, regions[ri].right * DBU), lanes=lanes[(ri, net)],
-                                 obst=obst, obst3=obst3, cells_of=cells_of, via2_at=via2_at, clear3=clear3, rc=rc,
-                                 add_obst=add_obst, put=put, used=used, notch_free=notch_free):
+                                 obs=obs, state=state):
                     continue
                 # Still nothing: give the tie a Metal4 lane of its own, at the nearest clear height. A lane is
                 # Metal4 and is only drawn where it serves a tie, so an extra one costs its own clearance and
@@ -2354,8 +2370,8 @@ class Gen:
                 for d in [round(0.1 * k, 3) for k in range(1, int(10 * RAIL_LANE_PITCH))]:
                     for ly in (round(y + d, 3), round(y - d, 3)):
                         if free_lane(ly):
-                            chosen = try_m2(ly)
-                            if chosen and not notch_free(net, x, y, chosen[2]):
+                            chosen = m2_search(ly)
+                            if chosen and not self.notch_free(obs, net, x, y, chosen[2]):
                                 chosen = None
                             if chosen:
                                 lanes[(ri, net)].append(ly)
@@ -2367,17 +2383,17 @@ class Gen:
             ly, xs, parts = chosen
             for pt in parts:
                 self.box(rc, L_METAL2, pt.left, pt.bottom, pt.right, pt.top)
-                add_obst(net, pt)
+                obs.add(net, pt)
             via(None, L_VIA2, L_METAL3, xs, ly)
             via(None, L_VIA3, L_METAL4, xs, ly)
             pad3 = kdb.DBox(xs - hp, ly - hp, xs + hp, ly + hp)
-            put(obst3, pad3, pad3)
-            via2_at.setdefault((ri, net, ly), []).append(xs)
-            used.setdefault((ri, net), set()).add(ly)
+            obs.add_m3(pad3)
+            state.via2_at.setdefault((ri, net, ly), []).append(xs)
+            state.used.setdefault((ri, net), set()).add(ly)
             self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
                                     "stub": "Metal2"})
         # lanes that serve at least one tie run on Metal4 out to the trunk of their net
-        for (ri, net), ys in sorted(used.items()):
+        for (ri, net), ys in sorted(state.used.items()):
             rb = regions[ri]
             tx = trunk_x[net]
             x0 = rb.left * DBU
@@ -2386,14 +2402,13 @@ class Gen:
                 via(None, L_VIA4, L_METAL4, tx, ly)
         # Metal5 trunks span every lane and strap of their net
         for net in ("VDD", "VSS"):
-            ys = list(seam_pads[net]) + [ly for (_, n), v in used.items() if n == net for ly in v]
+            ys = list(seam_pads[net]) + [ly for (_, n), v in state.used.items() if n == net for ly in v]
             tx = trunk_x[net]
             self.box(rc, L_METAL5, tx - TRUNK_W / 2, min(ys) - hp, tx + TRUNK_W / 2, max(ys) + hp)
             self.text(rc, (67, 25), net, tx, min(ys))
 
-    def tie_maze(self, net: str, x: float, y: float, ri: int, rb_x: tuple[float, float], lanes: list[float], obst: dict,
-                 obst3: dict, cells_of, via2_at: dict, clear3, rc: kdb.Cell, add_obst, put, used: dict, notch_free,
-                 reach: int = 0) -> bool:
+    def tie_maze(self, net: str, x: float, y: float, ri: int, rb_x: tuple[float, float], lanes: list[float],
+                 obs: Obstacles, state: RailState, reach: int = 0) -> bool:
         """Last resort for a tie whose straight stubs are blocked (issue #104): maze-route it on Metal2/Metal3 from its
         Metal2 pad to a Via3 on one of its net's Metal4 lanes, around everything already drawn. The search window grows
         (``TIE_MAZE_REACH``) where the decoder's cell nets leave no way out of the first one (issue #105)."""
@@ -2402,21 +2417,20 @@ class Gen:
         def retry() -> bool:
             if reach + 1 == len(TIE_MAZE_REACH):
                 return False
-            return self.tie_maze(net, x, y, ri, rb_x, lanes, obst, obst3, cells_of, via2_at, clear3, rc, add_obst, put, used,
-                                 notch_free, reach + 1)
+            return self.tie_maze(net, x, y, ri, rb_x, lanes, obs, state, reach + 1)
 
         pb = self.pre_rail_bb  # the rails may extend the macro to the right only
         win = kdb.DBox(max(x - rx, pb.left * DBU + 0.5), max(y - ry, pb.bottom * DBU + 0.5), x + rx, min(y + ry, pb.top * DBU - 0.5))
         mz = MazeRouter(dbu(win.left), dbu(win.bottom), dbu(win.right), dbu(win.top))
         seen: set[int] = set()
-        for c in cells_of(win):
-            for it in obst.get(c, ()):
+        for c in obs.cells_of(win):
+            for it in obs.m2.get(c, ()):
                 n, b = it
                 if id(it) in seen or (n == net and abs(b.center().x - x) < 1e-3 and abs(b.center().y - y) < 1e-3):
                     continue
                 seen.add(id(it))
                 mz.block(0, b.left, b.bottom, b.right, b.top)
-            for b in obst3.get(c, ()):
+            for b in obs.m3.get(c, ()):
                 if id(b) not in seen:
                     seen.add(id(b))
                     mz.block(1, b.left, b.bottom, b.right, b.top)
@@ -2438,11 +2452,11 @@ class Gen:
         for ly in lanes:
             for i in range(mz.i0, mz.i1 + 1):
                 gx, gy = i * STEP * DBU, round(ly / (STEP * DBU)) * STEP * DBU
-                if abs(gy - ly) > 0.055 or gx < rb_x[0] + 0.3 or (gx + hp > -WL_FANOUT_GAP and gx - hp < 0):
+                if abs(gy - ly) > 0.055 or gx < rb_x[0] + 0.3 or in_wl_gap(gx - hp, gx + hp):
                     continue
-                if any(abs(gx - ox) < VIA_PAD + M3_SPACE for ox in via2_at.get((ri, net, ly), ())):
+                if any(abs(gx - ox) < VIA_PAD + M3_SPACE for ox in state.via2_at.get((ri, net, ly), ())):
                     continue
-                if mz.inside(i, round(ly / (STEP * DBU))) and clear3(kdb.DBox(gx - M3_W / 2, gy - M3_W / 2, gx + M3_W / 2, gy + M3_W / 2)):
+                if mz.inside(i, round(ly / (STEP * DBU))) and obs.clear3(kdb.DBox(gx - M3_W / 2, gy - M3_W / 2, gx + M3_W / 2, gy + M3_W / 2)):
                     goals.add((1, i, round(ly / (STEP * DBU))))
         if not goals:
             return retry()
@@ -2459,34 +2473,34 @@ class Gen:
         m2 += [kdb.DBox(sh[1][0] * STEP * DBU - M2_W / 2, sh[1][1] * STEP * DBU - M2_W / 2,
                         sh[1][0] * STEP * DBU + M2_W / 2, sh[1][1] * STEP * DBU + M2_W / 2)
                for sh in mz.shapes.get(1, []) if sh[0] == "via"]
-        if not notch_free(net, x, y, m2):
+        if not self.notch_free(obs, net, x, y, m2):
             return retry()
         ly = min(lanes, key=lambda v: abs(v - path[-1][2] * STEP * DBU))
         # the Metal2 pad of the tie to the path start (lattice nodes are 0.05 apart, the pad is on the 0.005 grid)
-        self.seg(rc, L_METAL2, M2_W, x, y, start[0] * STEP * DBU, start[1] * STEP * DBU)
+        self.seg(state.rc, L_METAL2, M2_W, x, y, start[0] * STEP * DBU, start[1] * STEP * DBU)
         for sh in mz.shapes.get(1, []):
             if sh[0] == "wire":
                 _, l, a, b = sh
                 lp = L_METAL2 if l == 0 else L_METAL3
-                self.seg(rc, lp, M2_W, a[0] * STEP * DBU, a[1] * STEP * DBU, b[0] * STEP * DBU, b[1] * STEP * DBU)
+                self.seg(state.rc, lp, M2_W, a[0] * STEP * DBU, a[1] * STEP * DBU, b[0] * STEP * DBU, b[1] * STEP * DBU)
                 bx = kdb.DBox(min(a[0], b[0]) * STEP * DBU - M2_W / 2, min(a[1], b[1]) * STEP * DBU - M2_W / 2,
                               max(a[0], b[0]) * STEP * DBU + M2_W / 2, max(a[1], b[1]) * STEP * DBU + M2_W / 2)
                 if l == 0:
-                    add_obst(net, bx)
+                    obs.add(net, bx)
                 else:
-                    put(obst3, bx, bx)
+                    obs.add_m3(bx)
             else:
                 vx, vy = sh[1][0] * STEP * DBU, sh[1][1] * STEP * DBU
-                self.via_pad(rc, L_VIA2, vx, vy)
+                self.via_pad(state.rc, L_VIA2, vx, vy)
                 for lp in (L_METAL2, L_METAL3):
-                    self.rect(rc, lp, vx, vy, M2_W, M2_W)
+                    self.rect(state.rc, lp, vx, vy, M2_W, M2_W)
         gx, gy = path[-1][1] * STEP * DBU, path[-1][2] * STEP * DBU
-        self.via_pad(rc, L_VIA3, gx, gy)
-        self.rect(rc, L_METAL3, gx, gy, M3_W, M3_W)
+        self.via_pad(state.rc, L_VIA3, gx, gy)
+        self.rect(state.rc, L_METAL3, gx, gy, M3_W, M3_W)
         pad3 = kdb.DBox(gx - hp, gy - hp, gx + hp, gy + hp)
-        put(obst3, pad3, pad3)
-        via2_at.setdefault((ri, net, ly), []).append(round(gx, 3))
-        used.setdefault((ri, net), set()).add(ly)
+        obs.add_m3(pad3)
+        state.via2_at.setdefault((ri, net, ly), []).append(round(gx, 3))
+        state.used.setdefault((ri, net), set()).add(ly)
         self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": round(gx, 3), "region": ri, "stub": "maze"})
         return True
 

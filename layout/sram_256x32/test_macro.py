@@ -6,10 +6,12 @@ leaf-cell signal routing (flat-net resolution, router, per-cell connectivity).
 """
 
 import os
+import random
 import re
 import sys
 
 import klayout.db as kdb
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import generate as g  # noqa: E402
@@ -281,6 +283,47 @@ def test_gap_clearance_check_has_teeth():
     assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1
 
 
+# ---- the rails obstacle model (issue #163) ---------------------------------------
+def test_obstacle_clear_rejects_other_net_and_signal_shapes():
+    obs = g.Obstacles()
+    obs.add("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))
+    assert not obs.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # interior overlap
+    assert not obs.clear("VDD", kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M2.b
+    assert not obs.clear("VDD", kdb.DBox(1.21, 0.0, 2.0, 0.2))  # 0.21 away: still inside the 0.22 check margin
+    assert obs.clear("VDD", kdb.DBox(1.22, 0.0, 2.0, 0.2))  # past the check margin it is clear
+    sig = g.Obstacles()
+    sig.add(None, kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a signal shape blocks every net
+    assert not sig.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))
+    assert not sig.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))
+
+
+def test_obstacle_clear_same_net_merge_and_sliver():
+    obs = g.Obstacles()
+    obs.add("VSS", kdb.DBox(0.8, 0.0, 1.8, 0.2))
+    assert obs.clear("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))  # merged: the overlap is a full stub width deep
+    obs2 = g.Obstacles()
+    obs2.add("VSS", kdb.DBox(0.9, 0.0, 1.9, 0.2))
+    assert not obs2.clear("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a 0.1 um-deep corner overlap is a sliver under M2.a
+
+
+def test_obstacle_hash_spans_its_grid_cells():
+    obs = g.Obstacles()
+    obs.add("VDD", kdb.DBox(4.9, 4.9, 5.1, 5.1))  # straddles the 5 um grid line
+    assert {(0, 0), (1, 0), (0, 1), (1, 1)} <= set(obs.m2)
+    assert not obs.clear("VSS", kdb.DBox(5.0, 5.0, 5.5, 5.2))
+
+
+def test_obstacle_clear3_and_cross_layer_independence():
+    obs = g.Obstacles()
+    obs.add_m3(kdb.DBox(0.0, 0.0, 1.0, 0.2))
+    assert not obs.clear3(kdb.DBox(0.5, 0.05, 1.5, 0.25))
+    assert not obs.clear3(kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M3.b
+    assert not obs.clear3(kdb.DBox(1.21, 0.0, 2.0, 0.2))  # 0.21 away: still inside the 0.22 check margin
+    assert obs.clear3(kdb.DBox(1.22, 0.0, 2.0, 0.2))  # past the check margin it is clear
+    assert any(obs.m3.values())
+    assert obs.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # the Metal3 hash does not gate the Metal2 check
+
+
 # ---- flat-net resolution (issue #104) -------------------------------------------
 def _device_count(nl, name):
     n = 0
@@ -393,6 +436,60 @@ def test_router_keeps_spacing_between_nets():
         # nets are separate polygons at least M2.b / M3.b apart
         for x, y in (("A", "B"), ("A", "C"), ("B", "C")):
             assert regions[x][l].merged().separation_check(regions[y][l].merged(), g.dbu(g.M2_SPACE)).count() == 0, (x, y, l)
+
+
+def _path_cost(path):
+    """Cost of a router path under the generator's own model: ``VIA_COST`` to change layer, 1 along the layer's
+    preferred direction (Metal2 vertical, Metal3 horizontal), ``WRONG_WAY`` against it."""
+    return sum(g.VIA_COST if l != l2 else (1 if (i == i2) == (l == 0) else g.WRONG_WAY)
+               for (l, i, j), (l2, i2, j2) in zip(path, path[1:]))
+
+
+def test_router_aimed_and_unaimed_searches_agree():
+    """``MazeRouter.connect`` serves both of ``route_net``'s modes from one search. Aimed with ``toward`` it is an A*
+    whose Manhattan heuristic never overestimates a lattice path (the cheapest step costs 1), so for a single goal it
+    must agree with the unaimed Dijkstra on whether the goal is reachable and on what a cheapest path there costs."""
+    start, goal, routable = (4, 4), (52, 52), 0
+    for seed in range(12):
+        rnd = random.Random(seed)
+        # one obstacle map, two fresh routers: only the search differs between the pair
+        bars = [(rnd.randrange(2), rnd.randrange(6, 50), rnd.randrange(6, 50), rnd.randrange(2, 9)) for _ in range(20)]
+        pair = []
+        for _ in range(2):
+            mz = g.MazeRouter(0, 0, 3000, 3000)
+            s = g.STEP * g.DBU
+            for l, bi, bj, n in bars:
+                mz.block(l, bi * s, bj * s, (bi + n) * s, bj * s + g.M2_W)
+            mz.pad(0, start, 1)
+            mz.pad(0, goal, 1)
+            pair.append(mz)
+        unaimed = pair[0].connect(1, {(0, *start)}, {(0, *goal)})
+        aimed = pair[1].connect(1, {(0, *start)}, {(0, *goal)}, toward=goal)
+        assert (unaimed is None) == (aimed is None), seed
+        if unaimed is None:
+            continue
+        routable += 1
+        assert unaimed[0] == aimed[0] == (0, *start) and unaimed[-1] == aimed[-1] == (0, *goal), seed
+        assert _path_cost(unaimed) == _path_cost(aimed), (seed, _path_cost(unaimed), _path_cost(aimed))
+    assert routable >= 8, f"only {routable}/12 obstacle maps were routable: the comparison is not being exercised"
+
+
+def test_router_rejects_aimed_search_at_more_than_one_goal():
+    """``connect``'s ``toward`` aims an A* whose Manhattan heuristic is admissible only for the one node it aims at:
+    with ``WRONG_WAY`` steps on the lattice, a goal set holding more than ``toward`` alone can pop a
+    costlier-than-cheapest goal first (start (4, 4), goals {(0, 4, 12), (0, 8, 4)}, toward (8, 4): aimed cost 16 vs
+    optimal 8), silently. The aimed mode therefore asserts ``goals == {(0, *toward)}``; the unaimed Dijkstra over
+    any goal set, on either layer, is unaffected, as is the aimed singleton the generator itself calls."""
+    start = (4, 4)
+    mz = g.MazeRouter(0, 0, 3000, 3000)
+    with pytest.raises(AssertionError):
+        mz.connect(1, {(0, *start)}, {(0, 4, 12), (0, 8, 4)}, toward=(8, 4))
+    with pytest.raises(AssertionError):
+        mz.connect(1, {(0, *start)}, {(0, 20, 20)}, toward=(30, 30))
+    assert mz.connect(1, {(0, *start)}, {(0, 8, 4)}, toward=(8, 4)) is not None
+    assert mz.connect(1, {(0, *start)}, {(0, 4, 12), (0, 8, 4)}) is not None
+    assert mz.connect(1, {(0, *start)}, {(1, 4, 12), (1, 8, 4)}) is not None
+    assert mz.connect(1, {(0, *start)}, {(0, 20, 20)}) is not None
 
 
 # ---- leaf-cell nets on the generated layout (issue #104) ----------------------------
