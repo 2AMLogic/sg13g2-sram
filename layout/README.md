@@ -202,6 +202,22 @@ wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply 
 Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: inter-block signal
 routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
+**Provenance note (2026-11-17): this record alone carries
+`provenance.klayout_version_mismatch: true`.** It was minted by klt
+`0.9.3.dev234+g5ed4e55b`, which expects klayout 0.30.12, against a host klayout
+**0.30.13** (measured with `klt version --format json` on the worker,
+2026-11-17). The verdict is unaffected — `status: clean`, `violation_count: 0`,
+and `klt drc --check` reports `match` (hash binding; `verify.sh` step 8 runs
+this cheap mode) — but per klt's own warning the report counts, deck content
+hash and `rules_skipped` may differ from a record minted under the expected
+engine, even for an unchanged layout (the input hash above still binds this
+GDS). Whoever next re-mints a DRC/LVS record after the worker pins are matched
+should expect that churn and attribute it to the toolchain, not to the layout.
+The cause is a worker-image skew — klayout resolving ahead of the version the
+pinned klt expects; the fix (pin the two together) is pending in `2AMLogic/2am`
+`infra/aws/loom-worker/` (tracked as 2am#7369), and host tools are not changed
+from this repo (issue #195).
+
 The latest record (issue #159, `layout/reports/macro-record-blbm.json`, minted by
 `layout/reports/generate-macro-blbm.sh`) joins the column mux's `BLBM`, the last undrawn leaf-cell
 net (#104 left it undrawn: the bit-line jogs and lanes left it no Metal3 crossing; `route_bitlines`
