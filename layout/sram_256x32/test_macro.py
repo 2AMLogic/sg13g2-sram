@@ -529,7 +529,7 @@ def test_leaf_cell_nets_are_one_net_each_and_never_short():
         reps = [cl[0] for cl in ids.values()]
         assert len(set(reps)) == len(reps), (name, "two netlist nets share a cluster")
         n_checked += len(ids)
-    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 53
+    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 54
 
 
 def test_leaf_cell_undrawn_nets_are_listed():
@@ -540,11 +540,34 @@ def test_leaf_cell_undrawn_nets_are_listed():
         nets = {n for inst in gen.nl[name].insts if inst.ref in g.DEVICE_REFS for n in inst.nets[:3]}
         listed = set(rep["routed"]) | set(rep["failed"]) | set(rep["single_terminal"]) | set(rep["excluded"])
         assert listed == nets, (name, nets ^ listed)
-    # the known gap: the column mux's BLBM is not joined (the bit-line jogs leave no Metal3 crossing)
+    # every leaf-cell net is drawn (issue #159 joined the column mux's BLBM, the last undrawn one)
     undrawn = {(name, n) for name in g.LEAF_ROUTED for n in gen.leaf_report[name]["failed"]}
-    assert undrawn == {("column_mux", "BLBM")}, undrawn
+    assert undrawn == set(), undrawn
+    assert gen.leaf_report["column_mux"]["routed"]["BLBM"] == 4
     assert gen.leaf_report["inv"]["routed"] == {"A": 2, "Y": 2}
     assert gen.leaf_report["precharge"]["excluded"]["BL"]["reason"] == "bit line"
+
+
+def test_column_mux_blbm_is_one_net_and_has_teeth():
+    # the bit-line jogs are pushed below the BLBM terminal bands (``blbm_reserve``) so the net is
+    # joined; cutting any one of its traces must split it again (issue #159)
+    def probe(mutate):
+        layout, gen, _ = _built()
+        if mutate:
+            x, y = gen.leaf_terms["column_mux"]["BLBM"][0]
+            _erase_at(layout.cell("column_mux"), g.L_VIA1, x, y)
+        return _leaf_nets(layout, gen, "column_mux")["BLBM"]
+
+    assert len(set(probe(False))) == 1
+    assert len(set(probe(True))) > 1
+
+
+def test_column_mux_blbm_has_teeth_via2():
+    layout, gen, _ = _built()
+    v = next(v for v in gen.leaf_vias["column_mux"] if v["net"] == "BLBM")
+    _erase_at(layout.cell("column_mux"), g.L_VIA2, v["x"], v["y"])
+    ids = _leaf_nets(layout, gen, "column_mux")
+    assert len(set(ids["BLBM"])) > 1, v
 
 
 def test_leaf_cell_trace_has_teeth_via1_landing():
