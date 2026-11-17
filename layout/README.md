@@ -23,6 +23,7 @@ The same rule removed the per-stage scripts whose records no longer match the co
 - `generate-macro-rails.sh`: `git show 235e7a3:layout/reports/generate-macro-rails.sh`
 - `generate-macro-leafnets.sh`: `git show bb986a3:layout/reports/generate-macro-leafnets.sh`
 - `generate-macro-latchnets.sh`: `git show a1d6291:layout/reports/generate-macro-latchnets.sh`
+- `generate-macro-decoder.sh`: `git show 50289f1:layout/reports/generate-macro-decoder.sh` (superseded by `generate-macro-blbm.sh`; its #105 record stays as evidence of that older layout)
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
