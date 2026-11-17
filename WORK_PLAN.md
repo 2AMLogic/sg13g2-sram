@@ -10,7 +10,7 @@ Only the region between the markers is machine-generated.
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#191**: chore(loom): resync installed Loom to v0.19.1305
+_None._
 
 ## Very Important
 
@@ -29,7 +29,6 @@ Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a h
 - **#95**: layout: macro periphery signal nets and pin connection
 - **#108**: layout: connect macro pins, signals record, verify and README
 - **#152**: Guide docs PRs that edit README.md always drift the item-10 attestation envelope
-- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net
 
 ## Ready
 
@@ -48,7 +47,6 @@ Issues currently being built (`loom:building`).
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
-- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
 
 ## PRs Awaiting Review
@@ -64,7 +62,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#191**: chore(loom): resync installed Loom to v0.19.1305
+- **#197**: chore(loom): resync installed Loom to v0.19.1306
 
 ## Proposed
 
@@ -80,7 +78,6 @@ Issues carrying `loom:curated`.
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
-- **#159**: layout: join the column_mux BLBM net, the one undrawn leaf-cell net *(curated)*
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit *(curated)*
 
 ## Proposed (Architect / Hermit)
@@ -95,14 +92,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 1 |
+| Operator merge-risk holds | 0 |
 | Very important | 1 |
-| Important | 8 |
+| Important | 7 |
 | Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 9 |
+| In Progress (`loom:building`) | 8 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 12 |
+| Curated | 11 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
