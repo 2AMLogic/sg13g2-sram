@@ -181,7 +181,7 @@ print(json.dumps({
     },
     "not_covered": [
         "Connectivity: array-check is purely geometric. It says nothing about whether the abutting"
-        " risers are electrically joined -- that is macro-record-decoder.json and #30 (LVS).",
+        " risers are electrically joined -- that is macro-record-blbm.json and #30 (LVS).",
         "Design rules: no DRC. layout/reports/drc-macro.json is the DRC record.",
         "The array as a whole: the abutment check is one-dimensional, so no invocation covers the"
         " 128 x 64 array in one pass. The two clean runs cover one column along y and the 32 slices"

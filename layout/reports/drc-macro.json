@@ -20,6 +20,7 @@
       "5/0",
       "6/0",
       "7/0",
+      "7/21",
       "8/0",
       "10/0",
       "14/0",
@@ -27,9 +28,11 @@
       "29/0",
       "30/0",
       "31/0",
+      "32/0",
       "36/0",
       "49/0",
       "50/0",
+      "63/0",
       "66/0",
       "67/0",
       "125/0",
@@ -64,6 +67,7 @@
       "activ.enclosing.cont.1",
       "activ.space.1",
       "activ.width.1",
+      "cont.ongrid.1",
       "cont.space.1",
       "cont.width.1",
       "gatpoly.enclosing.cont.1",
@@ -154,7 +158,8 @@
       "V2",
       "V3",
       "V4",
-      "pSD"
+      "pSD",
+      "x"
     ],
     "unmodeled_rules": [
       "LU.a",
@@ -178,6 +183,7 @@
       "activ.enclosing.cont.1",
       "activ.space.1",
       "activ.width.1",
+      "cont.ongrid.1",
       "cont.space.1",
       "cont.width.1",
       "gatpoly.enclosing.cont.1",
@@ -306,20 +312,20 @@
     "nothing_checked_reasons": []
   },
   "provenance": {
-    "klt_version": "0.8.1.dev849+gf05774458ae2",
-    "klt_git_commit": "f05774458ae2e735e3b48c971e485ae0ea48301f",
-    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@f05774458ae2e735e3b48c971e485ae0ea48301f",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.3.dev234+g5ed4e55bffbd",
+    "klt_git_commit": "5ed4e55bffbd1ff909b9b3331d23d21c0a21894f",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@5ed4e55bffbd1ff909b9b3331d23d21c0a21894f",
+    "klayout_version": "0.30.13",
     "pdk": null,
     "deck": {
       "name": "sg13g2",
-      "content_hash": "sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15",
+      "content_hash": "sha256:cf6dfeadf75bd95bf89beb0a64e06ed43b65f6ff782df10ae200ea200a73d8e9",
       "released": true
     },
     "input": {
-      "content_hash": "sha256:3e534c55758f0c60da583d9e43d22be7452b8ee9805746b8f0e20f8c4ac801ec",
+      "content_hash": "sha256:e0a06f5f06a6b84ee053e4f8f3a5996d2a54681a78494083cc06192677cfbff6",
       "role": "layout"
     },
-    "klayout_version_mismatch": false
+    "klayout_version_mismatch": true
   }
 }

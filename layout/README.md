@@ -13,7 +13,7 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Generator tests (CI runs these: `layout-tests` in `ci.yml`; the slow macro tests in `layout-macro-tests.yml`, on `main` and PRs touching the macro) | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
-| Re-mint the current macro record (`macro-record-decoder.json`), socket and LEF (~2 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-decoder.sh` |
+| Re-mint the current macro record (`macro-record-blbm.json`), socket and LEF (~15 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-blbm.sh` |
 
 `layout/reports/generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and `macro-record-taps.json`, and was removed once it could only refuse to overwrite them. Both records still name it as `record_command`; recover the script with `git show cbf61db:layout/reports/generate-macro.sh`.
 
@@ -150,9 +150,9 @@ It is **partly routed**. The array interface (wordlines, bit lines) is wired; ev
 periphery transistor carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
 with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`); and
 every tie and every bitcell VDD/VSS riser reaches a VDD or VSS rail (#88 step 2, #92, re-planned
-in #102; `macro-record-rails.json`). The `VDD`/`VSS` pin squares are **not connected to the
-rails** and there is still no signal wiring inside the periphery (a net with several device
-terminals in one cell, such as `BL` on both precharge PMOS drains, is reached at one of them)
+in #102; `macro-record-rails.json`). Every signal net inside the periphery cells is routed
+(#104-#106, #105, #159: `macro-record-blbm.json`). The `VDD`/`VSS` pin squares are **not connected to the
+rails**, and there is no signal wiring between the blocks
 and none to the macro pins. The LEF pins are drawn Metal2 but are not connected to the logic, so
 the macro is not LVS-able yet. The wordline label on GatPoly text (5/1) sits mid-cell, off the
 poly row, and is not read by `klt extract`; the wordline nets take their names from the driver
@@ -195,17 +195,22 @@ it, and `RAIL_LANE_PITCH` (4 um, the rail lane pitch) is named apart from `LANE_
 
 `klt drc --deck sg13g2 --top macro layout/sram_256x32/macro.gds` ->
 `layout/reports/drc-macro.json`: `status: clean`, `violation_count: 0`, deck
-`sg13g2` hash `sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15`
-(released), input hash `sha256:76b3a60b…86715e`, the **partly routed** macro (array interface
+`sg13g2` hash `sha256:cf6dfeadf75bd95bf89beb0a64e06ed43b65f6ff782df10ae200ea200a73d8e9`
+(released, v0.9.2), input hash `sha256:e0a06f5f…cfbff6`, the macro with every leaf-cell
+signal net routed (issue #159 joined the last one, the column mux's `BLBM`; the array interface
 wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply rails on
-Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: periphery signal
+Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: inter-block signal
 routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
-The latest record (issue #105, `layout/reports/macro-record-decoder.json`, minted by
-`layout/reports/generate-macro-decoder.sh`) adds the nets between the child cells of `predec3`, `predec4`,
-`wl_drivers` and `row_decoder`, routed with the same router as the latch and control nets (#106), so one
-`HIER_ROUTED` covers all eight cells (87 nets, none undrawn; supply and wordline nets excluded); the macro DRC is
-still clean. Fan-out between blocks and pins are not drawn.
+The latest record (issue #159, `layout/reports/macro-record-blbm.json`, minted by
+`layout/reports/generate-macro-blbm.sh`) joins the column mux's `BLBM`, the last undrawn leaf-cell
+net (#104 left it undrawn: the bit-line jogs and lanes left it no Metal3 crossing; `route_bitlines`
+now keeps every jog clear of each `BLBM` terminal band before the jogs are placed, and `route_leaf`
+joins the net in the freed Metal3 under the jog lane). All twelve leaf cells now total 54 routed
+nets, none undrawn; the eight `HIER_ROUTED` cells stay at 114 nets (none undrawn; supply and
+wordline nets excluded); the macro DRC is still clean. The #105 record
+(`macro-record-decoder.json`) and every earlier one are append-only evidence of their own layouts
+and still list `BLBM` under `not_drawn`. Fan-out between blocks and pins are not drawn.
 
 The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
 put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the
@@ -280,7 +285,7 @@ pass it; a genuinely changed array mints a new append-only record instead.
 **What this does not cover:**
 
 - **No connectivity.** `array-check` is purely geometric -- no PDK deck, no compact models, no
-  SPICE. That the abutting risers are *electrically* joined is `macro-record-decoder.json`, and
+  SPICE. That the abutting risers are *electrically* joined is `macro-record-blbm.json`, and
   reference-netlist comparison is #30.
 - **No design rules.** DRC is `drc-macro.json` (above).
 - **Not the array as a whole.** The abutment mode is one-dimensional, so no invocation covers the
