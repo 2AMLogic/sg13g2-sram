@@ -215,8 +215,8 @@ GDS). Whoever next re-mints a DRC/LVS record after the worker pins are matched
 should expect that churn and attribute it to the toolchain, not to the layout.
 The cause is a worker-image skew — klayout resolving ahead of the version the
 pinned klt expects; the fix (pin the two together) is pending in `2AMLogic/2am`
-`infra/aws/loom-worker/`, and host tools are not changed from this repo
-(issue #195).
+`infra/aws/loom-worker/` (tracked as 2am#7369), and host tools are not changed
+from this repo (issue #195).
 
 The latest record (issue #159, `layout/reports/macro-record-blbm.json`, minted by
 `layout/reports/generate-macro-blbm.sh`) joins the column mux's `BLBM`, the last undrawn leaf-cell
