@@ -237,6 +237,9 @@ TIE_MAZE_REACH = ((8.0, 5.0), (20.0, 10.0), (40.0, 16.0), (60.0, 24.0))  # um ha
 
 # ---- macro-level fan-out between blocks (issue #107) ----
 PIN_LANE = 0.45  # um between escape pins / routing lanes: >= M2.a + M2.b (0.41) and a whole number of STEP
+LANE_TRIES = 40  # lanes the slice escape tries per net at each search level (issue #107)
+TIE_ROUNDS = 6  # re-searches of the slice escape, each blocking the tie pads the last route hit (issue #107)
+SEARCH_ITERS = 40  # net orders the slice escape tries (a walled-off net moves to the front) before giving up
 SLICE_ESCAPE_H = 5.0  # um of clear band below a slice's column path: where its nine ports reach their escape pins
 DECODER_APPROACH = 5.0  # um between the control block's top and the row decoder: the decoder's escape band
 CHANNEL_MARGIN = 1.0  # um kept clear at each end of the fan-out channel (>= M3.b from the pins and the blocks)
@@ -416,6 +419,16 @@ class MazeRouter:
         self.via_near: set[tuple[int, int]] = set()
         self.shapes: dict[int, list[tuple]] = {}  # net id -> [("wire", layer, a, b) | ("via", node)]
         self.exits: dict[int, tuple[int, int, int]] = {}  # net id -> the (layer, i, j) it left the window at (#107)
+
+    def clone(self) -> "MazeRouter":
+        """An independent copy (a trial route on it leaves this one untouched): columns copied flat, not deep."""
+        m = MazeRouter.__new__(MazeRouter)
+        m.__dict__.update(self.__dict__)
+        m.owner = [[col[:] for col in layer] for layer in self.owner]
+        m.via_near = set(self.via_near)
+        m.shapes = {k: list(v) for k, v in self.shapes.items()}
+        m.exits = dict(self.exits)
+        return m
 
     def node(self, x: float, y: float) -> tuple[int, int]:
         return math.floor(dbu(x) / STEP + 0.5), math.floor(dbu(y) / STEP + 0.5)  # ties round up in every frame
@@ -1420,6 +1433,18 @@ class Gen:
             flat = self.cell_shapes(cell, lp)
             for d in (-dbu(pitch), dbu(pitch)):  # ... and everything in the neighbouring slices
                 blocked += [(l, b) for b in self.boxes_of(flat.moved(d, 0), win)]
+        # the Metal2 pads of the column-path body ties are drawn later (the rails step, issue #92), so they are not
+        # shapes yet: keep the escape off them, with M2.b to spare, in this slice and in both neighbours
+        hp_tie = dbu(VIA_PAD / 2)
+        tie_boxes: list[kdb.Box] = []
+        for inst in self.nl["bit_slice"].insts:
+            off = self.place_of["bit_slice"].get(inst.name)
+            if off is None or inst.ref not in COLPATH_CELLS:
+                continue
+            for tx, ty in self.leaf_ties.get(inst.ref, ()):
+                cx, cy = dbu(tx) + off[0], dbu(ty) + off[1]
+                for d in (-dbu(pitch), 0, dbu(pitch)):
+                    tie_boxes.append(kdb.Box(cx + d - hp_tie, cy - hp_tie, cx + d + hp_tie, cy + hp_tie))
         vias += self.via_centres(cell, recursive=False)
         vias += [(x + s * pitch, y) for x, y in list(vias) for s in (-1, 1)]
 
@@ -1442,52 +1467,101 @@ class Gen:
             mz.via_near.update((vi + a, vj + b) for a in range(-near, near + 1) for b in range(-near, near + 1))
         pins: dict[str, tuple[float, float, int]] = {}
         report = {"routed": {}, "failed": [], "pins": pins}
-        # Candidate lanes are *assigned* highest-terminal first -- the top cells' nets are the ones only a tall
-        # lane can serve, so they claim the tall columns before a low net's short hop takes one -- and then
-        # *routed* lowest-terminal first, so the bottom cells' short hops commit before longer descents can wall
-        # them off (a committed wire keeps KEEP around itself). A net tries its candidates shortest-stub first
-        # and commits the first one that routes; a failed attempt commits nothing, so its lane goes back on the
-        # shelf and the net falls through to its next candidate, then to whatever is still unclaimed.
-        claimed: list[float] = []
-        assigned: dict[str, list[tuple[float, float]]] = {}
-        for n in sorted(SLICE_PORTS, key=lambda k: (by_net[k][0][1], by_net[k][0][0], k), reverse=True):
-            tx, ty = by_net[n][0][:2]
-            cands = sorted((c for c in cols if all(abs(c[0] - u) >= PIN_LANE - 1e-9 for u in claimed)),
-                           key=lambda c: (abs(c[0] - tx) + abs(c[1] - ty), c[0], c[1]))
-            assert cands, f"no Metal3 lane for the {n} escape"
-            assigned[n] = cands
-            claimed.append(cands[0][0])
-        first = {n: cands[0][0] for n, cands in assigned.items()}
-        used: list[float] = []  # lane x of every routed stub: lanes are PIN_LANE apart
-        for n in sorted(SLICE_PORTS, key=lambda k: (by_net[k][0][1], by_net[k][0][0], k), reverse=True):
-            # same order as the assignment: the top cells' nets route into a clean field (their tall lanes are
-            # the scarce ones), and a net that gets walled off backtracks through its candidate lanes
-            tx, ty = by_net[n][0][:2]
-            terms = by_net.get(n, ())
-            for x, y, landed in terms:
+        # Backtracking search over (net, lane) choices (issue #107). Greedy lane assignment cannot be made to work
+        # on the BLBM-joined leaf field: whichever order is fixed, exactly one net gets walled off by the others'
+        # committed wires. Each trial runs on a deep copy of the router, so a failed branch commits nothing; at
+        # every level the net with the fewest routable lanes goes next (forward checking: a net with none prunes
+        # the branch), and a node budget bounds the search.
+        for n in SLICE_PORTS:
+            for x, y, landed in by_net[n]:
                 if not landed:
                     ti, tj = mz.node(x, y)
                     self.m1_via1(cell, ti * STEP * DBU, tj * STEP * DBU)
-            nodes = [mz.node(x, y) for x, y, _ in terms]
-            # a Via2 may land on the net's own leaf Via2 (the vias merge into one shape), so its own Via2
-            # nodes do not keep the escape's Via2s out
-            own_via_nodes = {mz.node(x, y) for x, y in own_vias.get(n, ())}
-            saved = own_via_nodes & mz.via_near
-            mz.via_near -= own_via_nodes
-            # backtracking may use any column that no routed stub and no *other* net's reserved lane occupies
-            reserved = {first[n2] for n2 in SLICE_PORTS if n2 != n}
-            leftover = [c for c in cols if all(abs(c[0] - u) >= PIN_LANE - 1e-9 for u in used) and c[0] not in reserved]
-            cands = sorted(set(assigned[n]) | set(leftover),
-                           key=lambda c: (abs(c[0] - tx) + abs(c[1] - ty), c[0], c[1]))
-            cands = [c for c in cands if all(abs(c[0] - u) >= PIN_LANE - 1e-9 for u in used)]
-            for lx, ltop in cands:
+        near_v = near
+
+        def lanes_for(n: str, used: list[float]) -> list[tuple[float, float]]:
+            tx, ty = by_net[n][0][:2]
+            ok = [c for c in cols if all(abs(c[0] - u) >= PIN_LANE - 1e-9 for u in used)]
+            return sorted(ok, key=lambda c: (abs(c[0] - tx) + abs(c[1] - ty), c[0], c[1]))[:LANE_TRIES]
+
+        def attempt(m: MazeRouter, n: str, lane: tuple[float, float]) -> bool:
+            terms = by_net[n]
+            nodes = [m.node(x, y) for x, y, _ in terms]
+            # a Via2 may land on the net's own leaf Via2 (the vias merge into one shape)
+            own_via_nodes = {m.node(x, y) for x, y in own_vias.get(n, ())}
+            saved = own_via_nodes & m.via_near
+            m.via_near -= own_via_nodes
+            lx, ltop = lane
+            top = m.node(lx, ltop)
+            nodes_top = nodes + [top]
+            for t in nodes_top:  # the terminal pads and the lane's top Via2 pad are this net's own
+                m.own(0, t[0] * STEP * DBU - M2_W / 2, t[1] * STEP * DBU - M2_W / 2,
+                      t[0] * STEP * DBU + M2_W / 2, t[1] * STEP * DBU + M2_W / 2, ids[n])
+            if not m.route_net(ids[n], sorted(set(nodes_top)), m3_arrive={top}):
+                return False
+            for vx, vy in (m.node(lx, y_pin * DBU), top):
+                m.via_near.update((vx + a, vy + b) for a in range(-near_v, near_v + 1)
+                                  for b in range(-near_v, near_v + 1))
+            m.via_near |= saved
+            return True
+
+        # Move-to-front on failure: route the nets in order on a clone; the net that gets walled off goes first
+        # next time (it is the most constrained), until every net routes or the iterations run out.
+        # The search runs on a base router; any tie pad the winning route comes within M2.b of is then blocked on
+        # the base and the search repeats, so only the ties that actually collide cost the escape any room.
+        tie_block: set[int] = set()
+        for _round in range(TIE_ROUNDS):
+            base = mz.clone()
+            for k in tie_block:
+                tb = tie_boxes[k]
+                base._mark(0, tb.left, tb.bottom, tb.right, tb.top, -1)
+            order = sorted(SLICE_PORTS, key=lambda k: (by_net[k][0][1], by_net[k][0][0], k), reverse=True)
+            found = None
+            seen: set[tuple[str, ...]] = set()
+            for _ in range(SEARCH_ITERS):
+                if tuple(order) in seen:
+                    break
+                seen.add(tuple(order))
+                m, used, plan, victim = base.clone(), [], [], None
+                for n in order:
+                    for lane in lanes_for(n, used):
+                        m2 = m.clone()
+                        if attempt(m2, n, lane):
+                            m, used, plan = m2, used + [lane[0]], plan + [(n, lane)]
+                            break
+                    else:
+                        victim = n
+                        break
+                if victim is None:
+                    found = (m, plan)
+                    break
+                order.remove(victim)
+                order.insert(0, victim)
+            if found is None:
+                break
+            wires = []
+            for net_id, shp in found[0].shapes.items():
+                for sh in shp:
+                    if sh[0] == "wire" and sh[1] == 0:
+                        (i0_, j0_), (i1_, j1_) = sh[2], sh[3]
+                        h_ = dbu(M2_W / 2)
+                        wires.append(kdb.Box(min(i0_, i1_) * STEP - h_, min(j0_, j1_) * STEP - h_,
+                                             max(i0_, i1_) * STEP + h_, max(j0_, j1_) * STEP + h_))
+            gap_ = dbu(M2_SPACE + 0.01)
+            bad = {k for k, tb in enumerate(tie_boxes) if any(tb.enlarged(gap_, gap_).overlaps(w) for w in wires)}
+            if not bad:
+                break
+            tie_block |= bad
+            found = None
+        report = {"routed": {}, "failed": [], "pins": pins}
+        if found is None:
+            report["failed"] = list(SLICE_PORTS)
+            print(f"slice escape: no net order routed all ports in {SEARCH_ITERS} tries; last victim {order[0]}")
+        else:
+            mz, plan = found
+            for n, (lx, ltop) in plan:
                 top = mz.node(lx, ltop)
-                nodes_top = nodes + [top]
-                for t in nodes_top:  # the terminal pads and the lane's top Via2 pad are this net's own
-                    mz.own(0, t[0] * STEP * DBU - M2_W / 2, t[1] * STEP * DBU - M2_W / 2,
-                           t[0] * STEP * DBU + M2_W / 2, t[1] * STEP * DBU + M2_W / 2, ids[n])
-                if not mz.route_net(ids[n], sorted(set(nodes_top)), m3_arrive={top}):
-                    continue
+                nodes_top = [mz.node(x, y) for x, y, _ in by_net[n]] + [top]
                 own = {l: kdb.Region() for l in (0, 1)}
                 for l, nid, b in own_boxes:
                     if nid == n:
@@ -1498,29 +1572,8 @@ class Gen:
                 pin = (lx, y_pin * DBU)
                 self.seg(cell, L_METAL3, M3_W, lx, top[1] * STEP * DBU, *pin)
                 self.stack2(cell, *pin)
-                for vx, vy in (mz.node(*pin), top):
-                    vi, vj = vx, vj
-                    mz.via_near.update((vi + a, vj + b) for a in range(-near, near + 1)
-                                       for b in range(-near, near + 1))
-                used.append(lx)
-                report["routed"][n] = len(terms) + 1
+                report["routed"][n] = len(by_net[n]) + 1
                 pins[n] = (round(lx, 3), round(y_pin * DBU, 3), 0)  # Metal2: the macro runs on down
-                break
-            mz.via_near |= saved
-            if n not in report["routed"]:
-                report["failed"].append(n)
-                print(f"STUB FAIL {n}: terms={[(x, y) for x, y, _ in terms]} cands={cands[:6]} (of {len(cands)})")
-                print(f"  own vias: {sorted(own_vias.get(n, []))}")
-                i0, j0 = mz.node(tx, ty)
-                for l, tag in ((0, "M2"), (1, "M3")):
-                    print(f"  {tag}: rows y=-53.8..-56.2, cols x={((i0-4)*0.05):.2f}..{((i0+42)*0.05):.2f}")
-                    for jj in range(mz.node(tx, -53.8)[1], mz.node(tx, -56.2)[1] - 1, -1):
-                        row = ""
-                        for ii in range(i0 - 4, i0 + 43):
-                            o = mz.owner[l][ii - mz.i0][jj - mz.j0]
-                            row += "." if o == 0 else ("#" if o == -1 else chr(ord('A') + o - 1))
-                        vn = any((ii, jj) in mz.via_near for ii in range(i0 - 4, i0 + 43))
-                        print(f"  {jj * 0.05:8.2f} {row}{'V' if vn else ''}")
         report["dangling"] = sorted(n for n, v in self.slice_port_terms().items()
                                     if len(v) == 1 and n not in goals)
         assert not report["failed"], f"bit_slice escape failed for {report['failed']}"
