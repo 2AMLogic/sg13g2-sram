@@ -69,7 +69,8 @@ DECK
   sed -i "s|${PDK_ROOT}|\${PDK_ROOT}|g" "${REC}/logs/${name}.log"
 done
 
-OV="$(sed -n 's/^OPENVAF_TAG="\([^"]*\)".*/\1/p' "${SIM_DIR}/harness/common/tools/build-osdi.sh" | head -1)"
+OV="$(bash "${SIM_DIR}/harness/common/tools/build-osdi.sh" --print-pins | sed -n 's/^ *"openvaf_tag": *"\([^"]*\)".*/\1/p' | head -1)"
+[ -n "${OV}" ] || { echo "run_smoke: could not read openvaf_tag from build-osdi.sh --print-pins" >&2; exit 1; }
 PDKTAG="$(pdk_release_tag)"
 NGV="$(ngspice --version 2>&1 | grep -m1 -o 'ngspice-[0-9.]*')"
 
