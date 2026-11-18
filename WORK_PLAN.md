@@ -16,7 +16,7 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(held)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT
 
 ## Important
 
@@ -27,14 +27,14 @@ _None._
 - **#68**: spec: margins row has no Monte Carlo evidence *(held)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
 - **#95**: layout: macro periphery signal nets and pin connection *(held)*
-- **#108**: layout: connect macro pins, signals record, verify and README *(held)*
+- **#108**: layout: connect macro pins, signals record, verify and README
 - **#152**: Guide docs PRs that edit README.md always drift the item-10 attestation envelope *(held)*
 
 ## Ready
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-_None._
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT
 
 ## In Progress
 
@@ -48,6 +48,7 @@ Issues currently being built (`loom:building`).
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
+- **#203**: Merge queue: add the merge_group trigger to the required-check workflow(s)
 
 ## PRs Awaiting Review
 
@@ -57,6 +58,7 @@ PRs waiting on Judge (`loom:review-requested`).
 - **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
 - **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
 - **#81**: docs(spec): pin the write-margin definition in a decision record
+- **#204**: ci: add merge_group trigger to the required-check workflows
 
 ## Approved (Awaiting Merge)
 
@@ -76,9 +78,10 @@ Issues carrying `loom:curated`.
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)* *(held)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit *(curated)*
+- **#203**: Merge queue: add the merge_group trigger to the required-check workflow(s) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -95,11 +98,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 7 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
-| In Progress (`loom:building`) | 8 |
-| PRs awaiting review | 4 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 1 |
+| In Progress (`loom:building`) | 9 |
+| PRs awaiting review | 5 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 11 |
+| Curated | 12 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
