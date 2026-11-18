@@ -5,6 +5,9 @@ triage agent. Newest first.
 
 ### 2026-11-17
 
+- **PR #200**: chore: remove superseded generate-macro-decoder.sh, repoint README at the blbm script
+- **Issue #199** (closed): Remove generate-macro-decoder.sh: superseded by generate-macro-blbm.sh, and README points at it
+- **PR #197**: chore(loom): resync installed Loom to v0.19.1306
 - **PR #196**: docs: explain klayout_version_mismatch on drc-macro.json in layout README
 - **Issue #195** (closed): drc-macro.json is the first record minted with klayout_version_mismatch: true (host klayout 0.30.13 vs klt expecting 0.30.12)
 - **PR #194**: layout: join the column_mux BLBM net, the last undrawn leaf-cell net
