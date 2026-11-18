@@ -97,12 +97,10 @@ What is NOT drawn (disclosed, not hidden)
 -----------------------------------------
 No signal routing to the pins (#108, child 5 of #95): the nine Metal2 pin squares touch nothing, so the macro
 is not LVS-able yet. The ``VDD``/``VSS`` pin squares are not connected to the rails, and the supply D/S
-terminals of the devices are not joined to the ties. Two nets between the cells of ``bit_slice`` are undrawn:
-``BLM`` and ``BLBM``, between the column mux, the sense amplifier and the write driver -- they are inside the
-slice, not between blocks, so they are outside #107 and have no child of #95 of their own. One leaf-cell net is
-undrawn: ``column_mux`` ``BLBM``, whose terminals are separated by the bit-line jogs (Metal2) and lanes
-(Metal3) with too few Metal3 crossings left (``leaf_report["column_mux"]["failed"]``). The array interface
-(wordlines, bit lines) is routed; the macro is placed, tapped, supplied and wired between its blocks, but not
+terminals of the devices are not joined to the ties. Every leaf-cell net is drawn (#159), and every net
+between the blocks is wired (#107); still undrawn: ``BLM`` and ``BLBM`` between ``bit_slice``'s column mux,
+sense amplifier and write driver -- inside the slice, outside #107 and claimed by no child of #95. The array
+interface (wordlines, bit lines) is routed; the macro is placed, tapped, supplied and wired between its blocks, but not
 to its pins. LVS (#30) and power delivery checks (#31) are the checks that must be run once the pins are wired.
 
 Supply rails (issues #92, #102)
@@ -232,6 +230,8 @@ LATCH_PACK_GAP = 4.0  # um between the child cells of data_latch / out_latch: 32
 WL_STUB_DX = -0.15  # um: the wordline Metal2 stub leaves its terminal sideways first, clear of the gate landing of the same driver
 WL_ROW_TRACKS = 16  # wordline Metal3 tracks stacked above one decoder terminal row (``route_wordlines``)
 COLPATH_CELLS = ("precharge", "column_mux", "sense_amp", "write_driver")
+BLBM_CROSSING_CLEAR = M3_W + M3_SPACE  # M3.a + M3.b: Metal3 room a bit-line jog's lane must leave under a ``BLBM`` terminal band for the crossing ``route_leaf`` joins the net with
+BLBM_JOGLANE_CLEAR = M2_W / 2 + M2_SPACE  # M2.a/2 + M2.b: how far right of the jog's own M2 terminal column the ``BLBM`` reserve starts (the reserve blocks a jog's lane landing, never its descent)
 SUPPLY_NETS = ("VDD", "VSS")
 TIE_MAZE_REACH = ((8.0, 5.0), (20.0, 10.0), (40.0, 16.0), (60.0, 24.0))  # um half-width / half-height of the tie maze window, smallest first
 
@@ -1812,11 +1812,48 @@ class Gen:
         self.via_pad(cell, L_VIA1, x, y)
         self.rect(cell, L_METAL2, x, y, M2_W, M2_W)
 
+    def blbm_reserve(self) -> list[kdb.Box]:
+        """Metal2 boxes (``bit_slice`` frame, um) over the ``column_mux`` ``BLBM`` terminal bands that
+        ``route_bitlines`` keeps every bit-line jog clear of. Each band is the span of the terminals
+        whose y sits within 1 um of each other, grown by ``BLBM_CROSSING_CLEAR`` on every side but
+        never into the jog's own M2 terminal column (``BLBM_JOGLANE_CLEAR`` right of it), so the
+        reserve blocks a jog's lane landing, not its descent. A jog pushed below its band leaves
+        ``BLBM_CROSSING_CLEAR`` of clear Metal3 under the lane's bottom for the crossing
+        ``route_leaf`` joins ``BLBM`` with (issue #159)."""
+        out: list[kdb.Box] = []
+        for inst in self.nl["bit_slice"].insts:
+            off = self.place_of["bit_slice"].get(inst.name)
+            if off is None or inst.ref != "column_mux":
+                continue
+            pts = [(x + off[0] * DBU, y + off[1] * DBU)
+                   for sub in self.nl[inst.ref].insts
+                   if sub.name in self.dev_pts[inst.ref]
+                   for t, n in zip("DGS", sub.nets[:3]) if n == "BLBM"
+                   for x, y in [self.dev_pts[inst.ref][sub.name][t]]]
+            if not pts:
+                continue
+            tx = self.terminal(inst.ref, "BLB0")
+            assert tx is not None, inst.ref
+            x0 = tx[0] + off[0] * DBU + BLBM_JOGLANE_CLEAR
+            bands: list[list[tuple[float, float]]] = []
+            for p in sorted(pts, key=lambda p: -p[1]):
+                if bands and bands[-1][0][1] - p[1] < 1.0:
+                    bands[-1].append(p)
+                else:
+                    bands.append([p])
+            for band in bands:
+                out.append(kdb.Box(dbu(max(x0, min(p[0] for p in band) - BLBM_CROSSING_CLEAR)),
+                                   dbu(min(p[1] for p in band) - BLBM_CROSSING_CLEAR),
+                                   dbu(max(p[0] for p in band) + BLBM_CROSSING_CLEAR),
+                                   dbu(max(p[1] for p in band) + BLBM_CROSSING_CLEAR)))
+        return out
+
     def route_bitlines(self, cell: kdb.Cell) -> None:
         """Bit-line stripe bottoms to one BL/BLB terminal of the precharge and of
         the column mux. Per net: Via1 stack under the stripe, a Metal3 lane at the
         stripe's own x, and a Metal2 jog from each terminal to the lane (the jog
-        y moves down in 0.1 um steps until it clears the other nets' Metal2)."""
+        y moves down in 0.1 um steps until it clears the other nets' Metal2, and
+        the ``BLBM`` terminal bands of ``blbm_reserve`` until it clears those too)."""
         self.bl_terms: dict[str, list[tuple[float, float]]] = {}
         sl = {}  # net -> (stripe x, [terminal (x, y)])
         for inst in self.nl["bit_slice"].insts:
@@ -1851,6 +1888,10 @@ class Gen:
             if off is not None and inst.ref in COLPATH_CELLS:
                 sub = kdb.Region(self.cells[inst.ref].begin_shapes_rec(self.li(L_METAL2)))
                 supply += sub.transformed(kdb.Trans(off[0], off[1]))
+        # the ``BLBM`` terminal bands (issue #159) are obstacles too: a jog pushed below its band
+        # leaves the band's Metal3 crossing free under the jog's lane for ``route_leaf``
+        for b in self.blbm_reserve():
+            supply.insert(b)
         placed: dict[str, kdb.Region] = {}
         for net, (xs, terms) in sl.items():
             placed[net] = pad_region(xs, BL_VIA_Y)

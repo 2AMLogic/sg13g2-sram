@@ -3,6 +3,17 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-17
+
+- **PR #196**: docs: explain klayout_version_mismatch on drc-macro.json in layout README
+- **Issue #195** (closed): drc-macro.json is the first record minted with klayout_version_mismatch: true (host klayout 0.30.13 vs klt expecting 0.30.12)
+- **PR #194**: layout: join the column_mux BLBM net, the last undrawn leaf-cell net
+- **Issue #159** (closed): layout: join the column_mux BLBM net, the one undrawn leaf-cell net
+
+### 2026-11-16
+
+- **PR #189**: chore(loom): resync installed Loom to v0.19.1302
+
 ### 2026-11-15
 
 - **PR #185**: test: pin obstacle clear-side probes to the 0.22 margin boundary

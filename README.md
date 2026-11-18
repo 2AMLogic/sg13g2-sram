@@ -139,7 +139,7 @@ Records are append-only: each run writes a new `records/<UTC>/` directory.
    itself is generated with
    `uv run --with klayout python3 layout/sram_256x32/generate.py`, and its
    current record, socket and LEF re-minted with
-   `./layout/reports/generate-macro-decoder.sh`. Entry points, DRC coverage
+   `./layout/reports/generate-macro-blbm.sh`. Entry points, DRC coverage
    gaps and "What this macro is not" live in
    [`layout/README.md`](layout/README.md).
 6. **Signoff record** (`manifests/sg13g2-sram.signoff.json`), regenerated with

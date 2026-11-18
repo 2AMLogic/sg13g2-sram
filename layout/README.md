@@ -23,7 +23,8 @@ The same rule removed the per-stage scripts whose records no longer match the co
 - `generate-macro-rails.sh`: `git show 235e7a3:layout/reports/generate-macro-rails.sh`
 - `generate-macro-leafnets.sh`: `git show bb986a3:layout/reports/generate-macro-leafnets.sh`
 - `generate-macro-latchnets.sh`: `git show a1d6291:layout/reports/generate-macro-latchnets.sh`
-- `generate-macro-decoder.sh`: `git show 4e5fd29:layout/reports/generate-macro-decoder.sh`
+- `generate-macro-decoder.sh`: `git show 50289f1:layout/reports/generate-macro-decoder.sh` (superseded by `generate-macro-fanout.sh`; its #105 record stays as evidence of that older layout)
+- `generate-macro-blbm.sh`: `git show 12a700e:layout/reports/generate-macro-blbm.sh` (superseded by `generate-macro-fanout.sh`; its #159 record stays as evidence of that older layout)
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
@@ -152,12 +153,13 @@ periphery transistor carries a body tie (n+ Activ in the PMOS well; p+ Activ in 
 with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`); and
 every tie and every bitcell VDD/VSS riser reaches a VDD or VSS rail (#88 step 2, #92, re-planned
 in #102; `macro-record-rails.json`). The periphery's signal nets are routed inside the leaf cells
-(#104), inside the latch, control and decoder blocks (#106, #105) and **between the blocks**
+(#104; #159 joined the last one, `column_mux`'s `BLBM`), inside the latch, control and decoder
+blocks (#106, #105) and **between the blocks**
 (#107, below). The `VDD`/`VSS` pin squares are **not connected to the rails** and no signal net
 reaches a macro pin: the LEF pins are drawn Metal2 and touch nothing, so the macro is **not
 LVS-able yet** (#108). Also undrawn: `BLM` and `BLBM` between `bit_slice`'s column mux, sense
 amplifier and write driver -- inside the slice, so outside #107's scope, and claimed by no child
-of #95 -- and `column_mux`'s own `BLBM`. The wordline label on GatPoly text (5/1) sits mid-cell,
+of #95. The wordline label on GatPoly text (5/1) sits mid-cell,
 off the poly row, and is not read by `klt extract`; the wordline nets take their names from the
 driver labels. #30 (LVS) and #31 (power ERC) cannot proceed past #108. Unrun here: the PDK-native
 DRC, and DRC of the periphery against rules the curated deck lacks. `klt array-check` **has** now
@@ -250,16 +252,36 @@ it, and `RAIL_LANE_PITCH` (4 um, the rail lane pitch) is named apart from `LANE_
 
 `klt drc --deck sg13g2 --top macro layout/sram_256x32/macro.gds` ->
 `layout/reports/drc-macro.json`: `status: clean`, `violation_count: 0`, deck
-`sg13g2` hash `sha256:1c95db40596afc5412e216009bcf0b775d1d74895b32738447eccbc76336dd15`
-(released), input hash `sha256:76b3a60b…86715e`, the **partly routed** macro (array interface
+`sg13g2` hash `sha256:cf6dfeadf75bd95bf89beb0a64e06ed43b65f6ff782df10ae200ea200a73d8e9`
+(released, v0.9.2), input hash `sha256:e0a06f5f…cfbff6`, the macro with every leaf-cell
+signal net routed (issue #159 joined the last one, the column mux's `BLBM`; the array interface
 wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply rails on
-Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: periphery signal
-routing and pin routing are not drawn (see above), so no rule is exercised on them.
+Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: pin routing is not
+drawn (see above), so no rule is exercised on it.
+
+**Provenance note (2026-11-17): every record up to #159's carries
+`provenance.klayout_version_mismatch: true`.** They were minted by klt
+`0.9.3.dev234+g5ed4e55b`, which expects klayout 0.30.12, against a host klayout
+**0.30.13** (measured with `klt version --format json` on the worker,
+2026-11-17). The verdict is unaffected — `status: clean`, `violation_count: 0`,
+and `klt drc --check` reports `match` (hash binding; `verify.sh` step 8 runs
+this cheap mode) — but per klt's own warning the report counts, deck content
+hash and `rules_skipped` may differ from a record minted under the expected
+engine, even for an unchanged layout (the input hash above still binds this
+GDS). Whoever next re-mints a DRC/LVS record after the worker pins are matched
+should expect that churn and attribute it to the toolchain, not to the layout.
+The cause is a worker-image skew — klayout resolving ahead of the version the
+pinned klt expects; the fix (pin the two together) is pending in `2AMLogic/2am`
+`infra/aws/loom-worker/` (tracked as 2am#7369), and host tools are not changed
+from this repo (issue #195).
 
 The latest record (issue #107, `layout/reports/macro-record-fanout.json`, minted by
 `layout/reports/generate-macro-fanout.sh`) adds the fan-out between the blocks described above, on top of the
 nets inside the decoder cells (#105, `macro-record-decoder.json`) and inside the latch and control cells
-(#106). Pin routing is not drawn (#108).
+(#106). Pin routing is not drawn (#108). The #159 record (`macro-record-blbm.json`) and every
+earlier one are append-only evidence of their own layouts; the #159 one joined the column mux's
+`BLBM`, the last undrawn leaf-cell net, so all twelve leaf cells total 54 routed nets, none undrawn,
+and the eight `HIER_ROUTED` cells stay at 114 nets (none undrawn; supply and wordline nets excluded).
 
 The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
 put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the
@@ -334,7 +356,7 @@ pass it; a genuinely changed array mints a new append-only record instead.
 **What this does not cover:**
 
 - **No connectivity.** `array-check` is purely geometric -- no PDK deck, no compact models, no
-  SPICE. That the abutting risers are *electrically* joined is `macro-record-decoder.json`, and
+  SPICE. That the abutting risers are *electrically* joined is `macro-record-blbm.json`, and
   reference-netlist comparison is #30.
 - **No design rules.** DRC is `drc-macro.json` (above).
 - **Not the array as a whole.** The abutment mode is one-dimensional, so no invocation covers the

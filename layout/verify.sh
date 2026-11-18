@@ -89,6 +89,8 @@ for key in ("gds", "lef", "socket"):
         got = hashlib.sha256(open(path, "rb").read()).hexdigest()
         if got != want:
             sys.exit(f"FAIL: {path} differs from macro-record-fanout.json")
+if rec["leaf_signal_routing"]["undrawn"] or rec["hier_signal_routing"]["undrawn"]:
+    sys.exit("FAIL: macro-record-fanout.json reports an undrawn signal net")
 c = rec["rails_connectivity"]
 ok = (c["ties_on_own_rail"] == c["ties_expected"] and c["ties_floating"] == 0 and c["ties_on_other_rail"] == 0
       and c["vdd_vss_short_polygons"] == 0
@@ -103,7 +105,7 @@ if f["escape_undrawn"]:
 if f["net_count"] != 84 or sorted(f["nets_wired"]) != f["nets_wired"]:
     sys.exit(f"FAIL: macro-record-fanout.json wires {f['net_count']} inter-block nets, expected 84")
 print(f"PASS: record matches the files; {f['net_count']} inter-block nets wired on {f['trunk_tracks']} trunks; "
-      f"{c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
+      f"{c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear; no undrawn signal net")
 PYEOF
 
 hr "10. macro: array regularity (klt array-check; pinned klt 0.9.1 -- the host/signoff 0.8.0 lacks the verb)"
