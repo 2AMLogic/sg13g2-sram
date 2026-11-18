@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-18
+
+- **PR #204**: ci: add merge_group trigger to the required-check workflows
+- **Issue #203** (closed): Merge queue: add the merge_group trigger to the required-check workflow(s)
+
 ### 2026-11-17
 
 - **PR #200**: chore: remove superseded generate-macro-decoder.sh, repoint README at the blbm script
