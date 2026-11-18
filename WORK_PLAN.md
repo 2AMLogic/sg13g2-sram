@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-18T13:43:37Z (snapshot; compare against live labels)_
+_Generated: 2026-11-18T23:27:56Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -17,7 +17,7 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(held)*
 
 ## Important
 
@@ -47,9 +47,9 @@ Issues currently being built (`loom:building`).
 - **#71**: spec: write-margin definition under-specified
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
+- **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins
 
 ## PRs Awaiting Review
 
@@ -59,6 +59,7 @@ PRs waiting on Judge (`loom:review-requested`).
 - **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point *(held)*
 - **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows *(held)*
 - **#81**: docs(spec): pin the write-margin definition in a decision record *(held)*
+- **#209**: build: re-vendor build-osdi.sh and read OpenVAF tag via --print-pins
 
 ## Approved (Awaiting Merge)
 
@@ -78,9 +79,10 @@ Issues carrying `loom:curated`.
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)* *(held)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit *(curated)*
+- **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -99,9 +101,9 @@ _None._
 | Important | 7 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
 | In Progress (`loom:building`) | 9 |
-| PRs awaiting review | 4 |
+| PRs awaiting review | 5 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 11 |
+| Curated | 12 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
