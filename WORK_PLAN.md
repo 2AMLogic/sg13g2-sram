@@ -6,6 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
+_Generated: 2026-11-18T13:43:37Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -27,14 +28,14 @@ _None._
 - **#68**: spec: margins row has no Monte Carlo evidence *(held)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
 - **#95**: layout: macro periphery signal nets and pin connection *(held)*
-- **#108**: layout: connect macro pins, signals record, verify and README
+- **#108**: layout: connect macro pins, signals record, verify and README *(held)*
 - **#152**: Guide docs PRs that edit README.md always drift the item-10 attestation envelope *(held)*
 
 ## Ready
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT
+_None._
 
 ## In Progress
 
@@ -46,19 +47,18 @@ Issues currently being built (`loom:building`).
 - **#71**: spec: write-margin definition under-specified
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
-- **#203**: Merge queue: add the merge_group trigger to the required-check workflow(s)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#77**: docs(spec): record two-key review outcome for sram.md
-- **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point
-- **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows
-- **#81**: docs(spec): pin the write-margin definition in a decision record
-- **#204**: ci: add merge_group trigger to the required-check workflows
+- **#77**: docs(spec): record two-key review outcome for sram.md *(held)*
+- **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point *(held)*
+- **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows *(held)*
+- **#81**: docs(spec): pin the write-margin definition in a decision record *(held)*
 
 ## Approved (Awaiting Merge)
 
@@ -81,7 +81,6 @@ Issues carrying `loom:curated`.
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit *(curated)*
-- **#203**: Merge queue: add the merge_group trigger to the required-check workflow(s) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -98,11 +97,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 7 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 1 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
 | In Progress (`loom:building`) | 9 |
-| PRs awaiting review | 5 |
+| PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 12 |
+| Curated | 11 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
