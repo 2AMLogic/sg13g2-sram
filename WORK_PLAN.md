@@ -22,19 +22,19 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist
-- **#31**: T1 item 11 (power delivery): klt erc supply spec for the macro rails
-- **#68**: spec: margins row has no Monte Carlo evidence
+- **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist *(held)*
+- **#31**: T1 item 11 (power delivery): klt erc supply spec for the macro rails *(held)*
+- **#68**: spec: margins row has no Monte Carlo evidence *(held)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
-- **#95**: layout: macro periphery signal nets and pin connection
-- **#108**: layout: connect macro pins, signals record, verify and README
-- **#152**: Guide docs PRs that edit README.md always drift the item-10 attestation envelope
+- **#95**: layout: macro periphery signal nets and pin connection *(held)*
+- **#108**: layout: connect macro pins, signals record, verify and README *(held)*
+- **#152**: Guide docs PRs that edit README.md always drift the item-10 attestation envelope *(held)*
 
 ## Ready
 
-Human-approved issues ready for implementation (`loom:issue`).
+Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT
+_None._
 
 ## In Progress
 
@@ -46,6 +46,7 @@ Issues currently being built (`loom:building`).
 - **#71**: spec: write-margin definition under-specified
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#172**: Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
 
@@ -62,15 +63,15 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#197**: chore(loom): resync installed Loom to v0.19.1306
+_None._
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist *(curated)*
+- **#30**: T1 item 4 (LVS clean): klt lvs of the full macro vs the item-1 netlist *(curated)* *(held)*
 - **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 *(curated)*
-- **#68**: spec: margins row has no Monte Carlo evidence *(curated)*
+- **#68**: spec: margins row has no Monte Carlo evidence *(curated)* *(held)*
 - **#69**: spec: confirm the 1 ns write-pulse window *(curated)*
 - **#71**: spec: write-margin definition under-specified *(curated)*
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
@@ -95,10 +96,10 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 7 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 8 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
+| In Progress (`loom:building`) | 9 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 1 |
+| Approved PRs awaiting merge | 0 |
 | Curated | 11 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
