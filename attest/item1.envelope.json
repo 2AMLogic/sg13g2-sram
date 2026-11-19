@@ -929,16 +929,560 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.8.0",
+    "klt_version": "0.9.2",
     "klayout_version": null,
     "pdk": null,
     "deck": null,
     "input": {
-      "path": {
-        "path": "attest/item1.json",
-        "scope": "repo"
-      },
-      "content_hash": "sha256:22729c8aea6a4cc503f7c6ed964c146a0f975a4e4ee3ca508ff7d8dd9428cb61"
+      "paths": [
+        {
+          "path": {
+            "path": "attest/item1.json",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:22729c8aea6a4cc503f7c6ed964c146a0f975a4e4ee3ca508ff7d8dd9428cb61"
+        },
+        {
+          "path": {
+            "path": "design/bitcell/bitcell.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:eea785c7304539bb8609fbe7f86e1599e3a66f03040277bccb20a85004f230a3"
+        },
+        {
+          "path": {
+            "path": "design/bitcell/bitcell.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1fdf13f2753259b1c751a19f21fed5b57487d71883ad935a604b957a0c959fda"
+        },
+        {
+          "path": {
+            "path": "design/bitcell/bitcell.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1ae9c2cb8288b1737bd6f1b1e5f3461531e7120e463932419177d70bc9821e8d"
+        },
+        {
+          "path": {
+            "path": "design/column/column.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:30f480de2d4cd5d16fd01d195bb91d97aabebb310691eb31d28607483f76b530"
+        },
+        {
+          "path": {
+            "path": "design/column/column.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:9c791168bc1bfdd6d660d8a9ed02e048e4c91ad718aa8c31a14e1e07674d3f25"
+        },
+        {
+          "path": {
+            "path": "design/column/column.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:3038f3428cbb550c70e575fa571f94c83a87b1aa7b1233ee48648c6a40f974d4"
+        },
+        {
+          "path": {
+            "path": "design/column/column_mux.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:a72f20db12cbee67ff8468b1ce07d2dd248cab303ad6a1466e930ba1e946af09"
+        },
+        {
+          "path": {
+            "path": "design/column/column_mux.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:ab9b02d1ccc49762644614f0c47e02b5cb0db33e1a19fdbbb9ac70d20ed5be37"
+        },
+        {
+          "path": {
+            "path": "design/column/column_mux.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:7bece2739c225221fbde71b376395558f414177bc5456223ec27ebe07ab400c5"
+        },
+        {
+          "path": {
+            "path": "design/column/precharge.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1d74c96e344442a3050528eab81df561d1058874063871856ae8a0079544caee"
+        },
+        {
+          "path": {
+            "path": "design/column/precharge.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:e817a1d20504fb0cc23c164846395c2f187b2ffa7b33441c80180a2a1bbf9b48"
+        },
+        {
+          "path": {
+            "path": "design/column/precharge.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:9440a07121c4a979e1f24d650636a736f928330bbf57365a9c4e6150b6e1c9dd"
+        },
+        {
+          "path": {
+            "path": "design/column/sense_amp.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:add72d02c3a8640edea1b982b1e1920dca3847f78e049d254d96e7a2f0b4b615"
+        },
+        {
+          "path": {
+            "path": "design/column/sense_amp.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:bd57e97771956889eb491fbe15aca5f8e9a6d4d0df69f4bc0b85286b1dcf7d02"
+        },
+        {
+          "path": {
+            "path": "design/column/sense_amp.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:545ea3afa30b4306b8ba74c181ee5baa2ad0594226cc27266a476309644fe8ec"
+        },
+        {
+          "path": {
+            "path": "design/column/write_driver.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1ff7b3715ee55447e34ad164a8c64302930b35ff41c113aaa007781599889e46"
+        },
+        {
+          "path": {
+            "path": "design/column/write_driver.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:7b28397682fd7a4829bfa8cf989635dd5714ead558c0ad02bf92d0890097b2d0"
+        },
+        {
+          "path": {
+            "path": "design/column/write_driver.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:5d71cc1b67ab6dc3c0b6305c855f9c29bc600edbd3576a891032b54c63fa4bf0"
+        },
+        {
+          "path": {
+            "path": "design/control/control.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:a2041aa27ef25f50caec785a43968694a231e00e753de51b2f6bf4d37cdc056d"
+        },
+        {
+          "path": {
+            "path": "design/control/control.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:e9003e7507a09bdb5e9a3711d41bbd103462ec382f6eddf19aebc9bf111cd2b1"
+        },
+        {
+          "path": {
+            "path": "design/control/control.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:bcbeafbfb316aa25447b0a87a7e4b9416a55b5f08ca20d35aa3c808032d6f39a"
+        },
+        {
+          "path": {
+            "path": "design/decoder/predec3.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:c046b7bdc4e28f129d6665c9bcdbd31c4eda53a68ff4c5a79ab1ee70ddd0f804"
+        },
+        {
+          "path": {
+            "path": "design/decoder/predec3.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:68a31d6b874bb69c31c70b29a02dc89b3f5fcef03c36f85dc8a5969cf26fa3eb"
+        },
+        {
+          "path": {
+            "path": "design/decoder/predec3.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:d7c3a18d7657b36a81e1f585f35049e616db86e8584536ce25de57f48fa8f900"
+        },
+        {
+          "path": {
+            "path": "design/decoder/predec4.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:13c0b38ee618d332365f5bdbecfcf5abd12386c21e4fe6ef7ff0c6c9065c718d"
+        },
+        {
+          "path": {
+            "path": "design/decoder/predec4.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:31af2f1a584167851cbb8501116167acb0d42dca0180424ffaea5381856acce1"
+        },
+        {
+          "path": {
+            "path": "design/decoder/predec4.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:2163cec653d6af71c3e8c2481e510ca11163a3e972ca307a25e9d72c5f8aba2e"
+        },
+        {
+          "path": {
+            "path": "design/decoder/row_decoder.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:64d12f984f69ea67f84743b104bb2ccbd8d53c3cdefc4f48906801951ea72918"
+        },
+        {
+          "path": {
+            "path": "design/decoder/row_decoder.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:ba7281e42cff8e94c4c925456190331b805b03fd4d886fa2d53b73a24ac6b26e"
+        },
+        {
+          "path": {
+            "path": "design/decoder/row_decoder.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:343bd94b7a0d6ac1715775243ad295bb8e7d858c15bd6aa39944e81a35631142"
+        },
+        {
+          "path": {
+            "path": "design/decoder/wl_driver.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:17ad28c14a2ccdd0c3ce2787f11ce2d884035761402d2f023d40da83778c943d"
+        },
+        {
+          "path": {
+            "path": "design/decoder/wl_driver.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:4bd4528332e176fad4483231b88566c244a5d08fb065269b6e293ce261552875"
+        },
+        {
+          "path": {
+            "path": "design/decoder/wl_driver.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:079b2511dc5b04d00b11b1934dc4aba2d8a87bac298d5c2102733f184f410312"
+        },
+        {
+          "path": {
+            "path": "design/decoder/wl_drivers.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:0df3eae0dc45dcae2b419ecdbd6e396a513eb58304da27bc80ccf6ce4feb73d2"
+        },
+        {
+          "path": {
+            "path": "design/decoder/wl_drivers.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:62f28111b89e6896070b5a620f1b498a5da3e953b45d309b3793fba730a12915"
+        },
+        {
+          "path": {
+            "path": "design/decoder/wl_drivers.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:155d63a019e61bd6b50ecde68c52c3eed9ab0047b026255ae354cf0b3720f51c"
+        },
+        {
+          "path": {
+            "path": "design/gates/inv.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:a4b92a1db65b09e0137efc35fdf20ccb9f302f86acc999ed83ba436d97637cb5"
+        },
+        {
+          "path": {
+            "path": "design/gates/inv.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:32bcfb3c2a176268ce643f660ab6ef9c5026036412ab3d68c9e0058b187650b8"
+        },
+        {
+          "path": {
+            "path": "design/gates/inv.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:422c507334c29b6791dd68e59ffd4a218b7dd7c82ac19ed7aacf90a3e8bd3f29"
+        },
+        {
+          "path": {
+            "path": "design/gates/inv_x4.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:40a905ff73bdd9761611002e83f30defa2b8bbb2bd91437ce7b5125a5586a6eb"
+        },
+        {
+          "path": {
+            "path": "design/gates/inv_x4.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:5d1ade712a9dca0a8d7fd44a97bb1916dbc9ccadfc53b9af61849a9efcb834ba"
+        },
+        {
+          "path": {
+            "path": "design/gates/inv_x4.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:422c507334c29b6791dd68e59ffd4a218b7dd7c82ac19ed7aacf90a3e8bd3f29"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand2.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:228ff87740704d371cdddcb3bb25fd97adaac07c03ac72fb65e71a25a30716ef"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand2.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:178ecc678ec7b8bb964b648fbf80e554e1e01c9b7abed8545625c97c7373fd9d"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand2.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:52fdfb2e7e4d134058dc503efe6f7c04008ab48400755c8151dfca093fb6b2da"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand3.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:7ce2b8f25ad4eacf020b9a944deb392079db6cc2139e9a6bec669a0ccf13895e"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand3.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:b9c909ac6cf75d444008a2fa43678309c3e9429a4d7f45d97c762ede7c1d4751"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand3.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:45a1a49b748f104368df182c6f041b5fffec134b220f4ec1872749f54500e978"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand4.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:7265576378210591eae45ca299c408db183d942c228392feaf07efacaad74673"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand4.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:d16ed2402721d3c2956c7cd8bc6b6cc31e8558cd0c2f46d70f3790716ab34d85"
+        },
+        {
+          "path": {
+            "path": "design/gates/nand4.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:fb5b413f085212611f77c3a821a9ab35fe5cdcdf9f10dcb291235809d5d2e3ca"
+        },
+        {
+          "path": {
+            "path": "design/gates/nor2.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:e670314b342e372b80e0d6b601afae67aa723a345e35011608cf1d128600731d"
+        },
+        {
+          "path": {
+            "path": "design/gates/nor2.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:11bf2fa3aa438ca67c688a0ea2e91d9e4153a95180eb5bb5f581822e7046e3c7"
+        },
+        {
+          "path": {
+            "path": "design/gates/nor2.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:52fdfb2e7e4d134058dc503efe6f7c04008ab48400755c8151dfca093fb6b2da"
+        },
+        {
+          "path": {
+            "path": "design/latches/addr_latch.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:33125b1c5c2fcaf0f02819f1b9f890e63d298761db4c6c08fd78bc2f17459e81"
+        },
+        {
+          "path": {
+            "path": "design/latches/addr_latch.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:2688be84edf65ffef63675543529c2d21b5439f97dfa68aad1bf1d63f94aa1c8"
+        },
+        {
+          "path": {
+            "path": "design/latches/addr_latch.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:69ba7df53b049fd90eb11b822606c91e7bd10d9e3d796d782f1a184a6db7bea5"
+        },
+        {
+          "path": {
+            "path": "design/latches/data_latch.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:e1a5257b5266227e9faa7fd00a1dd2c989289367749e3a8a1fb81a7bb0d1d5ed"
+        },
+        {
+          "path": {
+            "path": "design/latches/data_latch.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:398e8d2529078cb00d8611ae5d74ddf589b92d5ce40825758b17ee912159b583"
+        },
+        {
+          "path": {
+            "path": "design/latches/data_latch.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:29a51b26c235a253f2c751f447f248e016657a19d44c86cefa27eaf05f98c2bb"
+        },
+        {
+          "path": {
+            "path": "design/latches/dlatch.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:87f4f6f1cd6d32e4ee3b631d651f4092d375fb83ee9eae174aac5f3125582995"
+        },
+        {
+          "path": {
+            "path": "design/latches/dlatch.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:6ee1da733c3e9e00e937f1dda73fe06e9e2d7f9a5507d82f08de0d3d106ed893"
+        },
+        {
+          "path": {
+            "path": "design/latches/dlatch.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:fae7b24beb0f03e317d9abce75e778bc251f3e0871c0d5f653b09f9e4e1b3de2"
+        },
+        {
+          "path": {
+            "path": "design/latches/out_latch.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:320497dc026e40da6f81836cdab69a6c981da8eccd0450c94a6941487471be3b"
+        },
+        {
+          "path": {
+            "path": "design/latches/out_latch.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:cd67f6eb2cab0add934373af7f091fc3c71ef085d71c890f82262398a297cff4"
+        },
+        {
+          "path": {
+            "path": "design/latches/out_latch.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:719845e10ce468f815b80dbcce4a48a703732cab0fc3e77a57d9a4170de5445d"
+        },
+        {
+          "path": {
+            "path": "design/macro/bit_slice.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:4091e61e09e178e0c65f979ba3925402432d269d311b673030efb82bfbfd6fbb"
+        },
+        {
+          "path": {
+            "path": "design/macro/bit_slice.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:921d8050f10546d9ca66263fec7fe81cea7b3e80e9e83f47bd03f59604f16bff"
+        },
+        {
+          "path": {
+            "path": "design/macro/bit_slice.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:2c110f6aa1b9e92fd0132e501893591ade58fb610b9aaa90dcc69680aa7a853d"
+        },
+        {
+          "path": {
+            "path": "design/macro/bl_pair.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:4470251839b1b2fa0bc92742423072b22454bc8dbdda7db3ac26f2fc6d9b8a42"
+        },
+        {
+          "path": {
+            "path": "design/macro/bl_pair.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:d143ac07ca5722827db817b33745b56deebb7f17799873d73b7b3c3add7937c4"
+        },
+        {
+          "path": {
+            "path": "design/macro/bl_pair.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:be3853b6de28a8a745282991f2fb94dd03465e9bff7c5f74921ab4c4369bf096"
+        },
+        {
+          "path": {
+            "path": "design/macro/macro.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:7c4bc58d365f183c92bc9db8d6a6cb7813bd7cb6dcd9379fe86fdb364242c09e"
+        },
+        {
+          "path": {
+            "path": "design/macro/macro.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:5637521969c90e9dfffbf8fa731f69ec3c2e322f23c4296d739518ff71c221a1"
+        },
+        {
+          "path": {
+            "path": "design/macro/macro.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:aca4e98f158d53d98373a910b912617e41bf2e37cb11b4747b025e09d8e5df72"
+        },
+        {
+          "path": {
+            "path": "design/netlist.sh",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1050034ebf57eb4fafa81b3e7ede275bbb154aac9ae62210a346f3b9c3cc5f73"
+        },
+        {
+          "path": {
+            "path": "design/xschemrc",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:a144f53523ad004adde94033bde74aa64ed360788cfbe1a21b99da62b4eef7e9"
+        }
+      ],
+      "content_hash": "sha256:abf3a3d9aa236e75fef1fb21857141403560ac4efea47e4adad1a63c5a101b5f"
     }
   }
 }
