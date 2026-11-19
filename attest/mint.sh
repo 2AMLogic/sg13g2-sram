@@ -138,7 +138,27 @@ ENVELOPE="attest/item${ITEM}.envelope.json"
 # makes it a REFRESH of committed evidence, never a cold mint -- with no
 # committed envelope there is nothing to carry outcomes from, so the refusal
 # below states that distinction instead of silently minting a hollow one.
-if grep -q '"local_only": true' "$INVENTORY"; then
+#
+# The decision is made on the inventory's CONTENT (any object whose local_only
+# is the boolean true), never its text: a compact or re-indented inventory with
+# unchanged data must not silently drop --skip-local-only, because without it
+# `klt signoff --attest` generates and runs the fleet cold start. A parser that
+# is missing, or an inventory that does not parse to a count, stops the script
+# before anything is minted -- an error must not fall through to the ordinary
+# mint path.
+command -v jq >/dev/null 2>&1 || die \
+    "jq is required to read $INVENTORY and was not found on PATH." \
+    "Nothing was launched and no file was written."
+LOCAL_ONLY_COUNT="$(jq -r '[.. | objects | select(.local_only == true)] | length' \
+  "$INVENTORY" 2>/dev/null)" || LOCAL_ONLY_COUNT=""
+case "$LOCAL_ONLY_COUNT" in
+  ''|*[!0-9]*)
+    die "cannot parse $INVENTORY as JSON (unreadable, empty or malformed)." \
+        "Refusing to guess whether it has local_only entries. Nothing was" \
+        "launched and no file was written."
+    ;;
+esac
+if [ "$LOCAL_ONLY_COUNT" -gt 0 ]; then
   [ -f "$ENVELOPE" ] || die "refusing to cold-mint item $ITEM." \
       "" \
       "attest/item${ITEM}.json carries local_only entries, so this script" \
