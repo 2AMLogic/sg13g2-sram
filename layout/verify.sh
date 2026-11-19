@@ -102,7 +102,7 @@ if rec["rails_vs_wordline_gap"]["total"] != 0:
 print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear; no undrawn signal net")
 PYEOF
 
-hr "10. macro: array regularity (klt array-check; pinned klt 0.9.1 -- the host/signoff 0.8.0 lacks the verb)"
+hr "10. macro: array regularity (klt array-check; pinned klt 0.9.1 -- reproduces the committed report: layout/reports/array-check-macro.json records provenance klt_version 0.9.1)"
 AC=layout/reports/array-check-macro.json
 ACK=(uvx --from klayout-tools==0.9.1 klt)
 "${ACK[@]}" clip $D/macro.gds --cell bl_pair -o "$WORK/bl_pair.gds" > /dev/null
