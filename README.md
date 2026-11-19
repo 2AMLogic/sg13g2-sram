@@ -166,6 +166,12 @@ Records are append-only: each run writes a new `records/<UTC>/` directory.
    ./attest/mint.sh 10
    ```
 
+   `README.md` itself is pinned out of the automated docs-maintenance lane
+   (`guide.docsMaintenance.pinnedPaths` in `.loom/config.json`): README changes
+   go through ordinary reviewed PRs, not the docs-only fast path, and the
+   author re-signs this envelope with the command above and commits the
+   refreshed envelope in the same PR.
+
    **Minting must use the pin**, which `attest/mint.sh` enforces by reading
    `KLT_VERSION` from `.github/workflows/ci.yml` and routing through `uvx`. The
    host `klt` is a newer, unreleased build: minting with it stamps an
