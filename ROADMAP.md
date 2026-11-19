@@ -10,7 +10,7 @@ says what the work is and what holds it.
 
 ## Where it stands
 
-`manifests/sg13g2-sram.signoff.json` (klayout-tools 0.8.0) is the verdict of
+`manifests/sg13g2-sram.signoff.json` is the verdict of
 record: **5 of 11 T1 items met, `tier: null`.**
 
 | T1 item | Grade | Evidence or gap |
