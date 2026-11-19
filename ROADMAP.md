@@ -48,7 +48,8 @@ issues below.
 ## Now
 
 Can start today. None of these touches a file in `attest/item9.json` (see
-Blocked and waiting for why that matters).
+Blocked and waiting for why that mattered; per the 2026-11-19 update there,
+an item 9 edit on `main` is now a refresh at the 0.9.2 pin, not a block).
 
 1. **Route global control fan-out and per-slice DL/DOUT** (#107). Done when the
    nets named in #107 are each one connected net with no short under
@@ -112,6 +113,31 @@ Blocked and waiting for why that matters).
   which lists three ways out). Until one is chosen, any change to a file in
   `attest/item9.json` leaves `signoff` red. Held on this: PR #64 (#56),
   PR #84 (#69), PR #130 (#126).
+  - **Update 2026-11-19, `main` @ `2973285` (issue #219): the block above is
+    discharged on `main`.** Both pins moved to 0.9.2 (`428f330`, 2026-11-15),
+    which ships `--skip-local-only` (klayout-tools#5209, resolving the release
+    gap tracked as 2AMLogic/klayout-tools#5694): `bash attest/mint.sh 9` is a
+    refresh, not a cold mint — it re-signs drifted inventory hashes and
+    carries the cold start's committed outcome (`committed outcome: pass`)
+    without submitting the fleet run. Measured in a disposable checkout of
+    this revision: unchanged tree grades `match`; a blank line appended to an
+    inventoried file grades `drifted` (exit 3); `bash attest/mint.sh 9`
+    returns `match` with the envelope byte-identical and the cold start
+    skipped. CI and signoff are green on `main` at 0.9.2. The three held PRs
+    stay held; each head's checks predate the bump and none has run at 0.9.2:
+    - **PR #64, `70fb920`**: item 9 drift check red and signoff record
+      comparison red (2026-10-28 runs); its last re-attestation retry
+      (2026-11-05) was a 0.8.0 cold mint, exit 6. Mergeable, carries
+      `loom:ci-failure` + `loom:operator`.
+    - **PR #84, `9dd9603`**: item 9 drift check red, signoff record green
+      (2026-10-30 run); conflicting with `main`. Its 2026-11-03 hold asks a
+      human-launched fleet cold start to re-mint — the ask the 0.9.2 refresh
+      path replaces, still untested at the new pin. Carries `loom:operator`.
+    - **PR #130, `808b3ce`**: item 9 drift check red, signoff record green
+      (2026-11-01 run); mergeable. `loom:blocked` on the standing operator
+      ruling of 2026-11-06 (item 9 not regenerable under 0.8.0 on any lane),
+      a premise the refresh path supersedes; the label waits on an operator
+      re-rule, not a roadmap edit.
 - **Spec PRs parked since 2026-10-29**: #77 (#37), #78 (#72), #80 (#74),
   #81 (#71, now conflicting with `main`). They were parked because CI could not
   start; CI on `main` is green as of 2026-11-13, so they need a re-run and a
