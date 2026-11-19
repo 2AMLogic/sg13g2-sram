@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# Mint the decoder signal-routing evidence record (issue #105): regenerate the macro GDS, socket
-# descriptor and LEF, then write layout/reports/macro-record-decoder.json. The earlier records
-# (macro-record.json, -taps, -routed, -rails, -leafnets, -latchnets) are results of earlier layouts and are not rewritten;
-# this record re-states the rails and wordline-gap checks on the new layout so `verify.sh` step 9
-# has a record that matches the committed files. Run from anywhere:
+# Mint the leaf-routing evidence record (issue #159): regenerate the macro GDS, socket
+# descriptor and LEF, then write layout/reports/macro-record-blbm.json. This record exists
+# because every earlier record (macro-record.json, -taps, -routed, -rails, -leafnets, -latchnets,
+# -decoder) pins the pre-#159 GDS hash and still lists the column mux's BLBM under not_drawn;
+# they are results of earlier layouts and are not rewritten. Records are append-only evidence:
+# a re-run after a layout or klt change is a new result -- commit it as such and say why in the
+# commit message. `layout/verify.sh` step 9 reads this record. Run from anywhere:
 #
-#     ./layout/reports/generate-macro-decoder.sh
-#
-# Records are append-only evidence: a re-run after a layout or klt change is a new result -- commit
-# it as such and say why in the commit message.
+#     ./layout/reports/generate-macro-blbm.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -25,7 +24,7 @@ klt extract --deck sg13g2 $D/macro.gds -o "$WORK/extracted.spice" --format json 
 klt drc --deck sg13g2 --top macro $D/macro.gds --format json > "$WORK/drc.json" || true
 
 (cd $D && uv run --with klayout python3 -I -c 'import json,sys; sys.path.insert(0, "."); import generate as g, rails_check as rc; l,gen,top=g.build(); print(json.dumps({"rails": rc.analyse(l,top,gen), "gap": rc.wordline_gap_clearance(l,top,gen), "leaf": gen.leaf_report, "hier": gen.hier_report, "stubs": [t["stub"] for t in gen.tie_wiring]}))' > "$WORK/analysis.json")
-python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record-decoder.json
+python3 - "$WORK" <<'PYEOF' > layout/reports/macro-record-blbm.json
 import collections, hashlib, json, subprocess, sys
 w = sys.argv[1]
 D = "layout/sram_256x32"
@@ -42,7 +41,8 @@ width, height = sizes["x1"] - sizes["x0"], sizes["y1"] - sizes["y0"]
 leaf = an["leaf"]
 print(json.dumps({
     "generator_command": "uv run --with klayout python3 layout/sram_256x32/generate.py",
-    "record_command": "./layout/reports/generate-macro-decoder.sh",
+    "record_command": "./layout/reports/generate-macro-blbm.sh",
+    "issue": 159,
     "gds": {f"{D}/macro.gds": sha(f"{D}/macro.gds")},
     "lef": {f"{D}/macro.lef": sha(f"{D}/macro.lef")},
     "socket": {f"{D}/macro.socket.json": sha(f"{D}/macro.socket.json")},
@@ -57,12 +57,17 @@ print(json.dumps({
     "leaf_signal_routing": {
         "router": "MazeRouter (generate.py): Metal2/Metal3 maze on a 0.05 um lattice, Via1 landings on the Metal1 terminals, "
                   "nets of two or more D/G/S terminals; supply, bit-line and wordline nets are not routed here",
+        "blbm_join": "issue #159: route_bitlines keeps every bit-line jog clear of the column_mux BLBM terminal bands "
+                     "(blbm_reserve: BLBM_CROSSING_CLEAR = M3.a + M3.b of Metal3 kept under each band, "
+                     "BLBM_JOGLANE_CLEAR = M2.a/2 + M2.b right of the jog's own M2 column), and route_leaf joins the net "
+                     "in the freed Metal3 under each band's jog lane; with it every leaf-cell net of every cell is drawn",
         "cells": {name: {"routed_nets": rep["routed"], "single_terminal_nets": rep["single_terminal"],
                          "excluded_nets": sorted(rep["excluded"]), "undrawn_nets": rep["failed"]}
                   for name, rep in sorted(leaf.items())},
         "routed_net_count": sum(len(r["routed"]) for r in leaf.values()),
         "undrawn": [f"{n}/{x}" for n, r in sorted(leaf.items()) for x in r["failed"]],
-        "connectivity_check": "test_macro.py::test_leaf_cell_nets_are_one_net_each_and_never_short (per-cell extraction)",
+        "connectivity_check": "test_macro.py::test_leaf_cell_nets_are_one_net_each_and_never_short (per-cell extraction)"
+                              " and test_macro.py::test_column_mux_blbm_is_one_net_and_has_teeth (BLBM)",
     },
     "hier_signal_routing": {
         "router": "MazeRouter (generate.py) over the child cells of addr_latch, data_latch, out_latch, control, predec3, predec4, wl_drivers and "
@@ -79,10 +84,10 @@ print(json.dumps({
     "rails_vs_wordline_gap": an["gap"],
     "rails_connectivity": an["rails"],
     "not_drawn": ["VDD/VSS pin connection to the rails", "signal nets between the blocks",
-                  "inter-block signal fan-out", "signal pin routing", "column_mux BLBM (listed in undrawn)"],
+                  "inter-block signal fan-out", "signal pin routing"],
     "deck": {"name": "sg13g2", "content_hash": deck["content_hash"], "released": deck["released"],
              "release": deck.get("release")},
     "klt_version": subprocess.run(["klt", "--version"], capture_output=True, text=True).stdout.strip(),
 }, indent=2))
 PYEOF
-echo "record written to layout/reports/macro-record-decoder.json"
+echo "record written to layout/reports/macro-record-blbm.json"

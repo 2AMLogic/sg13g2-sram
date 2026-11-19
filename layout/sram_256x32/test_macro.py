@@ -11,6 +11,7 @@ import re
 import sys
 
 import klayout.db as kdb
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import generate as g  # noqa: E402
@@ -282,6 +283,47 @@ def test_gap_clearance_check_has_teeth():
     assert rails_check.wordline_gap_clearance(layout, top, gen)["rail_shapes_in_gap_below_metal4"]["v2"] == 1
 
 
+# ---- the rails obstacle model (issue #163) ---------------------------------------
+def test_obstacle_clear_rejects_other_net_and_signal_shapes():
+    obs = g.Obstacles()
+    obs.add("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))
+    assert not obs.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # interior overlap
+    assert not obs.clear("VDD", kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M2.b
+    assert not obs.clear("VDD", kdb.DBox(1.21, 0.0, 2.0, 0.2))  # 0.21 away: still inside the 0.22 check margin
+    assert obs.clear("VDD", kdb.DBox(1.22, 0.0, 2.0, 0.2))  # past the check margin it is clear
+    sig = g.Obstacles()
+    sig.add(None, kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a signal shape blocks every net
+    assert not sig.clear("VDD", kdb.DBox(0.5, 0.05, 1.5, 0.25))
+    assert not sig.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))
+
+
+def test_obstacle_clear_same_net_merge_and_sliver():
+    obs = g.Obstacles()
+    obs.add("VSS", kdb.DBox(0.8, 0.0, 1.8, 0.2))
+    assert obs.clear("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))  # merged: the overlap is a full stub width deep
+    obs2 = g.Obstacles()
+    obs2.add("VSS", kdb.DBox(0.9, 0.0, 1.9, 0.2))
+    assert not obs2.clear("VSS", kdb.DBox(0.0, 0.0, 1.0, 0.2))  # a 0.1 um-deep corner overlap is a sliver under M2.a
+
+
+def test_obstacle_hash_spans_its_grid_cells():
+    obs = g.Obstacles()
+    obs.add("VDD", kdb.DBox(4.9, 4.9, 5.1, 5.1))  # straddles the 5 um grid line
+    assert {(0, 0), (1, 0), (0, 1), (1, 1)} <= set(obs.m2)
+    assert not obs.clear("VSS", kdb.DBox(5.0, 5.0, 5.5, 5.2))
+
+
+def test_obstacle_clear3_and_cross_layer_independence():
+    obs = g.Obstacles()
+    obs.add_m3(kdb.DBox(0.0, 0.0, 1.0, 0.2))
+    assert not obs.clear3(kdb.DBox(0.5, 0.05, 1.5, 0.25))
+    assert not obs.clear3(kdb.DBox(1.0, 0.0, 2.0, 0.2))  # even a bare edge touch violates M3.b
+    assert not obs.clear3(kdb.DBox(1.21, 0.0, 2.0, 0.2))  # 0.21 away: still inside the 0.22 check margin
+    assert obs.clear3(kdb.DBox(1.22, 0.0, 2.0, 0.2))  # past the check margin it is clear
+    assert any(obs.m3.values())
+    assert obs.clear("VSS", kdb.DBox(0.5, 0.05, 1.5, 0.25))  # the Metal3 hash does not gate the Metal2 check
+
+
 # ---- flat-net resolution (issue #104) -------------------------------------------
 def _device_count(nl, name):
     n = 0
@@ -432,6 +474,24 @@ def test_router_aimed_and_unaimed_searches_agree():
     assert routable >= 8, f"only {routable}/12 obstacle maps were routable: the comparison is not being exercised"
 
 
+def test_router_rejects_aimed_search_at_more_than_one_goal():
+    """``connect``'s ``toward`` aims an A* whose Manhattan heuristic is admissible only for the one node it aims at:
+    with ``WRONG_WAY`` steps on the lattice, a goal set holding more than ``toward`` alone can pop a
+    costlier-than-cheapest goal first (start (4, 4), goals {(0, 4, 12), (0, 8, 4)}, toward (8, 4): aimed cost 16 vs
+    optimal 8), silently. The aimed mode therefore asserts ``goals == {(0, *toward)}``; the unaimed Dijkstra over
+    any goal set, on either layer, is unaffected, as is the aimed singleton the generator itself calls."""
+    start = (4, 4)
+    mz = g.MazeRouter(0, 0, 3000, 3000)
+    with pytest.raises(AssertionError):
+        mz.connect(1, {(0, *start)}, {(0, 4, 12), (0, 8, 4)}, toward=(8, 4))
+    with pytest.raises(AssertionError):
+        mz.connect(1, {(0, *start)}, {(0, 20, 20)}, toward=(30, 30))
+    assert mz.connect(1, {(0, *start)}, {(0, 8, 4)}, toward=(8, 4)) is not None
+    assert mz.connect(1, {(0, *start)}, {(0, 4, 12), (0, 8, 4)}) is not None
+    assert mz.connect(1, {(0, *start)}, {(1, 4, 12), (1, 8, 4)}) is not None
+    assert mz.connect(1, {(0, *start)}, {(0, 20, 20)}) is not None
+
+
 # ---- leaf-cell nets on the generated layout (issue #104) ----------------------------
 def _extract_cell(layout, cell):
     """Hierarchical connectivity of one leaf cell: Cont-Metal1-Via1-Metal2-Via2-Metal3."""
@@ -469,7 +529,7 @@ def test_leaf_cell_nets_are_one_net_each_and_never_short():
         reps = [cl[0] for cl in ids.values()]
         assert len(set(reps)) == len(reps), (name, "two netlist nets share a cluster")
         n_checked += len(ids)
-    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 53
+    assert n_checked == sum(len(r["routed"]) for r in gen.leaf_report.values()) == 54
 
 
 def test_leaf_cell_undrawn_nets_are_listed():
@@ -480,11 +540,34 @@ def test_leaf_cell_undrawn_nets_are_listed():
         nets = {n for inst in gen.nl[name].insts if inst.ref in g.DEVICE_REFS for n in inst.nets[:3]}
         listed = set(rep["routed"]) | set(rep["failed"]) | set(rep["single_terminal"]) | set(rep["excluded"])
         assert listed == nets, (name, nets ^ listed)
-    # the known gap: the column mux's BLBM is not joined (the bit-line jogs leave no Metal3 crossing)
+    # every leaf-cell net is drawn (issue #159 joined the column mux's BLBM, the last undrawn one)
     undrawn = {(name, n) for name in g.LEAF_ROUTED for n in gen.leaf_report[name]["failed"]}
-    assert undrawn == {("column_mux", "BLBM")}, undrawn
+    assert undrawn == set(), undrawn
+    assert gen.leaf_report["column_mux"]["routed"]["BLBM"] == 4
     assert gen.leaf_report["inv"]["routed"] == {"A": 2, "Y": 2}
     assert gen.leaf_report["precharge"]["excluded"]["BL"]["reason"] == "bit line"
+
+
+def test_column_mux_blbm_is_one_net_and_has_teeth():
+    # the bit-line jogs are pushed below the BLBM terminal bands (``blbm_reserve``) so the net is
+    # joined; cutting any one of its traces must split it again (issue #159)
+    def probe(mutate):
+        layout, gen, _ = _built()
+        if mutate:
+            x, y = gen.leaf_terms["column_mux"]["BLBM"][0]
+            _erase_at(layout.cell("column_mux"), g.L_VIA1, x, y)
+        return _leaf_nets(layout, gen, "column_mux")["BLBM"]
+
+    assert len(set(probe(False))) == 1
+    assert len(set(probe(True))) > 1
+
+
+def test_column_mux_blbm_has_teeth_via2():
+    layout, gen, _ = _built()
+    v = next(v for v in gen.leaf_vias["column_mux"] if v["net"] == "BLBM")
+    _erase_at(layout.cell("column_mux"), g.L_VIA2, v["x"], v["y"])
+    ids = _leaf_nets(layout, gen, "column_mux")
+    assert len(set(ids["BLBM"])) > 1, v
 
 
 def test_leaf_cell_trace_has_teeth_via1_landing():

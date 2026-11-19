@@ -80,24 +80,26 @@ hr "8. macro: DRC of the full array (klt drc --deck sg13g2; coverage gaps are in
 klt drc --deck sg13g2 --top macro $D/macro.gds
 klt drc --check layout/reports/drc-macro.json
 
-hr "9. macro: the latest (decoder-net) record matches the committed layout; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
+hr "9. macro: the latest (leaf-routing, issue #159) record matches the committed layout; every tie and riser reaches a rail; no rail below Metal4 in the wordline gap"
 python3 - <<'PYEOF'
 import hashlib, json, sys
-rec = json.load(open("layout/reports/macro-record-decoder.json"))
+rec = json.load(open("layout/reports/macro-record-blbm.json"))
 for key in ("gds", "lef", "socket"):
     for path, want in rec[key].items():
         got = hashlib.sha256(open(path, "rb").read()).hexdigest()
         if got != want:
-            sys.exit(f"FAIL: {path} differs from macro-record-decoder.json")
+            sys.exit(f"FAIL: {path} differs from macro-record-blbm.json")
+if rec["leaf_signal_routing"]["undrawn"] or rec["hier_signal_routing"]["undrawn"]:
+    sys.exit("FAIL: macro-record-blbm.json reports an undrawn signal net")
 c = rec["rails_connectivity"]
 ok = (c["ties_on_own_rail"] == c["ties_expected"] and c["ties_floating"] == 0 and c["ties_on_other_rail"] == 0
       and c["vdd_vss_short_polygons"] == 0
       and all(v["on_rail"] == v["expected"] and v["on_other_rail"] == 0 for v in c["bitcell_risers"].values()))
 if not ok:
-    sys.exit("FAIL: macro-record-decoder.json reports a floating tie, a stray rail or a short")
+    sys.exit("FAIL: macro-record-blbm.json reports a floating tie, a stray rail or a short")
 if rec["rails_vs_wordline_gap"]["total"] != 0:
-    sys.exit("FAIL: macro-record-decoder.json reports a rail shape below Metal4 in the wordline gap")
-print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear")
+    sys.exit("FAIL: macro-record-blbm.json reports a rail shape below Metal4 in the wordline gap")
+print(f"PASS: record matches the files; {c['ties_on_own_rail']}/{c['ties_expected']} ties and all bitcell risers on their rail; wordline gap clear; no undrawn signal net")
 PYEOF
 
 hr "10. macro: array regularity (klt array-check; pinned klt 0.9.1 -- the host/signoff 0.8.0 lacks the verb)"

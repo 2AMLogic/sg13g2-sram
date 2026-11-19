@@ -18,7 +18,11 @@
 #      run_sizing.sh now REFUSING an exit 4 that produced no envelope, which
 #      is the one intentional behaviour change of issue #157.
 #   3. new_record's trap ordering: a failure part-way through a series of
-#      scratch-request writes leaves no .*.json behind in the checkout.
+#      scratch-request writes leaves no .*.json behind in the checkout. And
+#      its scope (issue #171): the trap removes only the scratch requests the
+#      caller declared to new_record -- never a sibling run script's files
+#      sharing the same HERE directory, and nothing at all when the caller
+#      declares none.
 #   4. The append-only record guard (exit 4) and the fleet-bucket redaction.
 #
 # Usage: sim/harness/common/test_setup.sh      (quiet unless something fails)
@@ -222,6 +226,81 @@ for _ in 1 2 3; do
   rm -rf "${TMP}/rec-dup"
 done
 check "new_record refuses an existing record (append-only)" 4 "${guard_rc}"
+
+# Sibling isolation (issue #171): the EXIT trap must remove only the scratch
+# requests the caller declared, not every .*.json in the shared HERE directory.
+# .req_read.json and .typ_snm.json stand in for sibling scripts' in-flight
+# scratch (run_column.sh / run_bitcell.sh share sim/column/ exactly this way
+# one directionally); this test fails against the directory-wide ".*.json"
+# trap setup.sh had before the issue.
+sib="${TMP}/sib-here"; mkdir -p "${sib}"
+: > "${sib}/.req_read.json"   # a sibling script's scratch request, in flight
+: > "${sib}/.typ_snm.json"    # another sibling's
+: > "${sib}/.own.json"        # this caller's own, declared below
+sib_ok=0
+# WORK/REC are set by new_record inside this subshell on purpose, as above.
+# shellcheck disable=SC2030,SC2031
+(
+  set -euo pipefail
+  cd "${TMP}"     # a pre-fix new_record would create its record relative to cwd
+  HERE="${sib}"   # scoped to this subshell; the trap reads it when it fires
+  # shellcheck source=/dev/null
+  source "${REPO}/sim/harness/common/setup.sh"
+  parent="${TMP}/rec-sib"; mkdir -p "${parent}"
+  new_record --scratch .own.json "${parent}" reports
+  [[ -d "${WORK}" && -d "${REC}/reports" ]] || exit 93
+) || sib_ok=$?
+check "new_record --scratch sets up the record normally" 0 "${sib_ok}"
+left="$(find "${sib}" -maxdepth 1 -name '.*.json' -printf '%f\n' 2>/dev/null | sort | tr '\n' ' ')"
+check "a new_record caller's exit leaves sibling scratch files alone" ".req_read.json .typ_snm.json " "${left}"
+if [[ ! -f "${sib}/.own.json" ]]; then
+  pass "the caller's own declared scratch request is removed on exit"
+else
+  fail "the caller's own declared scratch request is removed on exit"
+fi
+
+# Degenerate case: a caller that declares no scratch traps WORK only and
+# removes nothing from HERE.
+deg="${TMP}/deg-here"; mkdir -p "${deg}"
+: > "${deg}/.req_read.json"; : > "${deg}/.other.json"
+deg_ok=0
+# WORK/REC are set by new_record inside this subshell on purpose, as above.
+# shellcheck disable=SC2030,SC2031
+(
+  set -euo pipefail
+  HERE="${deg}"
+  # shellcheck source=/dev/null
+  source "${REPO}/sim/harness/common/setup.sh"
+  parent="${TMP}/rec-deg"; mkdir -p "${parent}"
+  new_record "${parent}" reports
+  [[ -d "${WORK}" ]] || exit 93
+) || deg_ok=$?
+check "new_record with no --scratch sets up the record normally" 0 "${deg_ok}"
+left="$(find "${deg}" -maxdepth 1 -name '.*.json' -printf '%f\n' 2>/dev/null | sort | tr '\n' ' ')"
+check "new_record with no --scratch leaves every dot-json in HERE alone" ".other.json .req_read.json " "${left}"
+
+# Usage errors: --scratch with no value must be a loud exit 2, and must not
+# silently swallow the record parent as its value.
+rc=0
+(
+  set -euo pipefail
+  cd "${TMP}"     # a pre-fix new_record would create its record relative to cwd
+  HERE="${TMP}"
+  # shellcheck source=/dev/null
+  source "${REPO}/sim/harness/common/setup.sh"
+  new_record --scratch
+) >/dev/null 2>&1 || rc=$?
+check "new_record --scratch with no value is a usage error" 2 "${rc}"
+
+rc=0
+(
+  set -euo pipefail
+  HERE="${TMP}"
+  # shellcheck source=/dev/null
+  source "${REPO}/sim/harness/common/setup.sh"
+  new_record --scratch "${TMP}/would-be-parent"
+) >/dev/null 2>&1 || rc=$?
+check "new_record --scratch does not swallow the parent argument" 2 "${rc}"
 
 echo "3. run script exit codes for each stubbed klt sim outcome"
 

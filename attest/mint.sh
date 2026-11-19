@@ -69,9 +69,9 @@ EOS
 # skipped local_only command's committed outcome from the existing envelope,
 # so it is a refresh of committed evidence, never a cold mint. Minting above
 # the gate pin remains accepted practice in this repo, per
-# manifests/README.md:5: attest/item2.envelope.json was "produced with
-# `klt signoff --attest 2` from klayout-tools `ce6583fe`, which 0.8.0 lacks
-# but 0.8.0 grades".
+# manifests/README.md:5: attest/item2.envelope.json is minted with
+# `klt signoff --attest 2 --input` from the released 0.9.1 (the release that
+# first shipped that flag combination) and graded met at 0.8.0.
 
 usage() {
   cat >&2 <<'EOS'
@@ -81,7 +81,7 @@ Mints attest/item<item>.envelope.json with the CI-pinned klayout-tools.
 
   1    refresh-mints the design-checks envelope (--skip-local-only carries
        the 25 local_only entries' committed outcomes; no PDK needed)
-  2    refuses -- no attest/item2.json inventory exists
+  2    refuses -- the CI pin cannot mint item 2 (0.9.1 can; see the message)
   9    refresh-mints the sim envelope (--skip-local-only skips the fleet
        cold start, carrying its committed outcome; no fleet submit)
   10   mints the repo-hygiene envelope
@@ -100,15 +100,22 @@ case "$ITEM" in
     : # mintable below; 1 and 9 refresh through the --skip-local-only path
     ;;
   2)
-    die "refusing to mint item 2: there is no inventory to mint from." \
+    die "refusing to mint item 2: this script pins the CI klt, and the pin" \
+        "cannot mint item 2." \
         "" \
-        "attest/item2.envelope.json exists but attest/item2.json does not, so" \
-        "there is no --inventory argument to give. Per manifests/README.md:5" \
-        "that envelope was produced with \`klt signoff --attest 2\` from" \
-        "klayout-tools commit ce6583fe -- an unreleased build that 0.8.0 grades" \
-        "but does not contain. Re-minting it is out of scope for this script;" \
-        "reconstructing the missing inventory is a spec question for spec/," \
-        "not a side effect of a mint. Nothing was launched, no file written."
+        "attest/item2.json does not exist, so there is no --inventory to give;" \
+        "and the pin's --attest documents only the --inventory form -- the" \
+        "--input STREAM mint path for item 2 first shipped in the released" \
+        "0.9.1 (measured, issue #159: a 0.9.1 mint of item 2 from the committed" \
+        "macro.gds reproduces and grades met at the gate pin). Re-mint item 2" \
+        "above the pin, as manifests/README.md:5 records:" \
+        "" \
+        "  uvx --from \"klayout-tools==0.9.1\" klt signoff --attest 2 \\" \
+        "    --input layout/sram_256x32/macro.gds \\" \
+        "    --generator \"uv run --with klayout python3 layout/sram_256x32/generate.py\" \\" \
+        "    --regenerated-hash sha256:<macro.gds sha256> -o attest/item2.envelope.json" \
+        "" \
+        "Nothing was launched, no file written."
     ;;
   *)
     die "unknown attestation item: '$ITEM'" \

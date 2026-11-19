@@ -14,7 +14,7 @@ Spec values (bitcell device, supply, swing, corners) live in `spec/`, not here.
 - `harness/common/setup.sh`: the setup contract every `sim/*/run_*.sh` sources
   once -- `sim_setup` (paths, the PDK environment, the tool guards, `POST`),
   `new_record` (the append-only record directory, its subdirectories and the
-  scratch-cleanup trap) and `pdk_release_tag`.
+  caller-declared scratch-cleanup trap) and `pdk_release_tag`.
 - `harness/common/run_klt.sh`: the batch-only `klt sim` wrappers (`run_klt` for
   one request, `run_klt_set` for a `--batch-set`) with one exit-code policy,
   one fleet-capacity flag set and the bucket redaction; sourced by `sim_setup`

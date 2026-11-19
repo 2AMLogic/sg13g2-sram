@@ -58,15 +58,22 @@ sim_setup() {
   return 0
 }
 
-# new_record <parent-dir> [subdir ...]
+# new_record [--scratch <basename>] ... <parent-dir> [subdir ...]
 #
+#   --scratch <basename>  a scratch request file, relative to HERE, that this
+#                         caller will write and the EXIT trap should remove.
+#                         Repeatable; declare exactly the files this script
+#                         writes -- a sibling run script sharing the directory
+#                         is never in reach, and a caller that declares none
+#                         traps WORK only.
 #   <parent-dir>  the append-only parent to add a record to (records/, sizing/).
 #   [subdir ...]  directories to create inside the new record.
 #
 # Sets STAMP (UTC), REC=<parent-dir>/<STAMP> and WORK (a scratch mktemp dir),
 # and installs the EXIT trap that removes WORK together with the caller's
-# "${HERE}"/.*.json scratch requests. Exits 4 if the record already exists:
-# records are append-only evidence and are never overwritten.
+# declared scratch requests. Exits 2 on a malformed argument list and 4 if the
+# record already exists: records are append-only evidence and are never
+# overwritten.
 #
 # The trap is installed BEFORE the caller writes any scratch request, so a
 # failure part-way through a series of writes cannot leave a .json behind in
@@ -74,22 +81,39 @@ sim_setup() {
 # and run_column.sh trapped WORK first and widened the trap only after their
 # scratch writes, so a failure between two writes leaked the first one.
 new_record() {
-  local parent="$1"; shift
+  local scratch=() parent d b t
+  while [[ "${1:-}" == --scratch ]]; do
+    if [[ $# -lt 2 ]]; then
+      echo "${0##*/}: new_record: --scratch needs a basename" >&2
+      exit 2
+    fi
+    scratch+=("$2"); shift 2
+  done
+  if [[ $# -lt 1 ]]; then
+    echo "${0##*/}: new_record: no record parent given" >&2
+    exit 2
+  fi
+  parent="$1"; shift
   STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
   REC="${parent}/${STAMP}"
   [[ -e "${REC}" ]] && { echo "${0##*/}: ${REC} exists (records are append-only)" >&2; exit 4; }
   mkdir -p "${REC}"
-  local d
   for d in "$@"; do
     mkdir -p "${REC}/${d}"
   done
   WORK="$(mktemp -d)"
-  # HERE and WORK are expanded when the trap runs, not now, matching the
-  # inline traps this replaces. No sim/*/ directory holds a committed
-  # .*.json file, so the pattern only ever names a caller's own scratch
-  # request; when it matches nothing `rm -rf` is handed the unexpanded
-  # pattern, which does not exist, and -f makes that silent.
-  trap 'rm -rf "${WORK}" "${HERE}"/.*.json' EXIT
+  # The removal list names only the basenames the caller declared, so the trap
+  # can never reach a sibling run script's files in the shared HERE directory.
+  # HERE and WORK are expanded when the trap runs, not now, matching the inline
+  # traps this replaces; a declared name that matches nothing is silent by -f.
+  # The trap string is built unexpanded on purpose (SC2016 here, SC2064 below).
+  # shellcheck disable=SC2016
+  local t='rm -rf "${WORK}"'
+  for b in "${scratch[@]}"; do
+    t+=" \"\${HERE}/${b}\""
+  done
+  # shellcheck disable=SC2064
+  trap "${t}" EXIT
   return 0
 }
 

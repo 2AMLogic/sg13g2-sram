@@ -34,7 +34,8 @@ TYPICAL=()
 "${POST[@]}" gen-access "${REPO}/design/macro/macro.spice" "${HERE}/bench_access.cir" --check \
   || { echo "run_array.sh: bench_access.cir is stale (regenerate: array_post.py gen-access)" >&2; exit 5; }
 
-new_record "${HERE}/records" reports curves negctl
+new_record --scratch .req_snm.json --scratch .req_write.json --scratch .req_access.json \
+  "${HERE}/records" reports curves negctl
 
 
 # --- negative controls (mos_tt, 1.20 V, 25 C, a grid corner) --------------------------------------------------------
