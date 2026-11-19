@@ -266,10 +266,11 @@ columns) -> `layout/reports/array-check-macro.json`, minted by
 `layout/reports/generate-array-check.sh` and re-run by `./layout/verify.sh` step 10.
 
 The check is run with **released `klayout-tools==0.9.1` through `uvx`**, not the host klt and not
-the `klayout-tools==0.8.0` this repo pins for signoff: `array-check` does not exist in 0.8.0
-(`invalid choice: 'array-check'`), it arrived in 0.9.0. The signoff pin is deliberately left alone
-(bumping it would force every `attest/*.envelope.json` to be regenerated), so the repo carries two
-klt pins for different purposes. No workflow invokes `array-check`, so step 10 cannot turn CI red.
+the `klayout-tools==0.9.2` this repo pins for signoff. The repo deliberately carries two klt pins
+for different purposes: the report pin stays at 0.9.1 because that is the release recorded in the
+committed report's provenance (`provenance.klt_version` in `layout/reports/array-check-macro.json`),
+so re-running the generator reproduces the committed record with the same released tool that minted
+it. No workflow invokes `array-check`, so step 10 cannot turn CI red.
 
 **Two abutment configurations are `clean` (`violation_count: 0`):**
 
