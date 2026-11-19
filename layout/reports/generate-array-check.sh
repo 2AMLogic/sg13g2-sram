@@ -12,11 +12,11 @@
 # a changed array mints a new result.
 #
 # Two deliberate klt pins live in this repo, for different purposes -- do not "unify" them:
-#   * klayout-tools==0.8.0 (KLT_VERSION in .github/workflows/*.yml, attest/*.envelope.json) is the
-#     signoff pin. Bumping it would force every attest envelope to be regenerated.
-#   * klayout-tools==0.9.1 (this script) is the report pin. `array-check` does not exist in 0.8.0
-#     (`invalid choice: 'array-check'`); it arrived in 0.9.0. 0.9.1 is the latest release, so the
-#     record is reproducible from PyPI rather than from a host dev build. See #155.
+#   * klayout-tools==0.9.2 (KLT_VERSION in .github/workflows/*.yml, attest/*.envelope.json) is the
+#     signoff pin.
+#   * klayout-tools==0.9.1 (this script) is the report pin: it is the release recorded in the
+#     committed report's provenance (provenance.klt_version in layout/reports/array-check-macro.json),
+#     so a re-run reproduces the committed record with the same released tool that minted it. See #155.
 # The pin is invoked through `uvx --from`, never installed onto the host.
 #
 # `klt array-check --format json` emits no `provenance` block (its sibling `klt drc` does -- see

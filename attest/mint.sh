@@ -52,13 +52,15 @@ pin_sync_set() {
   cat >&2 <<'EOS'
 
 The klt pin is recorded at 6 sites, which must be kept in sync:
-  .github/workflows/ci.yml:10        KLT_VERSION (the one this script reads)
-  .github/workflows/signoff.yml:14   KLT_VERSION
-  README.md:117                      signoff-record mint invocation
-  README.md:125                      item 10 --check invocation
-  manifests/README.md:8              grading invocation
-  manifests/README.md:13             the "Bump both together" prose
-Line numbers are as of origin/main @ eed93e9 -- re-grep before relying on them.
+  .github/workflows/ci.yml        KLT_VERSION (the one this script reads)
+  .github/workflows/signoff.yml   KLT_VERSION
+  README.md                       signoff-record mint invocation
+  README.md                       item 10 --check invocation
+  manifests/README.md             grading invocation
+  manifests/README.md             the "Bump both together" prose
+Find the current locations with:
+  git grep -nE '^[[:space:]]*KLT_VERSION:|klayout-tools==[0-9]|^Graded with klayout-tools release' \
+    -- .github/workflows/ci.yml .github/workflows/signoff.yml README.md manifests/README.md
 EOS
 }
 
