@@ -7,6 +7,13 @@
       "known_hosts": []
     }
   },
+  "guide": {
+    "docsMaintenance": {
+      "pinnedPaths": [
+        "README.md"
+      ]
+    }
+  },
   "health_monitoring": {
     "enabled": true,
     "collect_interval_minutes": 5,
