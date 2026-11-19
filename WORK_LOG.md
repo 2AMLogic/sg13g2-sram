@@ -3,6 +3,11 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-19
+
+- **PR #178**: chore: bump the signoff klayout-tools pin to 0.9.2 and refresh the attestation evidence
+- **Issue #172** (closed): Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
+
 ### 2026-11-18
 
 - **PR #204**: ci: add merge_group trigger to the required-check workflows
