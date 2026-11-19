@@ -5,6 +5,16 @@ triage agent. Newest first.
 
 ### 2026-11-19
 
+- **PR #220**: docs: record the item 9 roadmap block as discharged at the 0.9.2 pin
+- **PR #218**: docs: align three live signoff-pin cross-references with committed provenance
+- **PR #216**: docs: align layout/ signoff-pin prose with the 0.9.2 pin; drop mint.sh pin-sync line numbers for a grep
+- **PR #215**: docs: pin README.md out of Guide docs maintenance; document item-10 re-sign policy
+- **PR #214**: fix: decide mint --skip-local-only from inventory content, not text
+- **Issue #219** (closed): Reassess the roadmap’s item 9 blocker against the 0.9.2 refresh and the three held PRs
+- **Issue #217** (closed): Three live 0.8.0 signoff-pin cross-references remain outside #212's three-file scope
+- **Issue #212** (closed): Pin bump to 0.9.2 left stale 0.8.0 signoff-pin prose in layout/ and stale line numbers in mint.sh's pin_sync_set()
+- **Issue #211** (closed): attest/mint.sh gates --skip-local-only on a textual grep of inventory JSON formatting
+- **Issue #152** (closed): Pin README.md in Guide docs maintenance and document the item-10 re-sign procedure
 - **PR #178**: chore: bump the signoff klayout-tools pin to 0.9.2 and refresh the attestation evidence
 - **Issue #172** (closed): Bump CI's KLT_VERSION pin from 0.8.0 to 0.9.2 so attestation envelopes can be regenerated without a fleet submit
 
