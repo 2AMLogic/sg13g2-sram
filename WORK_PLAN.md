@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-19T08:15:01Z (snapshot; compare against live labels)_
+_Generated: 2026-11-20T23:22:58Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -29,12 +29,13 @@ _None._
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable
 - **#95**: layout: macro periphery signal nets and pin connection *(held)*
 - **#108**: layout: connect macro pins, signals record, verify and README *(held)*
+- **#230**: T1 item 6, pilot: size the write-margin Monte Carlo cost at small n and move the level search onto klt's built-in bisection (feeds the #68 budget decision)
 
 ## Ready
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
-_None._
+- **#74**: spec: no area target, min-clock-pulse, power or retention rows
 
 ## In Progress
 
@@ -45,9 +46,11 @@ Issues currently being built (`loom:building`).
 - **#69**: spec: confirm the 1 ns write-pulse window
 - **#71**: spec: write-margin definition under-specified
 - **#72**: spec: internal inconsistencies in sram.md text
-- **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins
+- **#228**: T1 item 7, first increment: klt pex on the LVS-matched 6T bitcell (schematic-vs-extracted read SNM, hold SNM and write margin)
+- **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31)
+- **#230**: T1 item 6, pilot: size the write-margin Monte Carlo cost at small n and move the level search onto klt's built-in bisection (feeds the #68 budget decision)
 
 ## PRs Awaiting Review
 
@@ -57,6 +60,7 @@ PRs waiting on Judge (`loom:review-requested`).
 - **#78**: docs: make spec/sram.md internally consistent on corners, signoff, open items, typical point *(held)*
 - **#80**: docs: add decision record for area, min-clock-pulse, power and retention spec rows *(held)*
 - **#81**: docs(spec): pin the write-margin definition in a decision record *(held)*
+- **#232**: feat: measure bitcell post-layout margins with klt pex (T1 item 7, bitcell half)
 
 ## Approved (Awaiting Merge)
 
@@ -79,6 +83,9 @@ Issues carrying `loom:curated`.
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)* *(held)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
+- **#228**: T1 item 7, first increment: klt pex on the LVS-matched 6T bitcell (schematic-vs-extracted read SNM, hold SNM and write margin) *(curated)*
+- **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31) *(curated)*
+- **#230**: T1 item 6, pilot: size the write-margin Monte Carlo cost at small n and move the level search onto klt's built-in bisection (feeds the #68 budget decision) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -94,12 +101,12 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
-| Important | 6 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
-| In Progress (`loom:building`) | 8 |
-| PRs awaiting review | 4 |
+| Important | 7 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 1 |
+| In Progress (`loom:building`) | 10 |
+| PRs awaiting review | 5 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 11 |
+| Curated | 14 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
