@@ -9,6 +9,8 @@ import os
 import random
 import re
 import sys
+from functools import cache
+from pathlib import Path
 
 import klayout.db as kdb
 import pytest
@@ -19,31 +21,32 @@ import generate as g  # noqa: E402
 LEF = os.path.join(g.HERE, "macro.lef")
 
 
-_BUILT = {}
+@cache
+def _cached_build():
+    """Build the shared, read-only reference macro on first use."""
+    return g.build()
 
 
 def _built():
-    """One ``g.build()`` per session (it costs minutes), as a fresh copy of the layout each call so a test
-    that damages or flattens it cannot affect another. ``gen`` is shared and read-only."""
-    if not _BUILT:
-        _BUILT["layout"], _BUILT["gen"], _ = g.build()
-    layout = _BUILT["layout"].dup()
-    return layout, _BUILT["gen"], layout.cell("macro")
+    """Copy the layout for tests that flatten or damage it. The generator is read-only."""
+    original, gen, _ = _cached_build()
+    layout = original.dup()
+    return layout, gen, layout.cell("macro")
 
 
-def _bytes(tmp_path, name):
-    layout, _, _ = g.build()
-    p = str(tmp_path / name)
-    layout.write(p, g.save_options())
-    return open(p, "rb").read()
+def _bytes(layout, path):
+    layout.write(str(path), g.save_options())
+    return path.read_bytes()
 
 
 def test_deterministic(tmp_path):
-    assert _bytes(tmp_path, "a.gds") == _bytes(tmp_path, "b.gds")
+    first = _bytes(_cached_build()[0], tmp_path / "a.gds")
+    assert first == _bytes(g.build()[0], tmp_path / "b.gds")
 
 
 def test_committed_gds_is_current(tmp_path):
-    assert _bytes(tmp_path, "c.gds") == open(g.GDS_PATH, "rb").read()
+    generated = _bytes(_cached_build()[0], tmp_path / "c.gds")
+    assert generated == Path(g.GDS_PATH).read_bytes()
 
 
 def test_bitcell_count_and_top():
