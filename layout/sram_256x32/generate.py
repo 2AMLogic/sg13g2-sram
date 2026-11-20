@@ -352,7 +352,8 @@ class MazeRouter:
         self.via_near: set[tuple[int, int]] = set()
         self.shapes: dict[int, list[tuple]] = {}  # net id -> [("wire", layer, a, b) | ("via", node)]
 
-    def node(self, x: float, y: float) -> tuple[int, int]:
+    @staticmethod
+    def node(x: float, y: float) -> tuple[int, int]:
         return math.floor(dbu(x) / STEP + 0.5), math.floor(dbu(y) / STEP + 0.5)  # ties round up in every frame
 
     def inside(self, i: int, j: int) -> bool:
@@ -826,6 +827,11 @@ class Gen:
                 vias.append({"x": round(x, 3), "y": round(y, 3)})
         return drawn, vias
 
+    def draw_landings(self, cell: kdb.Cell, nodes: list[tuple[int, int]]) -> None:
+        """A net's Via1 landings (Metal1 pad, Via1, Metal2 pad) on its snapped terminal nodes."""
+        for t in sorted(set(nodes)):
+            self.m1_via1(cell, t[0] * STEP * DBU, t[1] * STEP * DBU)
+
     def route_leaf(self, name: str, cell: kdb.Cell, extra: list[tuple[int, kdb.Box]] = (), phase: str = "all") -> None:
         """Draw the intra-cell signal nets of a leaf cell on Metal2/Metal3 (Via1 landings on the Metal1 terminals).
 
@@ -833,17 +839,21 @@ class Gen:
         (routed at slice level) are not signal-routed here, and a net with one terminal has nothing to join.
         Whatever is not drawn is listed in ``leaf_report``. The routes stay inside the cell's bounding box, so
         placement and every other cell are unchanged. ``phase`` "pads" only draws the terminal landings (so the
-        slice's bit-line jogs, which are drawn next, keep clear of them), "wires" the nets between them."""
+        slice's bit-line jogs, which are drawn next, keep clear of them) and sets nothing else up: the maze, the
+        body-tie records and the report are built when the wires are routed; "wires" the nets between them."""
         pts = self.dev_pts[name]
         by_net: dict[str, list[tuple[str, str, tuple[float, float]]]] = {}
         for inst in self.nl[name].insts:
             if inst.name in pts:
                 for t, n in zip("DGS", inst.nets[:3]):
                     by_net.setdefault(n, []).append((inst.name, t, pts[inst.name][t]))
-        bb = cell.bbox()
-        mz = MazeRouter(bb.left, bb.bottom, bb.right, bb.top)
-        report = {"routed": {}, "single_terminal": [], "excluded": {}, "failed": []}
         names = sorted(n for n, v in by_net.items() if not excluded_net(n) and len(v) >= 2)
+        node = {n: [MazeRouter.node(x, y) for _, _, (x, y) in by_net[n]] for n in names}
+        if phase == "pads":
+            for n in names:
+                self.draw_landings(cell, node[n])
+            return
+        report = {"routed": {}, "single_terminal": [], "excluded": {}, "failed": []}
         for n, v in sorted(by_net.items()):
             why = excluded_net(n)
             if why:
@@ -851,7 +861,8 @@ class Gen:
             elif len(v) < 2:
                 report["single_terminal"].append(n)
         ids = {n: k + 1 for k, n in enumerate(names)}
-        node = {n: [mz.node(x, y) for _, _, (x, y) in by_net[n]] for n in names}
+        bb = cell.bbox()
+        mz = MazeRouter(bb.left, bb.bottom, bb.right, bb.top)
         # fixed obstacles: body-tie Metal2 pads, bit-line terminals (their Metal2 comes at slice level) and,
         # in the column path, the slice's bit-line Metal3 lanes
         hp = VIA_PAD / 2
@@ -867,16 +878,10 @@ class Gen:
                     mz.block(0, x - M2_W / 2, y - M2_W / 2, x + M2_W / 2, y + M2_W / 2)
         for layer, eb in extra:  # Metal2 jogs and Metal3 lanes the parent already drew over the cell (bit lines)
             mz.block(layer, eb.left * DBU, eb.bottom * DBU, eb.right * DBU, eb.top * DBU)
-        if phase == "pads":
-            for n in names:
-                for t in sorted(set(node[n])):
-                    self.m1_via1(cell, t[0] * STEP * DBU, t[1] * STEP * DBU)
-            return
         mz, failed = self.search_routes(bb, mz, names, ids, node)
         for n in names:
             if phase == "all":
-                for t in sorted(set(node[n])):
-                    self.m1_via1(cell, t[0] * STEP * DBU, t[1] * STEP * DBU)
+                self.draw_landings(cell, node[n])
             if n in failed:
                 report["failed"].append(n)
                 continue
