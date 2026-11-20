@@ -3,6 +3,13 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-20
+
+- **PR #226**: layout: skip the discarded maze setup in route_leaf's pad-only pass
+- **PR #225**: test: share the reference macro build across GDS checks
+- **Issue #224** (closed): Skip discarded maze setup in the column-path pad pass
+- **Issue #223** (closed): Reuse the session macro build in the GDS byte checks
+
 ### 2026-11-19
 
 - **PR #220**: docs: record the item 9 roadmap block as discharged at the 0.9.2 pin
