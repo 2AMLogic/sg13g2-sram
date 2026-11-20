@@ -86,9 +86,17 @@ an item 9 edit on `main` is now a refresh at the 0.9.2 pin, not a block).
 - **Monte Carlo for the margin rows, T1 item 6** (#68): harness is on branch
   `feature/issue-68`; needs the batch backend (below) and `klt yield`. Done when
   a seeded campaign with a negative control and a yield report is recorded.
-- **Bitcell and macro post-layout re-run, T1 item 7**: after #30 and the batch
-  backend. Done when the spec benches are re-run on the extracted netlist and
-  recorded beside the schematic results.
+- **Bitcell and macro post-layout re-run, T1 item 7**: the bitcell half is
+  done (#228): `klt pex --measure-command` on the LVS-matched 6T cell
+  (`sim/bitcell/run_pex.sh`, record `sim/bitcell/records/20261120T230551Z/`)
+  -- 12 schematic-vs-extracted delta rows (read SNM, hold SNM, write margin at
+  the bounding corners and typical), all `pass`, deltas within ±0.004%,
+  `body_bias: biased`, `model_mismatch: null`; the PDK-free extraction digest
+  is re-checked by `layout/verify.sh` step 11. What remains is the macro run,
+  after #30. Done when the spec benches are re-run on the extracted macro
+  netlist and recorded beside the schematic results; the item itself stays
+  uncited in the manifest until then (the spec's signoff row is on the full
+  array).
 - **Wordline and bit-line wire-RC check** (`spec/wordline-rc-decision.md`, open
   item in `spec/sram.md`): after extraction with parasitics is available on the
   routed macro.

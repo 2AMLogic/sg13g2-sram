@@ -1,0 +1,22 @@
+* pex_reference.spice -- pin-order adapter for the bitcell `klt pex` runs
+* (issue #228, T1 item 7 first increment).
+*
+* `klt extract`/`klt pex` write the bitcell top as
+*     .SUBCKT sg13g2_sram_bitcell_6t BL BLB Q QB VDD VSS WL
+* while design/bitcell/bitcell.spice declares
+*     .subckt bitcell BL BLB WL VDD VSS Q QB
+* A pex run must drive both legs with comparable decks, and the extracted
+* leg's top name and pin order are the extraction's, not the schematic's.
+* sim/bitcell/measure_pex.py therefore stages, for each leg, a DUT file that
+* carries the netlist that leg was handed verbatim plus this wrapper: the
+* wrapper exposes the extracted (common) pin order BL BLB Q QB VDD VSS WL,
+* and its inner call targets the handed netlist's own top with that top's own
+* pin order (the X0 line below is rewritten to match). The benches instantiate
+* only `bitcell_pexrc`, positionally, in the common order -- the same bench
+* text on both legs.
+*
+* With the original design/bitcell/bitcell.spice handed to it (the schematic
+* leg), the wrapper below is used exactly as written:
+.SUBCKT bitcell_pexrc BL BLB Q QB VDD VSS WL
+X0 BL BLB WL VDD VSS Q QB bitcell
+.ENDS bitcell_pexrc

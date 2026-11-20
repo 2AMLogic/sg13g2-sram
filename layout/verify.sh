@@ -171,3 +171,47 @@ for path, want in rec["provenance"]["inputs"].items():
                  " -- the array changed, so mint a new record (records are append-only)")
 print("PASS: array-check-macro.json pins the committed GDS inputs")
 HASHEOF
+
+hr "11. bitcell PEX: PDK-free extraction digest matches the latest klt pex record"
+# The PDK-free half of the bitcell post-layout evidence (issue #228): the
+# parasitic extraction `klt pex` performs is deterministic, so re-running it
+# without a PDK install (CI has none) must reproduce the netlist digest the
+# committed sim/bitcell/records/<UTC>/ pex record pins. The measured
+# (PDK-bound, batch-fleet) legs are never re-run here; their envelope and the
+# PDK-bound digest live in the record. Pinned klt (KLT_VERSION in
+# .github/workflows/ci.yml) for the same reason as step 10: the committed
+# digest must be reproducible at the pin, and the host `klt` is a dev build.
+KLTPEX=(uvx --from klayout-tools==0.9.2 klt)
+PEXREC="$(ls -d "$ROOT"/sim/bitcell/records/*/pex-envelope.json 2>/dev/null | sort | tail -1 || true)"
+if [ -z "$PEXREC" ]; then
+  echo "FAIL: no klt pex record under sim/bitcell/records/ (run sim/bitcell/run_pex.sh)"; exit 1
+fi
+PEXDIR="$(dirname "$PEXREC")"
+rc=0
+"${KLTPEX[@]}" pex "$CELL" --deck sg13g2 --extract-only --reference-netlist "$REF" \
+  -o "$WORK/pex-free.spice" --envelope-out "$WORK/pex-free.json" \
+  --outdir "$WORK/pex-free-out" --format json >/dev/null 2> "$WORK/pex-free.stderr" || rc=$?
+# --extract-only measures nothing: exit 4 with a valid envelope is the result.
+if [ "$rc" -ne 4 ]; then
+  echo "FAIL: klt pex --extract-only exited $rc (want 4)"; tail -5 "$WORK/pex-free.stderr"; exit 1
+fi
+python3 -I - "$WORK/pex-free.spice" "$WORK/pex-free.json" "$PEXDIR" <<'PEXEOF'
+import hashlib, json, sys
+netlist, envelope, recdir = sys.argv[1:4]
+got = hashlib.sha256(open(netlist, "rb").read()).hexdigest()
+env = json.load(open(envelope))
+rec = json.load(open(f"{recdir}/record.json"))
+assert env["status"] == "not_checked", env["status"]
+assert env["measurement"]["mode"] == "extract-only", env["measurement"]["mode"]
+want = rec["extraction_digests"]["pdk_free_spice_sha256"]
+if got != want:
+    sys.exit(f"FAIL: PDK-free extraction digest {got} != {recdir}/record.json "
+             f"pdk_free_spice_sha256 {want} -- the bitcell layout or the extraction "
+             "deck changed, so mint a new pex record (records are append-only)")
+# The generic-class model mismatch of the PDK-free deck (nfet/pfet vs the
+# PDK-bound sg13_lv_*) is expected here and is quoted, not failed on.
+mm = env["model_mismatch"]
+kind = mm["kind"] if mm else None
+print(f"PASS: PDK-free extraction digest matches {recdir}/record.json "
+      f"(model_mismatch.kind={kind} on the PDK-free deck, as recorded)")
+PEXEOF
