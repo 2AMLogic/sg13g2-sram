@@ -551,6 +551,15 @@ def test_leaf_cell_undrawn_nets_are_listed():
     assert gen.leaf_report["precharge"]["excluded"]["BL"]["reason"] == "bit line"
 
 
+def test_column_path_ties_recorded_once_per_device():
+    # the pads pass only draws landings; the ties are registered once, with the wires (issue #224)
+    _, gen, _ = _built()
+    for name in g.COLPATH_CELLS:
+        ties = gen.leaf_ties[name]
+        assert len(ties) == len(set(ties)), (name, "a device's tie is recorded more than once")
+        assert set(ties) == {pts["B"] for pts in gen.dev_pts[name].values()}, name
+
+
 def test_column_mux_blbm_is_one_net_and_has_teeth():
     # the bit-line jogs are pushed below the BLBM terminal bands (``blbm_reserve``) so the net is
     # joined; cutting any one of its traces must split it again (issue #159)
