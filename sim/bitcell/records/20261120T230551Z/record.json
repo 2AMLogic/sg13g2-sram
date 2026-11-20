@@ -1,0 +1,293 @@
+{
+  "stamp": "20261120T230551Z",
+  "kind": "pex",
+  "pdk_release_tag": "v0.3.0",
+  "issue": "2AMLogic/sg13g2-sram#228 (T1 item 7, first increment: the bitcell)",
+  "what": "schematic-vs-extracted read SNM, hold SNM and write margin of the LVS-matched 6T bitcell (layout/bitcell/sg13g2_sram_bitcell_6t.gds), klt pex --measure-command, batch fleet",
+  "corners": {
+    "points": [
+      {
+        "process": "mos_fs",
+        "vdd_v": 1.08,
+        "temperature_c": 125
+      },
+      {
+        "process": "mos_sf",
+        "vdd_v": 1.08,
+        "temperature_c": -40
+      },
+      {
+        "process": "mos_ff",
+        "vdd_v": 1.08,
+        "temperature_c": 125
+      },
+      {
+        "process": "mos_tt",
+        "vdd_v": 1.2,
+        "temperature_c": 27
+      }
+    ],
+    "why": "the corner bounding each margin in the schematic 45-corner grid (sim/bitcell/records/20261028T143337Z) plus the typical point, kept separate from the grid's 25 C middle as run_bitcell.sh does"
+  },
+  "tool": {
+    "klt_pin": "0.9.2",
+    "deck": "sg13g2",
+    "pdk_variant": "ihp-sg13g2",
+    "parasitic_settings": "deck defaults (no --critical-net, no --distributed-rc, no --mom-rlc-*, lumped star R, C to vsubs)"
+  },
+  "envelope": {
+    "status": "pass",
+    "passed": 12,
+    "failed": 0,
+    "errored": 0,
+    "corner_count": 4,
+    "measurement_mode": "command",
+    "path": "pex-envelope.json"
+  },
+  "extraction_digests": {
+    "pdk_free_spice_sha256": "e5dccc8497dcd0dc92ad8e3ebff0579f74756f79710a6300704bfd4df11bd544",
+    "pdk_bound_spice_sha256": "fa1063ab85549df966263352bf2d46144c3e98becbb023564096f71b2eab6d38",
+    "envelope_netlist_sha256": "fa1063ab85549df966263352bf2d46144c3e98becbb023564096f71b2eab6d38",
+    "recheck": "layout/verify.sh step 11 re-runs the PDK-free extraction and compares against pdk_free_spice_sha256 (CI has no PDK install)"
+  },
+  "disclosures": {
+    "body_bias_status": "biased",
+    "unbiased_nets": [],
+    "extraction_model": {
+      "capacitance": "net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net",
+      "coupling": "vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled",
+      "resistance": "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star",
+      "frequency": "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
+    },
+    "model_mismatch": null,
+    "device_classes": [
+      "nfet",
+      "pfet",
+      "cap_cmim",
+      "rfcmim",
+      "cap_cmomi",
+      "cap_cmomf",
+      "resistor",
+      "dantenna",
+      "dpantenna"
+    ],
+    "unsupported_devices": [],
+    "parasitic_integrity": {
+      "short_threshold_ohm": 1.0,
+      "cap_tolerance": {
+        "absolute_ff": 1e-06,
+        "relative": 1e-09
+      },
+      "max_detail_items": 20,
+      "nets_checked": 6,
+      "nets_with_findings": 0,
+      "open_nets": 0,
+      "island_components": 0,
+      "orphan_nodes": 0,
+      "suspicious_resistors": 0,
+      "short_candidates": 0,
+      "capacitance_mismatches": 0
+    }
+  },
+  "parasitics_per_net": {
+    "BL": {
+      "terminals": 1,
+      "star_r_ohms_total": 1.9828,
+      "c_to_vsubs_ff": 0.326488
+    },
+    "BLB": {
+      "terminals": 1,
+      "star_r_ohms_total": 1.9828,
+      "c_to_vsubs_ff": 0.326488
+    },
+    "Q": {
+      "terminals": 5,
+      "star_r_ohms_total": 1.5187,
+      "c_to_vsubs_ff": 0.233481
+    },
+    "QB": {
+      "terminals": 5,
+      "star_r_ohms_total": 1.5187,
+      "c_to_vsubs_ff": 0.233481
+    },
+    "VDD": {
+      "terminals": 4,
+      "star_r_ohms_total": 0.6408,
+      "c_to_vsubs_ff": 0.116226
+    },
+    "VSS": {
+      "terminals": 6,
+      "star_r_ohms_total": 0.715,
+      "c_to_vsubs_ff": 0.127859
+    }
+  },
+  "batch_job_ids": {
+    "schematic": {
+      "snm": "klt-sim-fcc9067f1021",
+      "write": "klt-sim-d1f66c953aaa"
+    },
+    "extracted": {
+      "snm": "klt-sim-33bcd7992168",
+      "write": "klt-sim-cb3a7d5cedd1"
+    }
+  },
+  "schematic_leg_cross_check_vs_20261028T143337Z": {
+    "hold_snm": {
+      "recorded": 0.48583337839088236,
+      "pex_schematic_leg": 0.48583337839088236,
+      "abs_diff_v": 0.0
+    },
+    "read_snm": {
+      "recorded": 0.21317047273854042,
+      "pex_schematic_leg": 0.21317047273854042,
+      "abs_diff_v": 0.0
+    },
+    "write_margin": {
+      "recorded": 0.4,
+      "pex_schematic_leg": 0.4,
+      "abs_diff_v": 0.0
+    }
+  },
+  "delta_rows": [
+    {
+      "spec_row": "hold_snm",
+      "corner_id": "mos_fs/1.080V/125C",
+      "schematic_value": 0.4035741192619226,
+      "extracted_value": 0.4035736579768596,
+      "delta_pct": -0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "read_snm",
+      "corner_id": "mos_fs/1.080V/125C",
+      "schematic_value": 0.14297407903529394,
+      "extracted_value": 0.14297930554320817,
+      "delta_pct": 0.004,
+      "status": "pass"
+    },
+    {
+      "spec_row": "write_margin",
+      "corner_id": "mos_fs/1.080V/125C",
+      "schematic_value": 0.425,
+      "extracted_value": 0.425,
+      "delta_pct": 0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "hold_snm",
+      "corner_id": "mos_sf/1.080V/-40C",
+      "schematic_value": 0.4608658936077085,
+      "extracted_value": 0.460865736392361,
+      "delta_pct": -0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "read_snm",
+      "corner_id": "mos_sf/1.080V/-40C",
+      "schematic_value": 0.2461530393207959,
+      "extracted_value": 0.2461553759368515,
+      "delta_pct": 0.001,
+      "status": "pass"
+    },
+    {
+      "spec_row": "write_margin",
+      "corner_id": "mos_sf/1.080V/-40C",
+      "schematic_value": 0.25,
+      "extracted_value": 0.25,
+      "delta_pct": 0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "hold_snm",
+      "corner_id": "mos_ff/1.080V/125C",
+      "schematic_value": 0.38983674283171066,
+      "extracted_value": 0.3898355291823899,
+      "delta_pct": -0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "read_snm",
+      "corner_id": "mos_ff/1.080V/125C",
+      "schematic_value": 0.15384370549364237,
+      "extracted_value": 0.15384905407578436,
+      "delta_pct": 0.003,
+      "status": "pass"
+    },
+    {
+      "spec_row": "write_margin",
+      "corner_id": "mos_ff/1.080V/125C",
+      "schematic_value": 0.4,
+      "extracted_value": 0.4,
+      "delta_pct": 0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "hold_snm",
+      "corner_id": "mos_tt/1.200V/27C",
+      "schematic_value": 0.48583337839088236,
+      "extracted_value": 0.485832720092717,
+      "delta_pct": -0.0,
+      "status": "pass"
+    },
+    {
+      "spec_row": "read_snm",
+      "corner_id": "mos_tt/1.200V/27C",
+      "schematic_value": 0.21317047273854042,
+      "extracted_value": 0.2131766794355702,
+      "delta_pct": 0.003,
+      "status": "pass"
+    },
+    {
+      "spec_row": "write_margin",
+      "corner_id": "mos_tt/1.200V/27C",
+      "schematic_value": 0.4,
+      "extracted_value": 0.4,
+      "delta_pct": 0.0,
+      "status": "pass"
+    }
+  ],
+  "measurement_docs": {
+    "schematic": "measure/measurements-schematic.json",
+    "extracted": "measure/measurements-extracted.json"
+  },
+  "curves": [
+    "extracted-mos_ff_1.080V_125C.hold.curve1.csv",
+    "extracted-mos_ff_1.080V_125C.hold.curve2.csv",
+    "extracted-mos_ff_1.080V_125C.read.curve1.csv",
+    "extracted-mos_ff_1.080V_125C.read.curve2.csv",
+    "extracted-mos_fs_1.080V_125C.hold.curve1.csv",
+    "extracted-mos_fs_1.080V_125C.hold.curve2.csv",
+    "extracted-mos_fs_1.080V_125C.read.curve1.csv",
+    "extracted-mos_fs_1.080V_125C.read.curve2.csv",
+    "extracted-mos_sf_1.080V_-40C.hold.curve1.csv",
+    "extracted-mos_sf_1.080V_-40C.hold.curve2.csv",
+    "extracted-mos_sf_1.080V_-40C.read.curve1.csv",
+    "extracted-mos_sf_1.080V_-40C.read.curve2.csv",
+    "extracted-mos_tt_1.200V_27C.hold.curve1.csv",
+    "extracted-mos_tt_1.200V_27C.hold.curve2.csv",
+    "extracted-mos_tt_1.200V_27C.read.curve1.csv",
+    "extracted-mos_tt_1.200V_27C.read.curve2.csv",
+    "schematic-mos_ff_1.080V_125C.hold.curve1.csv",
+    "schematic-mos_ff_1.080V_125C.hold.curve2.csv",
+    "schematic-mos_ff_1.080V_125C.read.curve1.csv",
+    "schematic-mos_ff_1.080V_125C.read.curve2.csv",
+    "schematic-mos_fs_1.080V_125C.hold.curve1.csv",
+    "schematic-mos_fs_1.080V_125C.hold.curve2.csv",
+    "schematic-mos_fs_1.080V_125C.read.curve1.csv",
+    "schematic-mos_fs_1.080V_125C.read.curve2.csv",
+    "schematic-mos_sf_1.080V_-40C.hold.curve1.csv",
+    "schematic-mos_sf_1.080V_-40C.hold.curve2.csv",
+    "schematic-mos_sf_1.080V_-40C.read.curve1.csv",
+    "schematic-mos_sf_1.080V_-40C.read.curve2.csv",
+    "schematic-mos_tt_1.200V_27C.hold.curve1.csv",
+    "schematic-mos_tt_1.200V_27C.hold.curve2.csv",
+    "schematic-mos_tt_1.200V_27C.read.curve1.csv",
+    "schematic-mos_tt_1.200V_27C.read.curve2.csv"
+  ],
+  "not_established": [
+    "the macro-level PEX run (after #30; ROADMAP.md)",
+    "Monte Carlo (#68)",
+    "write flip time (spec/write-pulse-width-decision.md)",
+    "write-margin shifts below the 25 mV bin, and any DC-vs-geometry split of a delta row: this data cannot distinguish them (see README.md)"
+  ]
+}
