@@ -3,6 +3,10 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-21
+
+- **PR #235**: feat(sim): add a batch pilot for write-margin search costs
+
 ### 2026-11-20
 
 - **PR #226**: layout: skip the discarded maze setup in route_leaf's pad-only pass
