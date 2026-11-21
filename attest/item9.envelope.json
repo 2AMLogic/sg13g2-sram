@@ -73,7 +73,7 @@
         "role": "testbench",
         "path": "sim/bitcell/README.md",
         "passed": true,
-        "content_hash": "sha256:a47f102697ee244529082e55dd390ac894c2dea1703f05771bf6cdcdfb12416c"
+        "content_hash": "sha256:7dde4c9704e49d80ee8f7bebcc77b20ae53e450775358bdf7d9cadbf86103ae8"
       },
       {
         "check": "present",
@@ -94,7 +94,7 @@
         "role": "testbench",
         "path": "sim/bitcell/bitcell_post.py",
         "passed": true,
-        "content_hash": "sha256:61480c2de926de82b94a31e0b8bc679ede7edea5ae7b4ad152538831fa8b3954"
+        "content_hash": "sha256:1091ef31e109004f6baccb437f3166c01232173187b0ef9281695be0c5dd06bc"
       },
       {
         "check": "present",
@@ -122,7 +122,7 @@
         "role": "testbench",
         "path": "sim/bitcell/test_bitcell_post.py",
         "passed": true,
-        "content_hash": "sha256:93120ae749a4b0dfa8f91fa432cdb91d916269eca3ffd5c9b56cfe976f24939b"
+        "content_hash": "sha256:dbcf1aaac54b0fee62e7d85d30280fea4e9897fe1dde6ebff09e13784cf95553"
       },
       {
         "check": "present",
