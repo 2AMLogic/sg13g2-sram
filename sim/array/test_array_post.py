@@ -136,9 +136,9 @@ def test_negctl_bench_includes_resolve():
     with tempfile.TemporaryDirectory() as d:
         dst = Path(d) / "sub" / "b.cir"
         dst.parent.mkdir()
-        ap.cmd_negctl_bench(str(HERE / "bench_snm.cir"), str(dst), {"column.spice": "./column_weak.spice"})
+        ap.negctl_bench(str(HERE / "bench_snm.cir"), str(dst), {"column.spice": "./column_weak.spice"})
         assert ".include ./column_weak.spice" in dst.read_text()
-        ap.cmd_negctl_bench(str(HERE / "bench_snm.cir"), str(dst), {})
+        ap.negctl_bench(str(HERE / "bench_snm.cir"), str(dst), {})
         inc = [l for l in dst.read_text().splitlines() if l.startswith(".include")][0].split()[1]
         assert (dst.parent / inc).resolve() == (REPO / "design/column/column.spice").resolve()
 

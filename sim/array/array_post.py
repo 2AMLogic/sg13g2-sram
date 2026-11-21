@@ -30,16 +30,15 @@ Everything printed is labelled `simulated`.
 """
 from __future__ import annotations
 
-import gzip
 import json
-import os
 import re
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent / "bitcell"))
-import bitcell_post  # noqa: E402  (square_snm / signed_snm / waveform loader)
+sys.path.insert(0, str(HERE.parent / "lib" / "common"))
+import post_common  # noqa: E402  (load_report / columns / write_csv / signed_snm / request + bench helpers)
+from post_common import base_request, load_report, meas as _meas, negctl_bench, parse_negctl_args  # noqa: E402
 
 PROCESS = ["mos_tt", "mos_ss", "mos_ff", "mos_sf", "mos_fs"]
 SUPPLY_V = [1.08, 1.2, 1.32]
@@ -65,8 +64,6 @@ ACCESS_ROW = 45
 N_DUMMY_SLICES = 31          # bit slices 1..31 of the 32 I/O: control fan-out only
 N_DUMMY_WL_CELLS = 62        # the other 31 slices x 2 bit-line pairs on the selected wordline
 
-OSDI = ["psp103", "psp103_nqs", "r3_cmc", "mosvar"]
-
 
 # --- requests -----------------------------------------------------------------------------
 
@@ -74,10 +71,6 @@ def _corners(typical: bool) -> dict:
     if typical:
         return {"process": ["mos_tt"], "supply_v": {"vdd": [1.2]}, "temperature_c": [25]}
     return {"process": PROCESS, "supply_v": {"vdd": SUPPLY_V}, "temperature_c": TEMP_C}
-
-
-def _meas(name: str, expr: str, at: str, unit: str = "V") -> dict:
-    return {"name": name, "unit": unit, "spice": f".meas tran {name} FIND par('{expr}') AT={at}"}
 
 
 def _when(name: str, a: str, b: str, edge: str, td: str) -> dict:
@@ -121,24 +114,14 @@ def access_measurements() -> list[dict]:
 
 
 def make_request(kind: str, typical: bool = False, netlist: str | None = None) -> dict:
-    pdk = "$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/osdi"
     analysis = {"snm": {"kind": "dc", "args": "Vu 0 1 0.005"},
                 "write": {"kind": "tran", "args": "5p 3.6n"},
                 "access": {"kind": "tran", "args": f"50p {ACCESS_T_STOP_NS:g}n 0 50p"}}[kind]
     meas = {"snm": [{"name": "vdd_check", "unit": "V", "expr": "v(vdd)[0]"}],
             "write": write_measurements(), "access": access_measurements()}[kind]
-    return {
-        "engine": "ngspice",
-        "models": {"pdk": "ihp-sg13g2", "lib": "libs.tech/ngspice/models/cornerMOSlv.lib"},
-        "corners": _corners(typical),
-        "netlist": netlist or f"bench_{kind}.cir",
-        "backend": "batch",
-        "analysis": analysis,
-        "measurements": meas,
-        "options": {"osdi_preload": [f"{pdk}/{n}.osdi" for n in OSDI],
-                    "waveforms": kind == "snm", "keep_artifacts": kind == "snm",
-                    "timeout_s": 1800 if kind == "access" else 600},
-    }
+    return base_request(_corners(typical), netlist or f"bench_{kind}.cir", analysis, meas,
+                        timeout_s=1800 if kind == "access" else 600,
+                        waveforms=kind == "snm", keep_artifacts=kind == "snm")
 
 
 # --- bench generation / negative-control netlists ---------------------------------------------
@@ -279,20 +262,6 @@ def gen_access(macro_spice: str) -> str:
     return "\n".join(L) + "\n"
 
 
-def cmd_negctl_bench(bench: str, dst: str, replace: dict[str, str]) -> None:
-    here = Path(bench).resolve().parent
-    dst_dir = Path(dst).resolve().parent
-    out = []
-    for line in Path(bench).read_text().splitlines():
-        mi = re.match(r"\.include\s+(\S+)", line)
-        if mi:
-            name = Path(mi.group(1)).name
-            target = replace.get(name) or str((here / mi.group(1)).resolve())
-            line = f".include {target if target.startswith('./') else os.path.relpath(target, dst_dir)}"
-        out.append(line)
-    Path(dst).write_text("\n".join(out) + "\n")
-
-
 def weaken(text: str, what: str) -> str:
     if what == "snm":
         text = re.sub(r"(?m)^(XMN[01] .*?w=)0\.30u", r"\g<1>0.15u", text)
@@ -317,7 +286,7 @@ def _num(v) -> bool:
 
 
 def cmd_snm(report: str, curves_dir: str, label: str) -> dict:
-    rep = bitcell_post.load_report(report)
+    rep = load_report(report)
     cdir = Path(curves_dir)
     cdir.mkdir(parents=True, exist_ok=True)
     out = {"label": label, "kind": "simulated", "corners": []}
@@ -330,7 +299,7 @@ def cmd_snm(report: str, curves_dir: str, label: str) -> dict:
             entry["pass"] = entry.pop("pass_")
             out["corners"].append(entry)
             continue
-        cols = bitcell_post._columns(wave)
+        cols = post_common.columns(wave)
         tag = cid.replace("/", "_")
         try:
             qa, qba, qbb, qb = cols["v(xa.q0)"], cols["v(xa.qb0)"], cols["v(xb.qb0)"], cols["v(xb.q0)"]
@@ -338,9 +307,9 @@ def cmd_snm(report: str, curves_dir: str, label: str) -> dict:
             entry.update(error=f"waveform has no {e}", **{"pass": False})
             out["corners"].append(entry)
             continue
-        bitcell_post._write_csv(cdir / f"{tag}.read.curve1.csv", qa, qba)
-        bitcell_post._write_csv(cdir / f"{tag}.read.curve2.csv", qbb, qb)
-        sq, vgap = bitcell_post.signed_snm(sorted(zip(qa, qba)), sorted(zip(qbb, qb)))
+        post_common.write_csv(cdir / f"{tag}.read.curve1.csv", qa, qba)
+        post_common.write_csv(cdir / f"{tag}.read.curve2.csv", qbb, qb)
+        sq, vgap = post_common.signed_snm(sorted(zip(qa, qba)), sorted(zip(qbb, qb)))
         entry["read_snm_v"] = sq
         entry["read_snm_vgap_v"] = vgap
         entry["pass"] = _num(sq) and sq > 0
@@ -394,7 +363,7 @@ def verdict_write(m: dict) -> dict:
 
 
 def cmd_write(report: str, label: str) -> dict:
-    rep = bitcell_post.load_report(report)
+    rep = load_report(report)
     out = {"label": label, "kind": "simulated", "bl_step_v": BL_STEP_V, "pulse_ns": PULSE_NS,
            "margin_definition": "write_margin_v = L_trip - L_drv: L_trip = highest constant bit-line low level (25 mV grid) "
                                 "at which a stand-alone cell flips within the pulse; L_drv = bit-line low level the real "
@@ -439,7 +408,7 @@ def verdict_access(m: dict) -> dict:
 
 
 def cmd_access(report: str, label: str) -> dict:
-    rep = bitcell_post.load_report(report)
+    rep = load_report(report)
     out = {"label": label, "kind": "simulated",
            "definition": "access = CLK 50 % rise to Q[0] crossing 90 % (read of 1) or 10 % (read of 0) of VDD; "
                          "write completion = CLK 50 % rise to the cell's Q = QB crossing, and the cell beyond 90 % of VDD "
@@ -483,13 +452,7 @@ def main() -> int:
         else:
             Path(a[2]).write_text(text)
     elif a[0] == "negctl-bench" and len(a) >= 3:
-        rep, i = {}, 3
-        while i < len(a):
-            if a[i] == "--replace":
-                k, v = a[i + 1].split("=", 1)
-                rep[k] = v
-            i += 2
-        cmd_negctl_bench(a[1], a[2], rep)
+        negctl_bench(a[1], a[2], parse_negctl_args(a, 3)[0])
     elif a[0] == "weaken" and len(a) == 4:
         text = weaken(Path(a[1]).read_text(), a[3])
         if text == Path(a[1]).read_text():
