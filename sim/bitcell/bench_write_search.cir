@@ -1,0 +1,22 @@
+* One 6T cell, with the reset, bit-line window and wordline of bench_write_mc.cir.
+.include ../../design/bitcell/bitcell.spice
+Vdd vdd 0 DC 1.2
+Vlevel level 0 DC 0
+Vp p 0 PULSE(0 1 1.3n 20p 20p 1n 4n)
+Bwl wl 0 V = v(p)*v(vdd)
+Vq qph 0 PULSE(0 1 1.02n 20p 20p 1.58n 4n)
+Bbl bl 0 V = v(vdd) + (v(level) - v(vdd))*v(qph)
+Vr rst 0 PULSE(0 1 0.1n 20p 20p 0.62n 4n)
+.model swm SW(vt=0.5 vh=0.05 ron=100 roff=1e12)
+Sq vdd q rst 0 swm
+Sqb qb 0 rst 0 swm
+Xw bl vdd wl vdd 0 q qb bitcell
+.ic v(q)=0.9 v(qb)=0.3
+
+* A matched ideal line delays a buffered differential voltage by 1.2 ns.
+* At 3.5 ns its output is Q-QB at 2.3 ns. The larger of the two differences
+* is negative exactly when both observations satisfy the original flip test.
+Bdiff diff 0 V = v(q)-v(qb)
+Tobserve diff 0 earlier 0 Z0=1k TD=1.2n
+Rterminate earlier 0 1k
+Bscore score 0 V = max(v(diff),v(earlier))
