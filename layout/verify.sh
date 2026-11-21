@@ -6,7 +6,10 @@
 #
 # Needs klt (>= 0.8.0, sg13g2 deck) and uv on PATH for steps 1-9. Step 10 needs klt >= 0.9.0,
 # which first carries `array-check`; it does not use the host klt at all but pins
-# klayout-tools==0.9.1 through `uvx`, matching layout/reports/array-check-macro.json. Nothing
+# klayout-tools==0.9.1 through `uvx`, matching layout/reports/array-check-macro.json. Step 11
+# (issue #229) validates the supply spec, checks layout/reports/erc-macro.json against its
+# committed inputs and runs the erc negative controls (test_erc_controls.py; the controls
+# fall back to the pinned klt through uvx when no klt is on PATH). Nothing
 # here writes into sim/.
 set -euo pipefail
 
@@ -171,3 +174,18 @@ for path, want in rec["provenance"]["inputs"].items():
                  " -- the array changed, so mint a new record (records are append-only)")
 print("PASS: array-check-macro.json pins the committed GDS inputs")
 HASHEOF
+
+hr "11. macro: supply spec current, as-built klt erc report reproduces, negative controls bite (issue #229)"
+uv run --with klayout python3 $D/supply_spec.py
+if git diff --quiet -- $D/macro.supply.json; then
+  echo "PASS: macro.supply.json matches supply_spec.py output"
+else
+  echo "FAIL: macro.supply.json differs from supply_spec.py output"; exit 1
+fi
+klt erc --validate-spec $D/macro.supply.json
+if klt erc --check layout/reports/erc-macro.json > /dev/null; then
+  echo "PASS: layout/reports/erc-macro.json matches the committed macro.gds and spec (cheap hash mode)"
+else
+  echo "FAIL: erc-macro.json drifted from its inputs -- mint a new record (append-only), do not edit it"; exit 1
+fi
+(cd $D && uv run --with pytest --with klayout pytest -q test_erc_controls.py)
