@@ -1,0 +1,136 @@
+{
+  "corners": [
+    {
+      "corner_id": "mos_fs/1.080V/125C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.4035741192619226,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.14297407903529394,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.425,
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "corner_id": "mos_sf/1.080V/-40C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.4608658936077085,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.2461530393207959,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.25,
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "corner_id": "mos_ff/1.080V/125C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.38983674283171066,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.15384370549364237,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.4,
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "corner_id": "mos_tt/1.200V/27C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.48583337839088236,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.21317047273854042,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.4,
+          "status": "pass"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "side": "schematic",
+    "netlist_sha256": "sha256:1fdf13f2753259b1c751a19f21fed5b57487d71883ad935a604b957a0c959fda",
+    "top": "bitcell",
+    "pins": [
+      "BL",
+      "BLB",
+      "WL",
+      "VDD",
+      "VSS",
+      "Q",
+      "QB"
+    ],
+    "corner_points": [
+      {
+        "process": "mos_fs",
+        "vdd_v": 1.08,
+        "temperature_c": 125
+      },
+      {
+        "process": "mos_sf",
+        "vdd_v": 1.08,
+        "temperature_c": -40
+      },
+      {
+        "process": "mos_ff",
+        "vdd_v": 1.08,
+        "temperature_c": 125
+      },
+      {
+        "process": "mos_tt",
+        "vdd_v": 1.2,
+        "temperature_c": 27
+      }
+    ],
+    "batches": {
+      "snm": {
+        "report": "report-snm.json.gz",
+        "report_sha256": "sha256:741600bca7931f0787d641216ed8dbab9add2d9e4fa693bd59599fd2c7b1f736",
+        "batch_job_id": "klt-sim-fcc9067f1021",
+        "runner_klt_version": "0.9.0",
+        "engine_version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******"
+      },
+      "write": {
+        "report": "report-write.json.gz",
+        "report_sha256": "sha256:03662799176be1cfc0648df8e30f343fc142cee32b6a25cb3404e1aca70c4c1e",
+        "batch_job_id": "klt-sim-d1f66c953aaa",
+        "runner_klt_version": "0.9.0",
+        "engine_version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******"
+      }
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "corners": [
+    {
+      "corner_id": "mos_fs/1.080V/125C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.4035736579768596,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.14297930554320817,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.425,
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "corner_id": "mos_sf/1.080V/-40C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.460865736392361,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.2461553759368515,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.25,
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "corner_id": "mos_ff/1.080V/125C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.3898355291823899,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.15384905407578436,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.4,
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "corner_id": "mos_tt/1.200V/27C",
+      "measurements": [
+        {
+          "name": "hold_snm",
+          "value": 0.485832720092717,
+          "status": "pass"
+        },
+        {
+          "name": "read_snm",
+          "value": 0.2131766794355702,
+          "status": "pass"
+        },
+        {
+          "name": "write_margin",
+          "value": 0.4,
+          "status": "pass"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "side": "extracted",
+    "netlist_sha256": "sha256:fa1063ab85549df966263352bf2d46144c3e98becbb023564096f71b2eab6d38",
+    "top": "sg13g2_sram_bitcell_6t",
+    "pins": [
+      "BL",
+      "BLB",
+      "Q",
+      "QB",
+      "VDD",
+      "VSS",
+      "WL"
+    ],
+    "corner_points": [
+      {
+        "process": "mos_fs",
+        "vdd_v": 1.08,
+        "temperature_c": 125
+      },
+      {
+        "process": "mos_sf",
+        "vdd_v": 1.08,
+        "temperature_c": -40
+      },
+      {
+        "process": "mos_ff",
+        "vdd_v": 1.08,
+        "temperature_c": 125
+      },
+      {
+        "process": "mos_tt",
+        "vdd_v": 1.2,
+        "temperature_c": 27
+      }
+    ],
+    "batches": {
+      "snm": {
+        "report": "report-snm.json.gz",
+        "report_sha256": "sha256:b0aae39e010d8bd586b02e718459443f7950f8b13ba86b2319eef312715cfdde",
+        "batch_job_id": "klt-sim-33bcd7992168",
+        "runner_klt_version": "0.9.0",
+        "engine_version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******"
+      },
+      "write": {
+        "report": "report-write.json.gz",
+        "report_sha256": "sha256:513a9d47fde462e5567780cf732e90240f8775efddf695b8cc11222c29cb8309",
+        "batch_job_id": "klt-sim-cb3a7d5cedd1",
+        "runner_klt_version": "0.9.0",
+        "engine_version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******"
+      }
+    }
+  }
+}
