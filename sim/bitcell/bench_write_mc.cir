@@ -1,0 +1,26 @@
+* 6T bitcell write-margin bench for Monte Carlo (circuit body for `klt sim`; no .control/.end).
+*
+* ONE copy of design/bitcell/bitcell.spice, so one mismatch draw per Monte Carlo sample. The
+* deterministic bench (bench_write.cir) uses 33 copies, one per bit-line level; under mismatch
+* that would draw 33 different cells per sample, so here the 33 levels run back to back on the
+* same cell instead. Period 4 ns, level k = 0..32 in period k, bit-line low level L_k = 25 mV * k,
+* BLB at VDD:
+*   0.10-0.72 ns  reset: switches force Q=VDD, QB=0 (the cell stores Q=1), wordline low
+*   1.02-2.62 ns  bit line moves from VDD to L_k (smooth blend, before and after the pulse)
+*   1.30-2.30 ns  1 ns wordline pulse, amplitude VDD (spec/write-pulse-width-decision.md)
+*   2.30 ns, 3.50 ns  d_end_k / d_fin_k = v(q)-v(qb); flipped iff both < 0 (as bench_write.cir)
+* Write margin = highest L_k at which the cell flips (bitcell_post.py mc-write).
+.include ../../design/bitcell/bitcell.spice
+
+Vdd vdd 0 DC 1.2
+Vp  p 0 PULSE(0 1 1.3n 20p 20p 1n 4n)
+Bwl wl 0 V = v(p)*v(vdd)
+Vq  qph 0 PULSE(0 1 1.02n 20p 20p 1.58n 4n)
+Bbl bl 0 V = v(vdd) + (0.025*floor(time/4e-9) - v(vdd))*v(qph)
+Vr  rst 0 PULSE(0 1 0.1n 20p 20p 0.62n 4n)
+.model swm SW(vt=0.5 vh=0.05 ron=100 roff=1e12)
+Sq  vdd q  rst 0 swm
+Sqb qb  0  rst 0 swm
+*      BL BLB WL VDD VSS Q QB
+Xw     bl vdd wl vdd 0   q qb bitcell
+.ic v(q)=0.9 v(qb)=0.3

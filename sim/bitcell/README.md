@@ -70,6 +70,24 @@ the 0.5/1/2 ns sensitivity sweep, nor the rail-sharing decision.
 `curves/` the extracted voltage-transfer curves, `reports/` the `klt sim`
 reports.
 
+## Write-margin cost pilot
+
+With the pinned PDK from the cold start, a configured batch submitter and
+`klayout-tools[yield]==0.9.2` on PATH, run `sim/bitcell/run_write_pilot.py`.
+Use `--dry-run` to validate the request set. At 1.20 V and 27 °C the pilot
+pairs the single-cell 33-level sweep from #68 (25 mV grid) with klt's falling
+source search (6.25 mV bracket tolerance) for 10 and 30 mismatch draws with
+seed 20261029. Both use the pulse-end and retention observations. The control
+compares each searched bracket with the interval above the recorded highest
+passing grid level at all 45 deterministic corners and the separate typical
+point. A 300 s unit timeout permits 11 units per job under the 3,600 s ceiling
+with 120 s overhead. The runner splits larger requests automatically.
+Each completed record under `records/<UTC>/` includes the per-draw margins,
+yield reports and the cost table for #68. Wall time spans first submission to
+last collection for each request. Engine unit-hours sum each draw's ngspice
+runtime and exclude provisioning and idle time. The small pilot measures cost
+only. The statistical campaign and its budget decision remain with #68.
+
 ## Post-layout re-run (`klt pex`, issue #228)
 
 The same three margins, schematic leg vs parasitic-extracted leg, on the
