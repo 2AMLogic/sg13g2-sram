@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-22T07:24:13Z (snapshot; compare against live labels)_
+_Generated: 2026-11-22T20:33:11Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -48,7 +48,6 @@ Issues currently being built (`loom:building`).
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins
-- **#228**: T1 item 7, first increment: klt pex on the LVS-matched 6T bitcell (schematic-vs-extracted read SNM, hold SNM and write margin)
 - **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31)
 
 ## PRs Awaiting Review
@@ -81,7 +80,6 @@ Issues carrying `loom:curated`.
 - **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)* *(held)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
-- **#228**: T1 item 7, first increment: klt pex on the LVS-matched 6T bitcell (schematic-vs-extracted read SNM, hold SNM and write margin) *(curated)*
 - **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31) *(curated)*
 - **#230**: T1 item 6, pilot: size the write-margin Monte Carlo cost at small n and move the level search onto klt's built-in bisection (feeds the #68 budget decision) *(curated)* *(held)*
 
