@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-23T10:08:37Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T18:13:37Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -17,7 +17,7 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(held)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT
 
 ## Important
 
@@ -63,7 +63,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#236**: layout: add macro supply spec, as-built klt erc report and negative controls
 
 ## Proposed
 
@@ -77,7 +77,7 @@ Issues carrying `loom:curated`.
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)* *(held)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
 - **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31) *(curated)*
@@ -101,7 +101,7 @@ _None._
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 4 |
 | In Progress (`loom:building`) | 5 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 0 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 13 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
