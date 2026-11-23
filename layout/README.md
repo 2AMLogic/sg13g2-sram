@@ -393,7 +393,9 @@ odd-seam n-well bands, has a tap reaching its supply), no `erc.supply_short`, no
 Metal5 trunk cut once (in the widest gap between its Via4 landings) reports VSS 623
 islands -- exactly one more -- with VDD, the unlabelled remainder and every tie unchanged;
 a variant with the bitcell n-well tie removed reports 64 `erc.missing_tie` findings on
-`nwell_vdd` (one per merged array well band) with the island picture unchanged. Each
+`nwell_vdd` (one per merged array well band) with the island picture unchanged; a variant
+removing only the tie's Activ (Cont and metal left) must also report `erc.missing_tie`,
+since both tap definitions require active diffusion. Each
 control differs from as-built by its injected defect only, and the tests read the as-built
 baseline from the committed report, so a re-minted record re-arms them. Recorded with the
 controls: cutting **one array strap** is invisible to the net-level check by design -- the
@@ -401,9 +403,13 @@ rail mesh is redundant (every riser is strapped at 64 seams), which is a propert
 rail design, not a spec gap; the trunk is the rail whose severance the check can see.
 
 **Comparison with `rails_check.py`** (issue #229 step 5): `klt erc` now covers the
-tie-to-rail reachability (as `erc.missing_tie`, including a tie wired to the *wrong*
-supply), the VDD-VSS short (as `erc.supply_short`, plus the substrate pass) and adds the
-island/unlabelled measurements, but it does **not** cover everything, so
+presence of a body tie (as `erc.missing_tie`: a Cont over active diffusion with the right
+well/implant markers, wired to the *right* supply per well region), the VDD-VSS short (as `erc.supply_short`, plus the substrate pass) and adds the
+island/unlabelled measurements, but the two checks give different guarantees: `erc.missing_tie` says a tap exists and
+reaches *a* correctly labelled island of its supply -- it does not say that island still
+connects to the Metal5 trunk (with all 296 Via4s removed, the trunk-based trace of
+`rails_check.py` reaches 0 Metal1 polygons while ERC reports connectivity violations but no
+`psub_vss` missing tie). Trunk reachability stays with `rails_check.py`, so
 `rails_check.py` stays and no removal follow-up is filed:
 
 - the wordline-gap keep-out (no rail shape below Metal4 inside the fan-out corridor) is a

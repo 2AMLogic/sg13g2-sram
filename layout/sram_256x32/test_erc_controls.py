@@ -26,7 +26,7 @@ Needs ``klt`` on PATH (CI installs the pinned ``klayout-tools``); falls back to
 
 import json
 import os
-import shutil
+import re
 import subprocess
 import sys
 
@@ -39,10 +39,16 @@ sys.path.insert(0, HERE)
 import erc_controls  # noqa: E402
 import generate as g  # noqa: E402
 
-if shutil.which("klt"):
-    KLT = ["klt"]
-else:
-    KLT = ["uvx", "--from", "klayout-tools==0.9.2", "klt"]
+def _pinned_klt_version() -> str:
+    """The klt version the committed report was minted with (its provenance)."""
+    with open(os.path.join(ROOT, ".github", "workflows", "signoff.yml")) as f:
+        m = re.search(r'^\s*KLT_VERSION:\s*"([^"]+)"', f.read(), re.M)
+    assert m, "KLT_VERSION not found in signoff.yml"
+    return m.group(1)
+
+
+# Always the signoff pin, never whichever klt happens to be on PATH.
+KLT = ["uvx", "--from", f"klayout-tools=={_pinned_klt_version()}", "klt"]
 
 SPEC = os.path.join(HERE, "macro.supply.json")
 AS_BUILT_REPORT = os.path.join(ROOT, "layout", "reports", "erc-macro.json")
@@ -119,6 +125,12 @@ def test_severed_trunk_is_one_more_vss_island(variant_dir, as_built):
     report = _run_erc(os.path.join(variant_dir, "macro-severed.gds"))
     assert _islands(report, "VSS") == _islands(as_built, "VSS") + 1
     assert _islands(report, "VDD") == _islands(as_built, "VDD")
+    # the severed rail must produce the VSS finding itself, not only a count delta
+    vss = [
+        f for f in report["erc_findings"]
+        if f["rule"] == "erc.unconnected_net" and f.get("net") == "VSS"
+    ]
+    assert vss, "the severed VSS trunk must produce an erc.unconnected_net finding on VSS"
     assert not [f for f in report["erc_findings"] if f["rule"] == "erc.missing_tie"]
     for net in ("VDD", "VSS"):
         assert _unlabelled(report, net) == 0
@@ -131,5 +143,16 @@ def test_removed_bitcell_tie_is_a_missing_tie(variant_dir, as_built):
     assert {f["layer"] for f in missing} == {"nwell_vdd"}
     assert {f["net"] for f in missing} == {"VDD"}
     # the defect is isolated: the supply island picture is the as-built one
+    assert _islands(report, "VDD") == _islands(as_built, "VDD")
+    assert _islands(report, "VSS") == _islands(as_built, "VSS")
+
+
+def test_tie_contact_without_diffusion_is_a_missing_tie(variant_dir, as_built):
+    """A Cont (with its metal) over no Activ is not a body tie."""
+    report = _run_erc(os.path.join(variant_dir, "macro-no-activ.gds"))
+    missing = [f for f in report["erc_findings"] if f["rule"] == "erc.missing_tie"]
+    assert missing, "a tie Cont without Activ must produce erc.missing_tie"
+    assert {f["layer"] for f in missing} == {"nwell_vdd"}
+    assert {f["net"] for f in missing} == {"VDD"}
     assert _islands(report, "VDD") == _islands(as_built, "VDD")
     assert _islands(report, "VSS") == _islands(as_built, "VSS")

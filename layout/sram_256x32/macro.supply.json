@@ -106,7 +106,8 @@
       "well_layer": "31/0",
       "tap_layer": "6/0",
       "tap_requires": [
-        "31/0"
+        "31/0",
+        "1/0"
       ],
       "tap_excludes": [
         "14/0",
@@ -123,7 +124,8 @@
       ],
       "tap_layer": "6/0",
       "tap_requires": [
-        "14/0"
+        "14/0",
+        "1/0"
       ],
       "tap_excludes": [
         "5/0"

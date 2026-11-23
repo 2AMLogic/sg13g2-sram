@@ -4,7 +4,7 @@
 ``macro.supply.json`` must have teeth on the 8,192-cell macro: a rail defect
 or a removed body tie has to show up as a finding, or the committed as-built
 report (``layout/reports/erc-macro.json``) is evidence of nothing. This module
-writes two single-defect variants of the committed ``macro.gds`` and the tests
+writes three single-defect variants of the committed ``macro.gds`` and the tests
 assert each variant's findings against the as-built ones:
 
 * ``severed`` -- the VSS Metal5 trunk cut once, in the widest gap between its
@@ -19,7 +19,10 @@ assert each variant's findings against the as-built ones:
   The array's merged n-well then has no ``nwell_vdd`` tap at all and
   ``erc.missing_tie`` fires; nothing else moves.
 
-Both edits are hierarchy-local (the ``rails`` and ``bitcell`` cells; the
+* ``no_activ`` -- only the tie's Activ removed; its Cont and metal stay, so a
+  tap definition that does not require active diffusion would still see a tie.
+
+All edits are hierarchy-local (the ``rails`` and ``bitcell`` cells; the
 variants never touch the committed files). Run from the repo root::
 
     uv run --with klayout python3 layout/sram_256x32/erc_controls.py \
@@ -109,14 +112,34 @@ def _remove_bitcell_ntie(layout: kdb.Layout) -> str:
     )
 
 
+def _remove_bitcell_ntie_activ(layout: kdb.Layout) -> str:
+    """Remove only the n-well tie Activ; its Cont and metal stay (no diffusion under the contact)."""
+    cell = layout.cell("bitcell")
+    la = layout.layer(*ACTIV)
+    tie = max(
+        (s for s in cell.shapes(la).each() if s.is_box()),
+        key=lambda s: s.box.top,
+    )
+    tie_box = tie.box
+    tie.delete()
+    return (
+        f"bitcell n-well tie Activ {tie_box.to_s()} removed from cell 'bitcell'; "
+        f"its Cont and Metal1 left in place (all 8192 instances)"
+    )
+
+
 def build_variants(src: str, outdir: str) -> dict[str, str]:
-    """Write ``<outdir>/macro-severed.gds`` and ``<outdir>/macro-no-tie.gds``.
+    """Write ``<outdir>/macro-severed.gds``, ``macro-no-tie.gds`` and ``macro-no-activ.gds``.
 
     Returns ``{variant: description of the injected defect}``.
     """
     os.makedirs(outdir, exist_ok=True)
     out: dict[str, str] = {}
-    for name, edit in (("severed", _cut_trunk), ("no_tie", _remove_bitcell_ntie)):
+    for name, edit in (
+        ("severed", _cut_trunk),
+        ("no_tie", _remove_bitcell_ntie),
+        ("no_activ", _remove_bitcell_ntie_activ),
+    ):
         layout = kdb.Layout()
         layout.read(src)
         out[name] = edit(layout)

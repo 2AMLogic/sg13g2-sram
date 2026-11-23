@@ -34019,7 +34019,7 @@
     "klt_version": "0.9.2",
     "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
     "klt_reinstall_spec": "klayout-tools==0.9.2",
-    "klayout_version": "0.30.13",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sg13g2",
@@ -34031,7 +34031,7 @@
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:005fba4310d7e700a39a5890bbf4740b1b0b602b90be504ae826b41fa3d035d8"
+      "content_hash": "sha256:267a32f1990d349297bcb70cb943fe628e0015578d39181da021275843ec197c"
     },
     "devices": [],
     "net_exclusions": [],

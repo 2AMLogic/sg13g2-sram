@@ -182,8 +182,12 @@ if git diff --quiet -- $D/macro.supply.json; then
 else
   echo "FAIL: macro.supply.json differs from supply_spec.py output"; exit 1
 fi
-klt erc --validate-spec $D/macro.supply.json
-if klt erc --check layout/reports/erc-macro.json > /dev/null; then
+# Always the signoff pin (the report's provenance), never whichever klt is on PATH.
+KLT_PIN="$(sed -n 's/^  KLT_VERSION: "\(.*\)"$/\1/p' .github/workflows/signoff.yml)"
+[ -n "$KLT_PIN" ] || { echo "cannot read KLT_VERSION from .github/workflows/signoff.yml"; exit 1; }
+pinned_klt() { uvx --from "klayout-tools==$KLT_PIN" klt "$@"; }
+pinned_klt erc --validate-spec $D/macro.supply.json
+if pinned_klt erc --check layout/reports/erc-macro.json > /dev/null; then
   echo "PASS: layout/reports/erc-macro.json matches the committed macro.gds and spec (cheap hash mode)"
 else
   echo "FAIL: erc-macro.json drifted from its inputs -- mint a new record (append-only), do not edit it"; exit 1
