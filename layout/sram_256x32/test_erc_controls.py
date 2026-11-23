@@ -20,13 +20,15 @@ report first, so a regenerating drift cannot silently defang the controls.
 
     cd layout/sram_256x32 && uv run --with pytest --with klayout pytest -q test_erc_controls.py
 
-Needs ``klt`` on PATH (CI installs the pinned ``klayout-tools``); falls back to
-``uvx --from klayout-tools==0.9.2`` when it is absent.
+Uses ``klt`` on PATH only when its ``--version`` equals the pin (CI installs the
+pinned ``klayout-tools``); otherwise falls back to ``uvx --from
+klayout-tools==<pin>``; fails with a message naming the pin if neither exists.
 """
 
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -47,8 +49,48 @@ def _pinned_klt_version() -> str:
     return m.group(1)
 
 
-# Always the signoff pin, never whichever klt happens to be on PATH.
-KLT = ["uvx", "--from", f"klayout-tools=={_pinned_klt_version()}", "klt"]
+def _resolve_klt() -> list:
+    """Launcher for exactly the pinned klt, never an arbitrary PATH klt.
+
+    Uses ``klt`` on PATH only when its ``--version`` reports the pin; otherwise
+    ``uvx --from klayout-tools==<pin> klt``. Fails with one legible line naming
+    the pin and what was searched when neither is available.
+    """
+    pin = _pinned_klt_version()
+    searched = []
+    klt = shutil.which("klt")
+    if klt:
+        try:
+            out = subprocess.run([klt, "--version"], capture_output=True, text=True, timeout=60)
+            reported = out.stdout + out.stderr
+        except (OSError, subprocess.SubprocessError) as e:
+            reported = ""
+            searched.append(f"{klt} (--version failed: {e})")
+        else:
+            if re.search(rf"(?<![\w.]){re.escape(pin)}(?![\w.])", reported):
+                return [klt]
+            searched.append(f"{klt} (reports {reported.strip()!r})")
+    else:
+        searched.append("klt on PATH (not found)")
+    uvx = shutil.which("uvx")
+    if uvx:
+        return [uvx, "--from", f"klayout-tools=={pin}", "klt"]
+    searched.append("uvx on PATH (not found)")
+    pytest.fail(
+        f"need klayout-tools=={pin} (KLT_VERSION in signoff.yml) but no launcher found; "
+        f"searched: {'; '.join(searched)}. Install that pin or uv.",
+        pytrace=False,
+    )
+
+
+KLT = None  # resolved lazily by _klt() so import/collect never needs a launcher
+
+
+def _klt() -> list:
+    global KLT
+    if KLT is None:
+        KLT = _resolve_klt()
+    return KLT
 
 SPEC = os.path.join(HERE, "macro.supply.json")
 AS_BUILT_REPORT = os.path.join(ROOT, "layout", "reports", "erc-macro.json")
@@ -56,7 +98,7 @@ AS_BUILT_REPORT = os.path.join(ROOT, "layout", "reports", "erc-macro.json")
 
 def _run_erc(gds: str) -> dict:
     proc = subprocess.run(
-        KLT + [
+        _klt() + [
             "erc", gds, SPEC,
             "--top", "macro", "--deck", "sg13g2",
             "--findings-only", "--compact", "--omit-antenna-tables",

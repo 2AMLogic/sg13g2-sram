@@ -2,7 +2,7 @@
 # Mint the as-built klt erc report of the macro (issue #229): run `klt erc` on the
 # committed macro.gds against macro.supply.json at the klt version pinned for
 # signoff (KLT_VERSION in .github/workflows/signoff.yml; the report's provenance
-# records it) and write layout/reports/erc-macro.json. `layout/verify.sh` step 11
+# records it) and write layout/reports/erc-macro.json. `layout/verify.sh` step 12
 # checks this report against the committed inputs (`klt erc --check`), and
 # test_erc_controls.py reads it as the as-built baseline of the negative controls.
 #
