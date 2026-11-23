@@ -29,7 +29,7 @@ variants never touch the committed files). Run from the repo root::
         layout/sram_256x32/macro.gds /tmp/variants
 
 Used by ``test_erc_controls.py`` (CI: ``layout-macro-tests.yml``) and
-``./layout/verify.sh`` step 11.
+``./layout/verify.sh`` step 12.
 """
 
 from __future__ import annotations

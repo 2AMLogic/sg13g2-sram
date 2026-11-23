@@ -3,6 +3,20 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-23
+
+- **PR #240**: fix: grade nonpositive write margins fail and pin verify.sh step 11 to the record's klt pin
+- **Issue #234** (closed): measure_pex.py grades a zero write margin as pass; verify.sh step 11 hardcodes the klt pin
+
+### 2026-11-22
+
+- **PR #232**: feat: measure bitcell post-layout margins with klt pex (T1 item 7, bitcell half)
+- **Issue #228** (closed): T1 item 7, first increment: klt pex on the LVS-matched 6T bitcell (schematic-vs-extracted read SNM, hold SNM and write margin)
+
+### 2026-11-21
+
+- **PR #235**: feat(sim): add a batch pilot for write-margin search costs
+
 ### 2026-11-20
 
 - **PR #226**: layout: skip the discarded maze setup in route_leaf's pad-only pass

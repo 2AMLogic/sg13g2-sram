@@ -347,7 +347,7 @@ record: with no `--pdk` every antenna verdict is `unchecked` and the all-ungrade
 `gates[]` table of the 17,269 gate nets is ~45 MB; omitting it (klayout-tools #3011's
 purpose) keeps every finding, verdict and the exit code identical while making the report
 committable (1.3 MB). `klt erc --check layout/reports/erc-macro.json` reproduces it from
-the committed inputs (`./layout/verify.sh` step 11); `macro.supply.json` is generated
+the committed inputs (`./layout/verify.sh` step 12); `macro.supply.json` is generated
 from the layer/via/tap constants of both `generate.py` files, never hand-copied, and
 `test_erc_controls.py::test_supply_spec_is_current` fails if the two drift apart.
 
@@ -389,7 +389,7 @@ odd-seam n-well bands, has a tap reaching its supply), no `erc.supply_short`, no
 `erc.floating_gate`, unlabelled remainder 0 on both supplies.
 
 **Negative controls** (`erc_controls.py`, `test_erc_controls.py`, CI:
-`layout-macro-tests.yml`, local: `./layout/verify.sh` step 11): a variant with the VSS
+`layout-macro-tests.yml`, local: `./layout/verify.sh` step 12): a variant with the VSS
 Metal5 trunk cut once (in the widest gap between its Via4 landings) reports VSS 623
 islands -- exactly one more -- with VDD, the unlabelled remainder and every tie unchanged;
 a variant with the bitcell n-well tie removed reports 64 `erc.missing_tie` findings on

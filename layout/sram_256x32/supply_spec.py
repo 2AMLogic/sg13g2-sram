@@ -6,7 +6,7 @@ constants (``generate.py`` and ``layout/bitcell/generate.py``), never
 hand-copied, so "the stack matches the generator's constants" stays true by
 construction: a layer renumbering in either generator changes this spec on its
 next run, and ``test_macro.py::test_supply_spec_is_current`` (plus
-``./layout/verify.sh`` step 11) fails until the spec is re-emitted.
+``./layout/verify.sh`` step 12) fails until the spec is re-emitted.
 
 What the spec declares, and why:
 

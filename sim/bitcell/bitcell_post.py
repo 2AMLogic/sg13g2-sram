@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -189,6 +190,29 @@ def cmd_write(report: str, label: str) -> dict:
             entry["saturated"] = top == N_LEVELS - 1
         out["corners"].append(entry)
     return out
+
+
+def searched_margin(corner: dict) -> float | None:
+    """Read klt's boundary, or classify a uniform bracket using the 0 V probe."""
+    m = {entry["name"]: entry for entry in corner["measurements"]}
+    result = m["write_margin_v"]
+    errors = [d for d in corner["diagnostics"] if d["severity"] == "error"]
+    zero = m["zero_score"]
+    if zero["status"] != "pass" or zero["value"] is None or not math.isfinite(zero["value"]):
+        raise ValueError(f"{corner['corner_id']}: invalid 0 V probe")
+    if (corner["status"] == "pass" and not errors and result["search"]["converged"]
+            and zero["value"] < 0):
+        lo, hi = result["search"]["lo"], result["search"]["hi"]
+        value = result["value"]
+        if 0 <= lo <= value <= hi <= 0.8 and hi - lo <= 0.00625 + 1e-12:
+            return value
+    if (corner["status"] == "error" and result["status"] == "error"
+            and len(errors) == 1 and errors[0]["code"] == "measurement"
+            and errors[0]["message"].startswith("[search_bracket_invalid]")):
+        # The predicate is identical at both bounds. At BL=0 the primary tran
+        # ran on the same cell before the search altered the source.
+        return 0.8 if zero["value"] < 0 else None
+    raise ValueError(f"{corner['corner_id']}: unresolved write margin: {errors or result}")
 
 
 def main() -> int:
