@@ -17,7 +17,7 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(held)*
 
 ## Important
 
@@ -77,7 +77,7 @@ Issues carrying `loom:curated`.
 - **#72**: spec: internal inconsistencies in sram.md text *(curated)*
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows *(curated)*
 - **#88**: Macro layout: route periphery, array-to-column-path and pins so the macro is extractable *(curated)*
-- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)*
+- **#107**: layout: route global control fan-out and per-slice DL/DOUT *(curated)* *(held)*
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
 - **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31) *(curated)*
