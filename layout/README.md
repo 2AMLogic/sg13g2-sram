@@ -14,6 +14,8 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
 | Re-mint the current macro record (`macro-record-blbm.json`), socket and LEF (~15 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-blbm.sh` |
+| Regenerate the macro supply spec (`macro.supply.json`, from the generator constants) | `uv run --with klayout python3 layout/sram_256x32/supply_spec.py` |
+| Re-mint the as-built macro ERC report (`erc-macro.json`, pinned klt 0.9.2, ~20 s) | `./layout/reports/generate-erc-macro.sh` |
 
 `layout/reports/generate-macro.sh` minted the unrouted macro's `macro-record.json` (#28) and `macro-record-taps.json`, and was removed once it could only refuse to overwrite them. Both records still name it as `record_command`; recover the script with `git show cbf61db:layout/reports/generate-macro.sh`.
 
@@ -325,3 +327,95 @@ overlaps on a geometrically perfect array), the absence of a shared-edge / expec
 distinct from a measurement tolerance, and `array-check --format json` omitting the `provenance`
 block its sibling verbs emit plus leaving `file` unanchored -- which is why the mint script adds
 provenance itself.
+
+### Supply ERC (`klt erc`, issue #229)
+
+`klt erc` runs on the full 8,192-cell macro against the supply spec
+`layout/sram_256x32/macro.supply.json`, minted by `layout/sram_256x32/supply_spec.py`
+and re-minted by `./layout/reports/generate-erc-macro.sh` into
+`layout/reports/erc-macro.json`:
+
+```
+uvx --from klayout-tools==0.9.2 klt erc layout/sram_256x32/macro.gds \
+    layout/sram_256x32/macro.supply.json --top macro --deck sg13g2 \
+    --omit-antenna-tables --format json
+```
+
+The klt pin is the signoff pin (`KLT_VERSION` in `.github/workflows/signoff.yml`; the
+report's `provenance.klt_version` records it). `--omit-antenna-tables` is part of the
+record: with no `--pdk` every antenna verdict is `unchecked` and the all-ungraded
+`gates[]` table of the 17,269 gate nets is ~45 MB; omitting it (klayout-tools #3011's
+purpose) keeps every finding, verdict and the exit code identical while making the report
+committable (1.3 MB). `klt erc --check layout/reports/erc-macro.json` reproduces it from
+the committed inputs (`./layout/verify.sh` step 12); `macro.supply.json` is generated
+from the layer/via/tap constants of both `generate.py` files, never hand-copied, and
+`test_erc_controls.py::test_supply_spec_is_current` fails if the two drift apart.
+
+**What the spec declares.** Stackup GatPoly(gate, Activ as `active_layer`) → Metal1..Metal5
+with Cont/Via1..Via4 as the vias; Activ is deliberately no conductor role (a wire-model
+conductor there would short every transistor's source to its drain through the channel).
+VDD and VSS are `kind: "supply"` owning Metal4/Metal5 — the only layers the rails draw —
+which turns on the unlabelled-remainder measurement. Both tie classes are declared:
+`nwell_vdd` (Cont inside NWell, no pSD over it, not on poly) and `psub_vss` (Cont under
+pSD on the substrate, declared as `well_complement_of` NWell because SG13G2's p bulk draws
+no layer). The tap is the **Cont square**, not the tie Activ strip: `connect_to` wires a
+tap to its role by plan-view overlap, and a conductor that merely crosses a full-width tie
+strip without a contact would falsely weld the supplies together in the tie graph — the
+friction is filed as 2AMLogic/klayout-tools#6998, and the Cont-based tap is the workaround.
+
+**What it covers:** supply-net connectivity through the whole declared stack (island
+count per supply against the label resolution), the unlabelled remainder on the rail-only
+layers, VDD-VSS shorts on the metal graph, the substrate-continuity pass (the sg13g2 deck
+declares `nBuLay`; none is drawn, so VSS taps share the substrate while every VDD tap sits
+inside a drawn well -- no merge, no disclosure), `erc.missing_tie` per merged well shape,
+and `erc.floating_gate` per gate net. **Run cost at this size** (8,192 cells, 17,269 gate
+nets, klt 0.9.2, one core of an 8-vCPU AWS runner): 19.6 s wall, 345 MB peak RSS. No
+tool gap to file.
+
+**As built, the report is honestly red:** `erc_status: violations` (exit 3) with exactly
+two findings, `erc.unconnected_net` for each supply, and **no** `islands`,
+`unlabelled_allowed_boxes` or any other declaration was used to quiet it:
+
+| supply | islands | composition | owning issue |
+|---|---|---|---|
+| VDD | 1040 | 1 rail network (trunk label + riser + tie-pad labels) + 1 pin square + 1038 supply S/D terminal bars | pin square: #108; terminal bars: the #88 seam-4/5 routing chain (#95/#107/#108) |
+| VSS | 622 | 1 rail network + 1 pin square + 620 supply S/D terminal bars | same |
+
+The terminal-bar islands are the disclosed "supply D/S terminals of the devices are not
+joined to the ties" (`generate.py`, *What is NOT drawn*): each carries a `VDD`/`VSS`
+Metal1 label and is electrically correct in silicon, but the joining metal is not drawn
+yet. `erc.missing_tie` is **clean** (every merged well shape, including the array's 64
+odd-seam n-well bands, has a tap reaching its supply), no `erc.supply_short`, no
+`erc.floating_gate`, unlabelled remainder 0 on both supplies.
+
+**Negative controls** (`erc_controls.py`, `test_erc_controls.py`, CI:
+`layout-macro-tests.yml`, local: `./layout/verify.sh` step 12): a variant with the VSS
+Metal5 trunk cut once (in the widest gap between its Via4 landings) reports VSS 623
+islands -- exactly one more -- with VDD, the unlabelled remainder and every tie unchanged;
+a variant with the bitcell n-well tie removed reports 64 `erc.missing_tie` findings on
+`nwell_vdd` (one per merged array well band) with the island picture unchanged; a variant
+removing only the tie's Activ (Cont and metal left) must also report `erc.missing_tie`,
+since both tap definitions require active diffusion. Each
+control differs from as-built by its injected defect only, and the tests read the as-built
+baseline from the committed report, so a re-minted record re-arms them. Recorded with the
+controls: cutting **one array strap** is invisible to the net-level check by design -- the
+rail mesh is redundant (every riser is strapped at 64 seams), which is a property of the
+rail design, not a spec gap; the trunk is the rail whose severance the check can see.
+
+**Comparison with `rails_check.py`** (issue #229 step 5): `klt erc` now covers the
+presence of a body tie (as `erc.missing_tie`: a Cont over active diffusion with the right
+well/implant markers, wired to the *right* supply per well region), the VDD-VSS short (as `erc.supply_short`, plus the substrate pass) and adds the
+island/unlabelled measurements, but the two checks give different guarantees: `erc.missing_tie` says a tap exists and
+reaches *a* correctly labelled island of its supply -- it does not say that island still
+connects to the Metal5 trunk (with all 296 Via4s removed, the trunk-based trace of
+`rails_check.py` reaches 0 Metal1 polygons while ERC reports connectivity violations but no
+`psub_vss` missing tie). Trunk reachability stays with `rails_check.py`, so
+`rails_check.py` stays and no removal follow-up is filed:
+
+- the wordline-gap keep-out (no rail shape below Metal4 inside the fan-out corridor) is a
+  region-scoped placement assertion `klt erc` cannot express -- filed as the generic tool
+  gap 2AMLogic/klayout-tools#6999;
+- the per-probe enumeration (8192 + 8192 riser probes, 2796 tie pads, each against both
+  rails) is finer-grained than net-level ERC: a single severed, unlabelled Metal1 riser
+  fragment is invisible to the island count and to the Metal4/Metal5 unlabelled
+  measurement, and `test_macro.py` keeps catching it.

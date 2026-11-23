@@ -133,11 +133,12 @@ L_VIA3 = (49, 0)
 L_METAL4 = (50, 0)
 L_VIA4 = (66, 0)
 L_METAL5 = (67, 0)
+L_METAL5_LBL = (67, 25)
 LAYER_NAMES[L_VIA3] = "Via3"
 LAYER_NAMES[L_METAL4] = "Metal4"
 LAYER_NAMES[L_VIA4] = "Via4"
 LAYER_NAMES[L_METAL5] = "Metal5"
-LAYER_NAMES[(67, 25)] = "Metal5_text"
+LAYER_NAMES[L_METAL5_LBL] = "Metal5_text"
 
 VIA = 0.19  # V1.a / V2.a / V3.a: fixed 0.19 square
 VIA_ENC = 0.05  # metal enclosure of a via, kept at 0.05 on all sides (deck minimum is smaller)
@@ -1702,7 +1703,7 @@ class Gen:
             ys = list(seam_pads[net]) + [ly for (_, n), v in state.used.items() if n == net for ly in v]
             tx = trunk_x[net]
             self.box(rc, L_METAL5, tx - TRUNK_W / 2, min(ys) - hp, tx + TRUNK_W / 2, max(ys) + hp)
-            self.text(rc, (67, 25), net, tx, min(ys))
+            self.text(rc, L_METAL5_LBL, net, tx, min(ys))
 
     def tie_maze(self, net: str, x: float, y: float, ri: int, rb_x: tuple[float, float], lanes: list[float],
                  obs: Obstacles, state: RailState, reach: int = 0) -> bool:

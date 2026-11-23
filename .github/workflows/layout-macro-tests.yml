@@ -10,6 +10,7 @@ on:
       - "layout/sram_256x32/**"
       - "layout/bitcell/**"
       - "design/**"
+      - "layout/reports/erc-macro.json"
       - ".github/workflows/layout-macro-tests.yml"
   push:
     branches: [main]
@@ -33,6 +34,11 @@ jobs:
       - name: Install pytest and klayout
         run: pip install pytest "klayout==0.30.12"
 
+      # klt pin matches layout/reports/erc-macro.json (the erc negative
+      # controls, issue #229, run klt erc on defect variants of macro.gds).
+      - name: Install pinned klayout-tools
+        run: pip install "klayout-tools==0.9.2"
+
       - name: Macro generator tests
         working-directory: layout/sram_256x32
-        run: pytest -q test_macro.py --durations=10
+        run: pytest -q test_macro.py test_erc_controls.py --durations=10
