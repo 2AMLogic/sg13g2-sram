@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Tests for sim/bitcell/measure_pex.py's staging (pure Python, PDK- and
-fleet-free: nothing here simulates or touches klt).
+"""Tests for sim/bitcell/measure_pex.py's staging and measurement-row
+emission (pure Python, PDK- and fleet-free: nothing here simulates or
+touches klt).
 
 Run: python3 sim/bitcell/test_measure_pex.py
 """
@@ -13,6 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import bitcell_post  # noqa: E402
 import measure_pex  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
@@ -30,6 +32,70 @@ CBL BL vsubs 3.26488e-16
 Rvsubs_dctie vsubs 0 1e+12
 .ENDS sg13g2_sram_bitcell_6t
 """
+
+
+def _synth_write_report(path: Path, top_by_corner: list[tuple[str, int | None]]) -> None:
+    """A `klt sim`-shaped report for cmd_write: both flip measurements
+    (d_end_k, d_fin_k) go negative exactly at the levels k <= top (top is
+    the highest bit-line level index that flips; None = no level flips)."""
+    corners = []
+    for cid, top in top_by_corner:
+        meas = []
+        for k in range(bitcell_post.N_LEVELS):
+            v = -1.0 if (top is not None and k <= top) else 1.0
+            meas += [{"name": f"d_end_{k}", "value": v},
+                     {"name": f"d_fin_{k}", "value": v}]
+        corners.append({"corner_id": cid, "status": "pass", "measurements": meas})
+    path.write_text(json.dumps({"corners": corners, "environment": {}}))
+
+
+def _check_measure_rows(art: Path) -> None:
+    """measure()'s emitted write-margin rows on synthetic reducer input
+    (issue #234): a top = 0 margin of 0.000 V grades fail with its value
+    intact, top = 1 grades pass, and a no-flip corner stays error with the
+    reason. Only the batch sim call and the SNM reduction are stubbed -- the
+    write path runs the real bitcell_post.cmd_write reducer."""
+    snm_report = art / "report-snm.json"
+    write_report = art / "report-write.json"
+    cases = [
+        (measure_pex.corner_id("mos_sf", 1.08, -40), 0),     # flips only at BL = 0 V
+        (measure_pex.corner_id("mos_tt", 1.20, 27), 1),      # 25 mV of margin
+        (measure_pex.corner_id("mos_fs", 1.08, 125), None),  # never flips
+    ]
+    _synth_write_report(write_report, cases)
+    snm_report.write_text(json.dumps({
+        "corners": [{"corner_id": cid, "status": "pass"} for cid, _ in cases],
+        "environment": {},
+    }))
+
+    def fake_run_sim(klt, req, a, name, stderr_log):
+        stderr_log.write_text("")
+        return {"snm": snm_report, "write": write_report}[name]
+
+    def fake_cmd_snm(report, art_root, curves_dir, label):
+        return {"label": label, "kind": "simulated", "corners": [
+            {"corner_id": cid, "klt_status": "pass",
+             "hold_snm_v": 0.45, "read_snm_v": 0.20}
+            for cid, _ in cases
+        ]}
+
+    saved = (measure_pex.run_sim, bitcell_post.cmd_snm)
+    measure_pex.run_sim, bitcell_post.cmd_snm = fake_run_sim, fake_cmd_snm
+    try:
+        doc = measure_pex.measure("schematic", SCHEMATIC, art / "m")
+    finally:
+        measure_pex.run_sim, bitcell_post.cmd_snm = saved
+
+    rows = {c["corner_id"]: next(m for m in c["measurements"]
+                                 if m["name"] == "write_margin")
+            for c in doc["corners"]}
+    zero = rows[measure_pex.corner_id("mos_sf", 1.08, -40)]
+    assert zero == {"name": "write_margin", "value": 0.0, "status": "fail"}, zero
+    one = rows[measure_pex.corner_id("mos_tt", 1.20, 27)]
+    assert one == {"name": "write_margin", "value": 0.025, "status": "pass"}, one
+    noflip = rows[measure_pex.corner_id("mos_fs", 1.08, 125)]
+    assert noflip["value"] is None and noflip["status"] == "error", noflip
+    assert "no flip" in noflip["message"], noflip
 
 
 def main() -> int:
@@ -94,6 +160,9 @@ def main() -> int:
             pass
         else:
             raise AssertionError("stage() accepted a foreign pin set")
+
+        # measurement-row emission (issue #234): zero write margin -> fail
+        _check_measure_rows(art)
 
     print("ok")
     return 0

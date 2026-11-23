@@ -6,8 +6,10 @@
 #
 # Needs klt (>= 0.8.0, sg13g2 deck) and uv on PATH for steps 1-9. Step 10 needs klt >= 0.9.0,
 # which first carries `array-check`; it does not use the host klt at all but pins
-# klayout-tools==0.9.1 through `uvx`, matching layout/reports/array-check-macro.json. Nothing
-# here writes into sim/.
+# klayout-tools==0.9.1 through `uvx`, matching layout/reports/array-check-macro.json. Step 11
+# likewise bypasses the host klt: it pins `uvx` to the tool.klt_pin of the newest
+# sim/bitcell/records/<UTC>/record.json it selects -- the pin that record was minted at.
+# Nothing here writes into sim/.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -178,15 +180,18 @@ hr "11. bitcell PEX: PDK-free extraction digest matches the latest klt pex recor
 # without a PDK install (CI has none) must reproduce the netlist digest the
 # committed sim/bitcell/records/<UTC>/ pex record pins. The measured
 # (PDK-bound, batch-fleet) legs are never re-run here; their envelope and the
-# PDK-bound digest live in the record. Pinned klt (KLT_VERSION in
-# .github/workflows/ci.yml) for the same reason as step 10: the committed
-# digest must be reproducible at the pin, and the host `klt` is a dev build.
-KLTPEX=(uvx --from klayout-tools==0.9.2 klt)
+# PDK-bound digest live in the record. klt is pinned to the selected record's
+# own tool.klt_pin (not the CI KLT_VERSION) for the same reason as step 10:
+# the committed digest was minted at that pin and is reproducible only there,
+# and the host `klt` is a dev build.
 PEXREC="$(ls -d "$ROOT"/sim/bitcell/records/*/pex-envelope.json 2>/dev/null | sort | tail -1 || true)"
 if [ -z "$PEXREC" ]; then
   echo "FAIL: no klt pex record under sim/bitcell/records/ (run sim/bitcell/run_pex.sh)"; exit 1
 fi
 PEXDIR="$(dirname "$PEXREC")"
+KLTPIN="$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["tool"]["klt_pin"])' "$PEXDIR/record.json")"
+KLTPEX=(uvx --from "klayout-tools==$KLTPIN" klt)
+echo "re-extracting at klayout-tools==$KLTPIN (tool.klt_pin in $PEXDIR/record.json)"
 rc=0
 "${KLTPEX[@]}" pex "$CELL" --deck sg13g2 --extract-only --reference-netlist "$REF" \
   -o "$WORK/pex-free.spice" --envelope-out "$WORK/pex-free.json" \

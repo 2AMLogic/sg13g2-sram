@@ -145,8 +145,10 @@ deck binds generic `nfet`/`pfet` classes instead and reports
 - resistance: "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star"
 - frequency: "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
 
-**Why the deltas are this small.** Every net gained only its lumped star
-resistance and one C to `vsubs` (per net, from the record): BL/BLB 1.983 Ω
+**Why the deltas are this small.** Six of the top's seven nets -- BL, BLB,
+Q, QB, VDD and VSS, exactly the nets the record's `parasitics_per_net`
+lists -- gained only their lumped star resistance and one C to `vsubs` (per
+net, from the record): BL/BLB 1.983 Ω
 (one terminal) + 0.326 fF, Q/QB 1.519 Ω over five terminals (0.21-0.36 Ω
 each) + 0.233 fF, VDD 0.641 Ω over four + 0.116 fF, VSS 0.715 Ω over six +
 0.128 fF; no net-to-net coupling capacitor was extracted (no `--critical-net`
@@ -160,10 +162,15 @@ bit-line grid: both legs land in the same bin at all four corners, so any
 write-margin shift smaller than ~12.5 mV is invisible to this data -- and
 with RC time constants of ohms times sub-femtofarads (ps), none is expected
 within the 1 ns pulse. What this evidence cannot distinguish: a sub-bin
-write-margin shift from a genuine no-shift, and the DC-resistance part of a
+write-margin shift from a genuine no-shift, the DC-resistance part of a
 delta from device-geometry/representation differences (the extraction's
 device cards carry the layout-derived AS/AD/PS/PD areas; a `--device-only-leg`
-run would split those, and was not part of this increment).
+run would split those, and was not part of this increment), and any
+wordline-interconnect R/C contribution at all -- the seventh net, WL, drew
+no explicit R or C card in this record's `extract-parasitic-pdk.spice`, so
+both legs drive the wordline as an ideal net and this comparison says
+nothing about degradation from wordline interconnect parasitics (the
+macro-level wordline wire-RC check stays a separate item).
 
 This is bitcell-level evidence for the T1 item 7 method on this repo; the
 item itself stays `unmet` until the macro-level run after #30 (the spec's

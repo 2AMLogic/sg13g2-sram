@@ -31,8 +31,9 @@ measurement document is printed on stdout -- the contract klt pex expects:
   {"corners": [{"corner_id": ..., "measurements": [{name, value, status}]}]}
 
 Rows: hold_snm, read_snm (V, inscribed square; <= 0 is a failing margin and
-is preserved as such) and write_margin (V, 25 mV grid; a no-flip corner is
-value null with the reason in `message`). Everything else this script wants
+is preserved as such) and write_margin (V, 25 mV grid; <= 0 is a failing
+margin preserved as such, and a no-flip corner is value null with the reason
+in `message`). Everything else this script wants
 to keep (batch job ids, report digests) rides in a "provenance" key, which
 the measurement contract ignores.
 
@@ -238,7 +239,13 @@ def measure(side: str, netlist_path: Path, art: Path) -> dict:
                      "message": w.get("error") or w.get("note") or "write margin not extractable"}
                 )
             else:
-                measurements.append({"name": "write_margin", "value": v, "status": "pass"})
+                # mirror the SNM rule: a nonpositive write margin (top = 0,
+                # flips only with BL at exactly 0 V) is a real, failing
+                # margin -- keep the value
+                measurements.append(
+                    {"name": "write_margin", "value": v,
+                     "status": "fail" if v <= 0 else "pass"}
+                )
         corners.append({"corner_id": cid, "measurements": measurements})
 
     top, pins = parse_top(netlist_path.read_text())

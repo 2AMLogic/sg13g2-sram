@@ -73,7 +73,7 @@
         "role": "testbench",
         "path": "sim/bitcell/README.md",
         "passed": true,
-        "content_hash": "sha256:2adb9b0f2c0a7a4dc5137220728893b4fba6313f6768fc20ffdb25d5fd1b96d8"
+        "content_hash": "sha256:087961cb1c79672459ab0d4950c538e68b38f6617e50d616ac645d5b0920a6c3"
       },
       {
         "check": "present",
