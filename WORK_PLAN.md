@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-22T20:33:11Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T10:08:37Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -35,17 +35,17 @@ _None._
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
+- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
 - **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
+- **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
 - **#69**: spec: confirm the 1 ns write-pulse window
 - **#71**: spec: write-margin definition under-specified
-- **#72**: spec: internal inconsistencies in sram.md text
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins
 - **#229**: T1 item 11, pre-work: commit the klt erc supply spec, as-built ERC report and negative controls for the macro (split from #31)
@@ -98,11 +98,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 7 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
-| In Progress (`loom:building`) | 8 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 4 |
+| In Progress (`loom:building`) | 5 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 14 |
+| Curated | 13 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
