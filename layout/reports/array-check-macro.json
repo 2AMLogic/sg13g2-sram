@@ -39,7 +39,7 @@
       "intent": "the 32 bit_slice columns abut along x at the slice pitch",
       "command": "klt array-check layout/sram_256x32/macro.gds --cell bit_slice --pitch 5.74 --count 32 --direction x --tolerance 0.48 --format json",
       "input": "layout/sram_256x32/macro.gds",
-      "input_content_hash": "sha256:e0a06f5f06a6b84ee053e4f8f3a5996d2a54681a78494083cc06192677cfbff6",
+      "input_content_hash": "sha256:abf46bc3386b691810b88bfad498738dc9c260b2fec498512bdaf52f97bbcf00",
       "tolerance_rationale": "0.48 um is the measured shared-edge overlap of the column seam -- the mirror abutment of the two bl_pair halves shares that edge by design (layout/README.md, 'Supply rails'). At --tolerance 0 the same run reports that 0.48 um as an overlap. It is not slack.",
       "expectation": "clean",
       "result": {
@@ -67,7 +67,7 @@
       "input": "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds",
       "input_content_hash": "sha256:9b1bcec0f9c3a5482fa562e96068894d6a9a612367663ec357a263877fb89067",
       "input_derived_from": {
-        "layout/sram_256x32/macro.gds": "sha256:e0a06f5f06a6b84ee053e4f8f3a5996d2a54681a78494083cc06192677cfbff6"
+        "layout/sram_256x32/macro.gds": "sha256:abf46bc3386b691810b88bfad498738dc9c260b2fec498512bdaf52f97bbcf00"
       },
       "tolerance_rationale": "0.27 um is the measured shared-edge overlap of the row seam, where the mirror abutment merges the bitcell VDD/VSS risers (layout/README.md, 'Supply rails'). At --tolerance 0 the run reports 0.27 um / 0.15 um seam overlaps and a 0.15 um length error; a sweep gives 64 violations at 0.15 and clean at 0.27. It is not slack.",
       "expectation": "clean",
@@ -96,7 +96,7 @@
       "input": "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds",
       "input_content_hash": "sha256:9b1bcec0f9c3a5482fa562e96068894d6a9a612367663ec357a263877fb89067",
       "input_derived_from": {
-        "layout/sram_256x32/macro.gds": "sha256:e0a06f5f06a6b84ee053e4f8f3a5996d2a54681a78494083cc06192677cfbff6"
+        "layout/sram_256x32/macro.gds": "sha256:abf46bc3386b691810b88bfad498738dc9c260b2fec498512bdaf52f97bbcf00"
       },
       "expectation": "characterized: 8 residuals in exactly two y bands, both explained below. NOT a pass, and NOT to be tolerance-tuned away -- raising --tolerance until this reports clean would mask a future break of interior symmetry. The residual count and the two bands are the regression guard.",
       "characterization": {
@@ -410,12 +410,12 @@
   "provenance": {
     "klt_version": "0.9.1",
     "klt_reinstall_spec": "uvx --from klayout-tools==0.9.1 klt",
-    "klayout_version": "0.30.13",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": null,
     "note": "array-check is deck-independent (purely geometric: no PDK deck, no compact models, no SPICE). klt emits no provenance block for this verb, so this block is added by ./layout/reports/generate-array-check.sh from `klt env-provenance emit`; its host_id/os/python_version fields are dropped so the record reproduces on any host.",
     "inputs": {
-      "layout/sram_256x32/macro.gds": "sha256:e0a06f5f06a6b84ee053e4f8f3a5996d2a54681a78494083cc06192677cfbff6",
+      "layout/sram_256x32/macro.gds": "sha256:abf46bc3386b691810b88bfad498738dc9c260b2fec498512bdaf52f97bbcf00",
       "layout/bitcell/sg13g2_sram_bitcell_tile2x2.gds": "sha256:47bd8c76698e37e9e5c540c173cad8128f9b789112457b20029a3a5123d7cc1d",
       "(derived) bl_pair column clipped from layout/sram_256x32/macro.gds": "sha256:9b1bcec0f9c3a5482fa562e96068894d6a9a612367663ec357a263877fb89067"
     }

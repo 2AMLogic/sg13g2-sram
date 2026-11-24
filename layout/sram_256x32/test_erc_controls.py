@@ -135,17 +135,20 @@ def as_built() -> dict:
 
 
 def test_as_built_report_is_the_expected_honest_result(as_built):
-    """Two unconnected-net findings (rails + pin squares + the un-joined supply
-    S/D terminal bars), no short, no missing tie, nothing unlabelled."""
+    """Two unconnected-net findings (rail network + un-joined boundary pin square per
+    supply; periphery supply S/D pads joined in #231), no short, no missing tie,
+    nothing unlabelled."""
     assert as_built["erc_status"] == "violations"
     rules = [f["rule"] for f in as_built["erc_findings"]]
     assert rules == ["erc.unconnected_net", "erc.unconnected_net"]
     assert {f["net"] for f in as_built["erc_findings"]} == {"VDD", "VSS"}
-    # more than rail + pin square on each: the supply S/D terminal fragments
-    # (generate.py "What is NOT drawn") are counted, not suppressed
+    # exactly two islands per supply: the connected internal rail network and the
+    # detached Metal2 boundary pin square (#108); zero isolated Metal1 D/S islands
     for net in ("VDD", "VSS"):
-        assert _islands(as_built, net) >= 3
+        assert _islands(as_built, net) == 2
         assert _unlabelled(as_built, net) == 0
+    for f in as_built["erc_findings"]:
+        assert [isl["layer"] for isl in f["islands"]] == ["metal4", "metal2"]
     for cov in ("skipped", "inapplicable"):
         assert as_built["erc_coverage"][cov] == []
 
