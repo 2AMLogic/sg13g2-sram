@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-# Mint the array-regularity evidence record (issue #160): run `klt array-check` on the committed
-# macro and on the 2x2 bitcell tile, then write layout/reports/array-check-macro.json. Nothing is
-# regenerated and no existing report is rewritten -- this reads the committed GDS only. Run from
-# anywhere:
+# Mint the array-regularity evidence record (issue #160) or check the committed one
+# (issue #247): run `klt array-check` on the committed macro and on the 2x2 bitcell
+# tile, then write layout/reports/array-check-macro.json -- or, with `--check`, leave
+# the committed record untouched and assert it still reproduces (both abutment
+# configurations clean, the symmetry characterization, every provenance input hash,
+# no home-directory-shaped absolute path). `layout/verify.sh` step 10 is exactly that
+# `--check` call: one script owns the invocations, the assertions and the exit-code
+# handling in both modes, so the mint and the check cannot drift apart. Nothing is
+# regenerated and no existing report is rewritten -- this reads the committed GDS
+# only. Run from anywhere:
 #
-#     ./layout/reports/generate-array-check.sh
+#     ./layout/reports/generate-array-check.sh            # mint the record
+#     ./layout/reports/generate-array-check.sh --check    # verify the committed record
 #
 # Records are append-only evidence: a re-run after a layout or klt change is a new result -- commit
 # it as such and say why in the commit message. In particular the record pins the sha256 of
@@ -29,6 +36,10 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
+
+MODE=""
+[[ "${1:-}" == "--check" ]] && { MODE="--check"; shift; }
+[[ $# -eq 0 ]] || { echo "usage: $0 [--check]" >&2; exit 2; }
 
 KLT_PIN="klayout-tools==0.9.1"
 K=(uvx --from "$KLT_PIN" klt)
@@ -61,15 +72,106 @@ run "$WORK/column.json"   "$WORK/bl_pair.gds"  --cell bitcell      --pitch 3.605
 run "$WORK/symmetry.json" "$WORK/bl_pair.gds"  --cell bl_pair      --translate '0,7.21' --layers '[[1,0],[5,0],[8,0],[10,0]]'
 run "$WORK/tile.json"     "$TILE"              --cell bitcell_leaf --pitch 2.87  --count 2   --direction x
 
+# scan exits 3 when it finds a home-directory-shaped absolute path; report that rather than
+# letting `set -e` abort silently.
+scan_ok() { # scan_ok <record.json>
+  local rc=0
+  "${K[@]}" env-provenance scan "$1" > /dev/null || rc=$?
+  if [ "$rc" -eq 0 ]; then
+    echo "PASS: no home-directory-shaped absolute path in $1"
+  else
+    echo "FAIL: $1 carries a home-directory-shaped absolute path:" >&2
+    "${K[@]}" env-provenance scan "$1" || true
+    return 1
+  fi
+}
+
+if [ -n "$MODE" ]; then
+python3 -I - "$WORK" "$OUT" <<'CHEOF'
+import hashlib, json, sys
+
+work, out = sys.argv[1:3]
+load = lambda n: json.load(open(f"{work}/{n}.json"))
+rec = json.load(open(out))
+inv = {i["name"]: i for i in rec["invocations"]}
+
+# The two abutment configurations are assertions: a non-clean status fails the check. Their
+# tolerances are the measured shared-edge overlap of mirror abutment, not slack -- read the
+# tolerance_rationale in the record before touching them.
+for n, name in (("slice", "macro-slice-abutment"), ("column", "macro-column-abutment")):
+    st = load(n)["status"]
+    if st != "clean":
+        sys.exit(f"FAIL: abutment {name} reports status '{st}', expected clean")
+    print(f"PASS: abutment {name} is clean")
+
+# The symmetry run is a *characterized* result, not a pass: 8 residuals at the finite-array end
+# and at seam 0, both documented in the record. Assert the recorded count and y bands so a change
+# that breaks interior symmetry fails here instead of being absorbed. Do NOT raise --tolerance
+# to make this report clean.
+want = inv["column-translation-symmetry"]["characterization"]
+got = load("symmetry")
+bands = [tuple(b) for b in want["y_bands_um"]]
+if got["violation_count"] != want["residual_count"]:
+    sys.exit(f"FAIL: {got['violation_count']} symmetry residuals, record says {want['residual_count']}"
+             " -- interior symmetry may have changed; mint a new record deliberately,"
+             " do not retune tolerance")
+stray = [v["bbox"] for v in got["violations"]
+         if not any(lo - 1e-6 <= v["bbox"]["bottom"] and v["bbox"]["top"] <= hi + 1e-6
+                    for lo, hi in bands)]
+if stray:
+    sys.exit(f"FAIL: {len(stray)} symmetry residual(s) outside the recorded y bands {bands}: {stray}")
+print(f"PASS: {got['violation_count']} symmetry residuals, all within the recorded y bands {bands}"
+      " (finite-array end + seam 0)")
+
+# Every provenance input hash must match: the committed GDS files directly, and the derived
+# bl_pair clip re-clipped from the committed macro.gds by this very run. provenance.klayout_version
+# is deliberately not compared: it floats when PyPI ships a newer klayout wheel under
+# uvx --from klayout-tools==0.9.1.
+for path, want_hash in rec["provenance"]["inputs"].items():
+    p = f"{work}/bl_pair.gds" if path.startswith("(derived)") else path
+    got = "sha256:" + hashlib.sha256(open(p, "rb").read()).hexdigest()
+    if got != want_hash:
+        sys.exit(f"FAIL: {path} differs from {out}"
+                 " -- the array changed, so mint a new record (records are append-only)")
+print(f"PASS: {out} pins the committed GDS inputs (including the derived bl_pair clip)")
+CHEOF
+scan_ok "$OUT"
+echo "PASS: $OUT reproduces against the committed inputs (generate-array-check.sh --check)"
+exit 0
+fi
+
 "${K[@]}" env-provenance emit --path macro="$MACRO" --path tile="$TILE" --format json > "$WORK/env.json"
 
-python3 -I - "$WORK" "$MACRO" "$TILE" "$KLT_PIN" <<'PYEOF' > "$OUT"
+# Mint to a temp file and scan it before replacing the committed record -- a failed or dirty
+# mint must not touch it (same contract as generate-erc-macro.sh).
+python3 -I - "$WORK" "$MACRO" "$TILE" "$KLT_PIN" <<'PYEOF' > "$WORK/record.json"
 import hashlib, json, sys
 
 work, macro, tile, pin = sys.argv[1:5]
 sha = lambda p: "sha256:" + hashlib.sha256(open(p, "rb").read()).hexdigest()
 load = lambda n: json.load(open(f"{work}/{n}.json"))
 env = load("env")
+
+SYM_COUNT = 8
+SYM_BANDS = [[7.065, 7.355], [461.440, 461.585]]
+
+# Mint-time assertions (issue #247): check the run results against the expectations this record
+# stamps before writing it, so an abutment or interior-symmetry regression fails the mint instead
+# of being recorded as if expected.
+for n, name in (("slice", "macro-slice-abutment"), ("column", "macro-column-abutment")):
+    st = load(n)["status"]
+    if st != "clean":
+        sys.exit(f"FAIL: abutment {name} reports status '{st}', expected clean")
+sym = load("symmetry")
+if sym["violation_count"] != SYM_COUNT:
+    sys.exit(f"FAIL: {sym['violation_count']} symmetry residuals, expected {SYM_COUNT}"
+             " -- interior symmetry may have changed; mint deliberately, do not retune tolerance")
+stray = [v["bbox"] for v in sym["violations"]
+         if not any(lo - 1e-6 <= v["bbox"]["bottom"] and v["bbox"]["top"] <= hi + 1e-6
+                    for lo, hi in SYM_BANDS)]
+if stray:
+    sys.exit(f"FAIL: {len(stray)} symmetry residual(s) outside the characterized y bands"
+             f" {SYM_BANDS}: {stray}")
 
 # The clipped column is a derived intermediate in a mktemp dir; klt records its absolute path in
 # `file`. Replace that with a stable logical name so the record is byte-for-byte reproducible, and
@@ -126,8 +228,8 @@ invocations = [
                        " this reports clean would mask a future break of interior symmetry. The"
                        " residual count and the two bands are the regression guard.",
         "characterization": {
-            "residual_count": 8,
-            "y_bands_um": [[7.065, 7.355], [461.440, 461.585]],
+            "residual_count": SYM_COUNT,
+            "y_bands_um": SYM_BANDS,
             "by_layer": {"1/0": 2, "8/0": 4, "10/0": 2, "5/0": 0},
             "why_not_a_defect": [
                 "y 7.065..7.355 is the finite-array end: under a +7.21 um shift no partner geometry"
@@ -215,5 +317,6 @@ print(json.dumps({
     },
 }, indent=2))
 PYEOF
-
+scan_ok "$WORK/record.json"
+mv "$WORK/record.json" "$OUT"
 echo "record written to $OUT"
