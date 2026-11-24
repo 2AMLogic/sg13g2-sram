@@ -5,6 +5,11 @@ triage agent. Newest first.
 
 ### 2026-11-24
 
+- **PR #261**: docs: correct DRC rules-checked count in ROADMAP item 3 to 48
+- **Issue #260** (closed): ROADMAP.md item-3 rule count is stale against drc-macro.json (says 42, record says 43)
+- **PR #258**: layout: remove superseded generate-macro-blbm.sh report script
+- **Issue #255** (closed): Remove generate-macro-blbm.sh: superseded record script that would overwrite its own evidence
+- **Issue #245** (closed): WORK_PLAN.md *(held)* markers are not reproducible from the checked-in Guide generator
 - **PR #254**: fix: skip # comment lines in both python TABLE parsers like the bash arm
 - **Issue #253** (closed): generate-array-check.sh: the TABLE python parsers crash on a comment line the bash parser tolerates
 - **PR #252**: fix: verify recorded array-check commands and by_layer residuals in --check
