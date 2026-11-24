@@ -3,6 +3,17 @@
 Chronological record of merged PRs and closed issues, maintained by the Guide
 triage agent. Newest first.
 
+### 2026-11-24
+
+- **PR #254**: fix: skip # comment lines in both python TABLE parsers like the bash arm
+- **Issue #253** (closed): generate-array-check.sh: the TABLE python parsers crash on a comment line the bash parser tolerates
+- **PR #252**: fix: verify recorded array-check commands and by_layer residuals in --check
+- **Issue #249** (closed): generate-array-check.sh --check does not verify the record's documented invocation args or summary against the live run
+- **PR #248**: fold verify.sh array-check re-runs into generate-array-check.sh --check
+- **Issue #247** (closed): Consolidate duplicated klt array-check runs between layout/verify.sh and generate-array-check.sh
+- **PR #246**: feat: route periphery supply D/S pads to their assigned supply rails
+- **Issue #231** (closed): Route isolated periphery source and drain pads to their supply rails
+
 ### 2026-11-23
 
 - **PR #236**: layout: add macro supply spec, as-built klt erc report and negative controls
