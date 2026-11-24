@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-11-24
 
+- **PR #265**: docs: sync ROADMAP item 3 DRC rule count to 43
+- **Issue #262** (closed): ROADMAP.md item-3 rule count will go stale again when PR #259 merges (48 -> 43), and nothing owns the re-sync
 - **PR #259**: layout: mint drc-macro.json at the released 0.9.2 pin via a generator
 - **Issue #251** (closed): Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list
 - **PR #261**: docs: correct DRC rules-checked count in ROADMAP item 3 to 48
