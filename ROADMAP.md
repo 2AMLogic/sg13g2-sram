@@ -17,7 +17,7 @@ record: **5 of 11 T1 items met, `tier: null`.**
 |---|---|---|
 | 1 Design sources | met | `design/` schematics and netlists up to `design/macro/macro.spice`; `attest/item1.envelope.json` (#24) |
 | 2 Layout | met | generated `layout/sram_256x32/macro.gds`, LEF, socket; `attest/item2.envelope.json` (#27, #28) |
-| 3 DRC clean | met | `layout/reports/drc-macro.json`: clean, 42 rules checked, 20 skipped for lack of geometry, coverage gaps listed in `layout/README.md` (#29) |
+| 3 DRC clean | met | `layout/reports/drc-macro.json`: clean, 48 rules checked, 20 skipped for lack of geometry, coverage gaps listed in `layout/README.md` (#29) |
 | 4 LVS clean | unmet | macro is partly routed, so not LVS-able (#30) |
 | 5 Corners vs a ratified spec | unmet | 45-corner records exist (`sim/bitcell/records/`, `sim/array/records/`) but `spec/sram.md` is Proposed, not ratified |
 | 6 Monte Carlo | unmet | no campaign recorded (#68) |
