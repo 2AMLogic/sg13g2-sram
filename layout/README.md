@@ -26,6 +26,7 @@ The same rule removed the per-stage scripts whose records no longer match the co
 - `generate-macro-leafnets.sh`: `git show bb986a3:layout/reports/generate-macro-leafnets.sh`
 - `generate-macro-latchnets.sh`: `git show a1d6291:layout/reports/generate-macro-latchnets.sh`
 - `generate-macro-decoder.sh`: `git show 50289f1:layout/reports/generate-macro-decoder.sh` (superseded by `generate-macro-blbm.sh`; its #105 record stays as evidence of that older layout)
+- `generate-macro-blbm.sh`: `git show 58a3959:layout/reports/generate-macro-blbm.sh` (superseded by `generate-macro-supply-terminals.sh`; its #159 record stays as evidence of that older layout)
 
 Friction filed: 2AMLogic/klayout-tools#4605 (`.include` path with a hyphen truncated in `klt lvs`; the tile reference is inlined as a workaround).
 
@@ -225,8 +226,7 @@ The latest record (issue #231, `layout/reports/macro-record-supply-terminals.jso
 `layout/reports/generate-macro-supply-terminals.sh`) joins all 1,038 VDD and 620 VSS periphery
 supply D/S pads to their assigned supply rails (`net_count` 20,288 -> 18,630; `erc-macro.json`
 islands 1,040 -> 2 on VDD and 622 -> 2 on VSS, leaving only each supply's internal rail network and
-detached boundary pin square, #108). The #159 record (`layout/reports/macro-record-blbm.json`, minted by
-`layout/reports/generate-macro-blbm.sh`) joined the column mux's `BLBM`, the last undrawn leaf-cell
+detached boundary pin square, #108). The #159 record (`layout/reports/macro-record-blbm.json`) joined the column mux's `BLBM`, the last undrawn leaf-cell
 net (#104 left it undrawn: the bit-line jogs and lanes left it no Metal3 crossing; `route_bitlines`
 now keeps every jog clear of each `BLBM` terminal band before the jogs are placed, and `route_leaf`
 joins the net in the freed Metal3 under the jog lane). All twelve leaf cells total 54 routed
