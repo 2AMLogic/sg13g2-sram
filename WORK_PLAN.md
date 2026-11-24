@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-24T12:30:00Z (snapshot; compare against live labels)_
+_Generated: 2026-11-24T13:30:00Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -40,7 +40,6 @@ Human-approved issues (`loom:issue`) ready for implementation — excluding held
 - **#72**: spec: internal inconsistencies in sram.md text
 - **#74**: spec: no area target, min-clock-pulse, power or retention rows
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
-- **#251**: Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list
 
 ## In Progress
 
@@ -49,8 +48,7 @@ Issues currently being built (`loom:building`).
 - **#69**: spec: confirm the 1 ns write-pulse window
 - **#71**: spec: write-margin definition under-specified
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins
-- **#245**: WORK_PLAN.md *(held)* markers are not reproducible from the checked-in Guide generator
-- **#253**: generate-array-check.sh: the TABLE python parsers crash on a comment line the bash parser tolerates
+- **#251**: Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list
 
 ## PRs Awaiting Review
 
@@ -65,7 +63,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#259**: layout: mint drc-macro.json at the released 0.9.2 pin via a generator
 
 ## Proposed
 
@@ -83,9 +81,7 @@ Issues carrying `loom:curated`.
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
 - **#230**: T1 item 6, pilot: size the write-margin Monte Carlo cost at small n and move the level search onto klt's built-in bisection (feeds the #68 budget decision) *(curated)* *(held)*
-- **#245**: WORK_PLAN.md *(held)* markers are not reproducible from the checked-in Guide generator *(curated)*
 - **#251**: Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list *(curated)*
-- **#253**: generate-array-check.sh: the TABLE python parsers crash on a comment line the bash parser tolerates *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -102,11 +98,11 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 7 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 6 |
-| In Progress (`loom:building`) | 5 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 5 |
+| In Progress (`loom:building`) | 4 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 15 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 13 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
