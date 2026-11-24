@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-24T13:30:00Z (snapshot; compare against live labels)_
+_Generated: 2026-11-24T14:40:00Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -48,7 +48,6 @@ Issues currently being built (`loom:building`).
 - **#69**: spec: confirm the 1 ns write-pulse window
 - **#71**: spec: write-margin definition under-specified
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins
-- **#251**: Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list
 
 ## PRs Awaiting Review
 
@@ -63,7 +62,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#259**: layout: mint drc-macro.json at the released 0.9.2 pin via a generator
+_None._
 
 ## Proposed
 
@@ -81,7 +80,6 @@ Issues carrying `loom:curated`.
 - **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface *(curated)*
 - **#208**: Re-vendor build-osdi.sh at the new owner hash and read pins from --print-pins *(curated)*
 - **#230**: T1 item 6, pilot: size the write-margin Monte Carlo cost at small n and move the level search onto klt's built-in bisection (feeds the #68 budget decision) *(curated)* *(held)*
-- **#251**: Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -99,10 +97,10 @@ _None._
 | Very important | 1 |
 | Important | 7 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 5 |
-| In Progress (`loom:building`) | 4 |
+| In Progress (`loom:building`) | 3 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 13 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 12 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
 <!-- guide:plan-body:end -->
