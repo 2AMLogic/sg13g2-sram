@@ -197,30 +197,39 @@ it, and `RAIL_LANE_PITCH` (4 um, the rail lane pitch) is named apart from `LANE_
 
 ### Macro DRC (issue #29, T1 item 3)
 
-`klt drc --deck sg13g2 --top macro layout/sram_256x32/macro.gds` ->
-`layout/reports/drc-macro.json`: `status: clean`, `violation_count: 0`, deck
-`sg13g2` hash `sha256:b2634caf6d96c00579ce3340e47a24b84d8671937d9886ff3aa92f7cdc539ea8`
-(`klayout_version_mismatch: false`), input hash `sha256:abf46bc3…bbcf00`, the macro with every leaf-cell
+`layout/reports/drc-macro.json`, minted by `layout/reports/generate-drc-macro.sh`
+(issue #251) with **released `klayout-tools==0.9.2` through `uvx`** — the signoff pin
+(`KLT_VERSION` in `.github/workflows/signoff.yml`; `ci.yml` pins the same value), never
+the host klt, whose dev build ships an unreleased deck (that is how #246's record
+drifted — see the history note below): `status: clean`, `violation_count: 0`, deck
+`sg13g2` hash `sha256:cf6dfeadf75bd95bf89beb0a64e06ed43b65f6ff782df10ae200ea200a73d8e9`
+(released, v0.9.2), input hash `sha256:abf46bc3…bbcf00`, the macro with every leaf-cell
 signal net (#159) and every periphery supply D/S pad (#231) routed (plus the array interface
 wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply rails on
 Metal4/Metal5/Via3/Via4). **This is a clean DRC of what is drawn**: inter-block signal
 routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
-**Provenance note (2026-11-17): this record alone carries
-`provenance.klayout_version_mismatch: true`.** It was minted by klt
-`0.9.3.dev234+g5ed4e55b`, which expects klayout 0.30.12, against a host klayout
-**0.30.13** (measured with `klt version --format json` on the worker,
-2026-11-17). The verdict is unaffected — `status: clean`, `violation_count: 0`,
-and `klt drc --check` reports `match` (hash binding; `verify.sh` step 8 runs
-this cheap mode) — but per klt's own warning the report counts, deck content
-hash and `rules_skipped` may differ from a record minted under the expected
-engine, even for an unchanged layout (the input hash above still binds this
-GDS). Whoever next re-mints a DRC/LVS record after the worker pins are matched
-should expect that churn and attribute it to the toolchain, not to the layout.
-The cause is a worker-image skew — klayout resolving ahead of the version the
-pinned klt expects; the fix (pin the two together) is pending in `2AMLogic/2am`
-`infra/aws/loom-worker/` (tracked as 2am#7369), and host tools are not changed
-from this repo (issue #195).
+**Provenance note (2026-11-24, #251): minted at the signoff pin;
+`provenance.klayout_version_mismatch: true`.** `uvx` resolves the klayout wheel
+fresh, so the pin's engine floats ahead of the klayout this klayout-tools build
+was tested against (minted under klayout **0.30.14** vs tested 0.30.12). The
+verdict is unaffected — `status: clean`, `violation_count: 0`, and `klt drc
+--check` at the same pin reports `match` (hash binding; `verify.sh` step 8 runs
+this cheap mode at the pin) — but per klt's own warning the report counts, deck
+content hash and `rules_skipped` may differ from a record minted under the
+tested engine, even for an unchanged layout (the input hash above still binds
+this GDS). The float is the repo's established pin policy —
+`generate-array-check.sh` carries the same caveat for its record — so a re-run
+after PyPI ships a newer klayout wheel can change that one provenance field.
+
+Record history: the 2026-11-17 record (host klt `0.9.3.dev234`, released deck,
+`klayout_version_mismatch: true` from a host-klayout skew) and #246's re-mint
+(host klt `0.9.3.dev5094`, **unreleased** deck `b2634caf…539ea8`, hash-bound to
+the same GDS) were both minted with whatever klt the worker had on PATH; #251
+replaced them with this pinned, released-deck record so the evidence is
+reproducible from the pin by anyone. The worker-image skew behind the original
+mismatch (klayout resolving ahead of the pinned klt) is tracked as 2am#7369;
+host tools are not changed from this repo (issue #195).
 
 The latest record (issue #231, `layout/reports/macro-record-supply-terminals.json`, minted by
 `layout/reports/generate-macro-supply-terminals.sh`) joins all 1,038 VDD and 620 VSS periphery
@@ -246,11 +255,19 @@ The supply rails (#102) were first drawn with four `metal2.width.1` violations (
 its tie pad by 0.045 um left a sliver); the stub now keeps `M2.b` clear of its own pad or merges with
 it, and the rerun is clean. `macro-record-routed.json` records the macro before the rails and is not rewritten.
 
-Coverage, quoted from the report's `coverage` block:
+Coverage, quoted from the report's `coverage` block (released 0.9.2 deck; #246's
+host-build record on the unreleased deck checked 48 rules and named five more
+`deck_scope` chapters — the upper-landing containment rules
+`metal1.enclosing.cont.1`, `metal2.enclosing.via1.1`, `metal3.enclosing.via2.1`,
+`metal4.enclosing.via3.1`, `metal5.enclosing.via4.1` exist only in that deck, its
+`x` chapter is renamed `Offgrid`, and it lists `pSD.c`/`c1`/`d`/`d1` as unchecked
+where the 0.9.2 deck does not name them at all — a disclosed deck difference, not
+a layout regression):
 
 - `layers_in_stream_without_rules`: `5/1`, `8/25`, `10/25`, `67/25`, `189/4`
 - `deck_scope`: `Act`, `Cnt`, `Gat`, `M1`, `M2`, `M3`, `M4`, `M5`, `MIM`, `NW`,
-  `TM1`, `TM2`, `TV1`, `TV2`, `V1`, `V2`, `V3`, `V4`, `pSD`
+  `TM1`, `TM2`, `TV1`, `TV2`, `V1`, `V2`, `V3`, `V4`, `pSD`, `x` (the 0.9.2
+  deck's unnamed chapter label, quoted verbatim)
 - `rules_skipped` (20, all `no_applicable_geometry` under `inapplicable`):
   `metal5.enclosing.mim.1`, `metal5.enclosing.topvia1.1`, `mim.enclosing.topvia1.1`,
   `nwell.enclosing.nactiv.1`, `nwell.enclosing.nactiv.dig.1`,
@@ -258,13 +275,18 @@ Coverage, quoted from the report's `coverage` block:
   `nwell.space.nactiv.hv.1`, `topmetal1.enclosing.topvia1.1`,
   `topmetal1.enclosing.topvia2.1`, `topmetal1.space.1`, `topmetal1.width.1`,
   `topmetal2.enclosing.topvia2.1`, `topmetal2.space.1`, `topmetal2.width.1`,
-  `topvia1.space.1`, `topvia1.width.1`, `topvia2.space.1`, `topvia2.width.1`.
+  `topvia1.space.1`, `topvia1.width.1`, `topvia2.space.1`, `topvia2.width.1`
+- `unchecked_rules` (1): `NW.b1` — the minimum PWell width between NWell regions
+  of different nets (1.80 um) is net-aware and this engine has no net-aware
+  spacing check, so wells on different nets closer than 1.80 um are not flagged;
+  only the geometric `nwell.space.1` (0.62 um) ran.
 
-The other 42 rules were checked (`rules_checked`), including Metal1-Metal5
+The other 43 rules were checked (`rules_checked`), including Metal1-Metal5
 width/space, Via1-Via4 width/space, Via/Metal enclosure up to Via4 and the NWell-to-P+ Activ
 rules. Unchecked as a result: TopMetal1/2, MIM, TopVia1/2, the NWell-to-N+ Activ rules (no
-geometry), and every density, antenna and latch-up rule (the deck carries none; `unmodeled_rules`
-lists LU.* and Pad.*). Periphery devices use bitcell-derived rule constants.
+geometry), `NW.b1` (net-aware, above), and every density, antenna and latch-up rule (the deck
+carries none; `unmodeled_rules` lists LU.* and Pad.*). Periphery devices use bitcell-derived
+rule constants.
 
 ### Array regularity (issue #160)
 

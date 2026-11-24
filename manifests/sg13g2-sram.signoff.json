@@ -771,7 +771,6 @@
           "deck_scope": [
             "Act",
             "Cnt",
-            "Cont upper-landing containment (curated)",
             "Gat",
             "M1",
             "M2",
@@ -780,7 +779,6 @@
             "M5",
             "MIM",
             "NW",
-            "Offgrid",
             "TM1",
             "TM2",
             "TV1",
@@ -789,11 +787,8 @@
             "V2",
             "V3",
             "V4",
-            "Via1 upper-landing containment (curated)",
-            "Via2 upper-landing containment (curated)",
-            "Via3 upper-landing containment (curated)",
-            "Via4 upper-landing containment (curated)",
-            "pSD"
+            "pSD",
+            "x"
           ]
         }
       }
