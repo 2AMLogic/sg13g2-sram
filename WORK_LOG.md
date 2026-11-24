@@ -5,6 +5,8 @@ triage agent. Newest first.
 
 ### 2026-11-24
 
+- **PR #259**: layout: mint drc-macro.json at the released 0.9.2 pin via a generator
+- **Issue #251** (closed): Macro DRC evidence of record is minted against an unreleased deck, and four pSD rules moved into the coverage-gap list
 - **PR #261**: docs: correct DRC rules-checked count in ROADMAP item 3 to 48
 - **Issue #260** (closed): ROADMAP.md item-3 rule count is stale against drc-macro.json (says 42, record says 43)
 - **PR #258**: layout: remove superseded generate-macro-blbm.sh report script
