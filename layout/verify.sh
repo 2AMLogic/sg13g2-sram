@@ -83,7 +83,14 @@ klt socket-check --socket $D/macro.socket.json $D/macro.gds
 
 hr "8. macro: DRC of the full array (klt drc --deck sg13g2; coverage gaps are in the report)"
 klt drc --deck sg13g2 --top macro $D/macro.gds
-klt drc --check layout/reports/drc-macro.json
+# The record check runs at the signoff pin (the report's provenance), never whichever
+# klt is on PATH: --check's cheap mode re-hashes the deck from the running klt, and the
+# record is minted by generate-drc-macro.sh against the pin's released deck (#251) -- a
+# dev-build host klt ships a different deck and would report drift that is the tool's,
+# not the layout's (same pattern as step 12).
+KLT_PIN="$(sed -n 's/^  KLT_VERSION: "\(.*\)"$/\1/p' .github/workflows/signoff.yml)"
+[ -n "$KLT_PIN" ] || { echo "cannot read KLT_VERSION from .github/workflows/signoff.yml"; exit 1; }
+uvx --from "klayout-tools==$KLT_PIN" klt drc --check layout/reports/drc-macro.json
 
 hr "9. macro: the latest (supply-terminal routing, issue #231) record matches the committed layout; every tie, periphery supply D/S pad and riser reaches its rail; no rail below Metal4 in the wordline gap"
 python3 - <<'PYEOF'

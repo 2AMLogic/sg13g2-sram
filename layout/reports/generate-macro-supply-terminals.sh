@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Mint the periphery supply-terminal routing evidence record (issue #231): regenerate the
 # macro GDS, socket descriptor and LEF, re-mint layout/reports/erc-macro.json against the
-# committed supply spec, and write layout/reports/macro-record-supply-terminals.json.
+# committed supply spec and layout/reports/drc-macro.json at the signoff pin
+# (generate-drc-macro.sh, #251), and write layout/reports/macro-record-supply-terminals.json.
 # Earlier records (macro-record.json through macro-record-blbm.json) pin earlier GDS
 # hashes and are append-only evidence -- they are not rewritten. `layout/verify.sh` step 9
 # reads this record. Run from anywhere:
@@ -44,8 +45,11 @@ klt socket-check --socket $D/macro.socket.json $D/macro.gds --format json > "$WO
 klt lef-abstract $D/macro.gds --socket $D/macro.socket.json --macro-name macro \
   --cell-library sg13g2_stdcell --pdk ihp-sg13g2 --obs-mode coarse -o $D/macro.lef --format json > "$WORK/lef.json"
 klt extract --deck sg13g2 $D/macro.gds -o "$WORK/extracted.spice" --format json > "$WORK/extract.json"
-klt drc --deck sg13g2 --top macro $D/macro.gds --format json > "$WORK/drc.json" || true
-cp "$WORK/drc.json" layout/reports/drc-macro.json
+# drc-macro.json is minted by its own generator at the signoff pin (#251): the
+# committed record must cite the released deck the pin ships, never whichever
+# (possibly dev-build) klt is on PATH -- the mint asserts clean, released and
+# input-bound before replacing the committed report.
+./layout/reports/generate-drc-macro.sh
 ./layout/reports/generate-erc-macro.sh
 
 python3 - "$WORK" <<'PYEOF' > "$WORK/record.json"
@@ -56,7 +60,7 @@ sha = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
 lef = json.load(open(f"{w}/lef.json"))
 sock = json.load(open(f"{w}/socket.json"))
 ext = json.load(open(f"{w}/extract.json"))
-drc = json.load(open(f"{w}/drc.json"))
+drc = json.load(open("layout/reports/drc-macro.json"))
 erc = json.load(open("layout/reports/erc-macro.json"))
 an = json.load(open(f"{w}/analysis.json"))
 deck = json.loads(subprocess.run(["klt", "deck", "info", "--deck", "sg13g2", "--format", "json"],
