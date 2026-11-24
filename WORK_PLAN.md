@@ -6,7 +6,7 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-23T10:08:37Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T18:13:37Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -63,7 +63,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#236**: layout: add macro supply spec, as-built klt erc report and negative controls
 
 ## Proposed
 
@@ -101,7 +101,7 @@ _None._
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 4 |
 | In Progress (`loom:building`) | 5 |
 | PRs awaiting review | 4 |
-| Approved PRs awaiting merge | 0 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 13 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 0 |
