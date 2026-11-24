@@ -226,8 +226,9 @@ The latest record (issue #231, `layout/reports/macro-record-supply-terminals.jso
 `layout/reports/generate-macro-supply-terminals.sh`) joins all 1,038 VDD and 620 VSS periphery
 supply D/S pads to their assigned supply rails (`net_count` 20,288 -> 18,630; `erc-macro.json`
 islands 1,040 -> 2 on VDD and 622 -> 2 on VSS, leaving only each supply's internal rail network and
-detached boundary pin square, #108). The #159 record (`layout/reports/macro-record-blbm.json`) joined the column mux's `BLBM`, the last undrawn leaf-cell
-net (#104 left it undrawn: the bit-line jogs and lanes left it no Metal3 crossing; `route_bitlines`
+detached boundary pin square, #108). The #159 record (`layout/reports/macro-record-blbm.json`)
+joined the column mux's `BLBM`, the last undrawn leaf-cell net (#104 left it undrawn: the bit-line
+jogs and lanes left it no Metal3 crossing; `route_bitlines`
 now keeps every jog clear of each `BLBM` terminal band before the jogs are placed, and `route_leaf`
 joins the net in the freed Metal3 under the jog lane). All twelve leaf cells total 54 routed
 nets, none undrawn; the eight `HIER_ROUTED` cells stay at 114 nets (none undrawn; supply and
