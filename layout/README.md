@@ -13,7 +13,7 @@ Bitcell layout for the SG13G2 6T SRAM (issue #27) and the macro layout generator
 | Generator tests (CI runs these: `layout-tests` in `ci.yml`; the slow macro tests in `layout-macro-tests.yml`, on `main` and PRs touching the macro) | `cd layout/bitcell && uv run --with pytest --with klayout pytest test_bitcell.py` |
 
 | Regenerate the macro GDS, socket descriptor | `uv run --with klayout python3 layout/sram_256x32/generate.py` |
-| Re-mint the current macro record (`macro-record-blbm.json`), socket and LEF (~15 min, runs `klt extract` and `klt drc`) | `./layout/reports/generate-macro-blbm.sh` |
+| Re-mint the current macro record (`macro-record-supply-terminals.json`), socket, LEF, DRC and ERC (~10 min, runs `klt extract`, `klt drc` and `klt erc`) | `./layout/reports/generate-macro-supply-terminals.sh` |
 | Regenerate the macro supply spec (`macro.supply.json`, from the generator constants) | `uv run --with klayout python3 layout/sram_256x32/supply_spec.py` |
 | Re-mint the as-built macro ERC report (`erc-macro.json`, pinned klt 0.9.2, ~20 s) | `./layout/reports/generate-erc-macro.sh` |
 
@@ -152,7 +152,7 @@ is the new record (`macro-record.json` is unchanged).
 It is **partly routed**. The array interface (wordlines, bit lines) is wired; every
 periphery transistor carries a body tie (n+ Activ in the PMOS well; p+ Activ in pSD for NMOS)
 with a Metal1 pad labelled with the netlist bulk net (#88 step 1, `macro-record-taps.json`); and
-every tie and every bitcell VDD/VSS riser reaches a VDD or VSS rail (#88 step 2, #92, re-planned
+every tie, every periphery supply D/S pad (#231, `macro-record-supply-terminals.json`) and every bitcell VDD/VSS riser reaches its VDD or VSS rail (#88 step 2, #92, re-planned
 in #102; `macro-record-rails.json`). Every signal net inside the periphery cells is routed
 (#104-#106, #105, #159: `macro-record-blbm.json`). The `VDD`/`VSS` pin squares are **not connected to the
 rails**, and there is no signal wiring between the blocks
@@ -198,11 +198,11 @@ it, and `RAIL_LANE_PITCH` (4 um, the rail lane pitch) is named apart from `LANE_
 
 `klt drc --deck sg13g2 --top macro layout/sram_256x32/macro.gds` ->
 `layout/reports/drc-macro.json`: `status: clean`, `violation_count: 0`, deck
-`sg13g2` hash `sha256:cf6dfeadf75bd95bf89beb0a64e06ed43b65f6ff782df10ae200ea200a73d8e9`
-(released, v0.9.2), input hash `sha256:e0a06f5f…cfbff6`, the macro with every leaf-cell
-signal net routed (issue #159 joined the last one, the column mux's `BLBM`; the array interface
+`sg13g2` hash `sha256:b2634caf6d96c00579ce3340e47a24b84d8671937d9886ff3aa92f7cdc539ea8`
+(`klayout_version_mismatch: false`), input hash `sha256:abf46bc3…bbcf00`, the macro with every leaf-cell
+signal net (#159) and every periphery supply D/S pad (#231) routed (plus the array interface
 wordlines and bit lines on Metal2/Metal3/Via1/Via2, periphery body ties, supply rails on
-Metal4/Metal5/Via3/Via4 as well). **This is a clean DRC of what is drawn**: inter-block signal
+Metal4/Metal5/Via3/Via4). **This is a clean DRC of what is drawn**: inter-block signal
 routing and pin routing are not drawn (see above), so no rule is exercised on them.
 
 **Provenance note (2026-11-17): this record alone carries
@@ -221,15 +221,19 @@ pinned klt expects; the fix (pin the two together) is pending in `2AMLogic/2am`
 `infra/aws/loom-worker/` (tracked as 2am#7369), and host tools are not changed
 from this repo (issue #195).
 
-The latest record (issue #159, `layout/reports/macro-record-blbm.json`, minted by
-`layout/reports/generate-macro-blbm.sh`) joins the column mux's `BLBM`, the last undrawn leaf-cell
+The latest record (issue #231, `layout/reports/macro-record-supply-terminals.json`, minted by
+`layout/reports/generate-macro-supply-terminals.sh`) joins all 1,038 VDD and 620 VSS periphery
+supply D/S pads to their assigned supply rails (`net_count` 20,288 -> 18,630; `erc-macro.json`
+islands 1,040 -> 2 on VDD and 622 -> 2 on VSS, leaving only each supply's internal rail network and
+detached boundary pin square, #108). The #159 record (`layout/reports/macro-record-blbm.json`, minted by
+`layout/reports/generate-macro-blbm.sh`) joined the column mux's `BLBM`, the last undrawn leaf-cell
 net (#104 left it undrawn: the bit-line jogs and lanes left it no Metal3 crossing; `route_bitlines`
 now keeps every jog clear of each `BLBM` terminal band before the jogs are placed, and `route_leaf`
-joins the net in the freed Metal3 under the jog lane). All twelve leaf cells now total 54 routed
+joins the net in the freed Metal3 under the jog lane). All twelve leaf cells total 54 routed
 nets, none undrawn; the eight `HIER_ROUTED` cells stay at 114 nets (none undrawn; supply and
-wordline nets excluded); the macro DRC is still clean. The #105 record
-(`macro-record-decoder.json`) and every earlier one are append-only evidence of their own layouts
-and still list `BLBM` under `not_drawn`. Fan-out between blocks and pins are not drawn.
+wordline nets excluded); the macro DRC is still clean. The #159, #105
+(`macro-record-decoder.json`) and earlier records are append-only evidence of their own layouts.
+Fan-out between blocks and pins are not drawn.
 
 The first run was not clean: 522 `nwell.space.1` violations, the periphery packer
 put PMOS wells 0.5 um apart against the 0.62 um minimum (NW.b). Fixed in the
@@ -378,19 +382,20 @@ two findings, `erc.unconnected_net` for each supply, and **no** `islands`,
 
 | supply | islands | composition | owning issue |
 |---|---|---|---|
-| VDD | 1040 | 1 rail network (trunk label + riser + tie-pad labels) + 1 pin square + 1038 supply S/D terminal bars | pin square: #108; terminal bars: the #88 seam-4/5 routing chain (#95/#107/#108) |
-| VSS | 622 | 1 rail network + 1 pin square + 620 supply S/D terminal bars | same |
+| VDD | 2 | 1 rail network (trunk + lanes + risers + tie pads + 1038 periphery D/S pads) + 1 boundary pin square | pin square: #108 |
+| VSS | 2 | 1 rail network (trunk + lanes + risers + tie pads + 620 periphery D/S pads) + 1 boundary pin square | pin square: #108 |
 
-The terminal-bar islands are the disclosed "supply D/S terminals of the devices are not
-joined to the ties" (`generate.py`, *What is NOT drawn*): each carries a `VDD`/`VSS`
-Metal1 label and is electrically correct in silicon, but the joining metal is not drawn
-yet. `erc.missing_tie` is **clean** (every merged well shape, including the array's 64
+Before #231 (`macro.gds` `e0a06f5f…`, `macro-record-blbm.json`), the 1,038 VDD and 620 VSS
+periphery supply S/D terminal bars were isolated single-Metal1 islands (1,040 VDD and 622 VSS
+total islands); #231 joined them to their assigned supply rails (`macro-record-supply-terminals.json`),
+leaving zero isolated Metal1 D/S islands and only the detached Metal2 boundary pin square per
+supply (#108). `erc.missing_tie` is **clean** (every merged well shape, including the array's 64
 odd-seam n-well bands, has a tap reaching its supply), no `erc.supply_short`, no
 `erc.floating_gate`, unlabelled remainder 0 on both supplies.
 
 **Negative controls** (`erc_controls.py`, `test_erc_controls.py`, CI:
 `layout-macro-tests.yml`, local: `./layout/verify.sh` step 12): a variant with the VSS
-Metal5 trunk cut once (in the widest gap between its Via4 landings) reports VSS 623
+Metal5 trunk cut once (in the widest gap between its Via4 landings) reports VSS 3
 islands -- exactly one more -- with VDD, the unlabelled remainder and every tie unchanged;
 a variant with the bitcell n-well tie removed reports 64 `erc.missing_tie` findings on
 `nwell_vdd` (one per merged array well band) with the island picture unchanged; a variant

@@ -74,18 +74,23 @@
       "gatpoly.separation.activ.1",
       "gatpoly.space.1",
       "gatpoly.width.1",
+      "metal1.enclosing.cont.1",
       "metal1.enclosing.via1.1",
       "metal1.space.1",
       "metal1.width.1",
+      "metal2.enclosing.via1.1",
       "metal2.enclosing.via2.1",
       "metal2.space.1",
       "metal2.width.1",
+      "metal3.enclosing.via2.1",
       "metal3.enclosing.via3.1",
       "metal3.space.1",
       "metal3.width.1",
+      "metal4.enclosing.via3.1",
       "metal4.enclosing.via4.1",
       "metal4.space.1",
       "metal4.width.1",
+      "metal5.enclosing.via4.1",
       "metal5.space.1",
       "metal5.width.1",
       "nwell.enclosing.pactiv.1",
@@ -136,12 +141,33 @@
         "rule": "NW.b1",
         "layer": "31/0",
         "description": "NW.b1 (min. PWell width between NWell regions of different nets, 1.80 um) is net-aware and this engine has no net-aware spacing check; wells on different nets closer than 1.80 um are not flagged. Only the geometric nwell.space.1 (0.62 um) ran."
+      },
+      {
+        "rule": "pSD.c",
+        "layer": "14/0",
+        "description": "Minimum pSD enclosure of P+ Activ in NWell is 0.18 um."
+      },
+      {
+        "rule": "pSD.c1",
+        "layer": "14/0",
+        "description": "Minimum pSD enclosure of P+ Activ in PWell is 0.03 um."
+      },
+      {
+        "rule": "pSD.d",
+        "layer": "14/0",
+        "description": "Minimum pSD space to unrelated N+ Activ in PWell is 0.18 um."
+      },
+      {
+        "rule": "pSD.d1",
+        "layer": "14/0",
+        "description": "Minimum pSD spacing to N+ Activ in NWell is 0.03 um."
       }
     ],
     "marker_blind_layers_in_stream": [],
     "deck_scope": [
       "Act",
       "Cnt",
+      "Cont upper-landing containment (curated)",
       "Gat",
       "M1",
       "M2",
@@ -150,6 +176,7 @@
       "M5",
       "MIM",
       "NW",
+      "Offgrid",
       "TM1",
       "TM2",
       "TV1",
@@ -158,8 +185,11 @@
       "V2",
       "V3",
       "V4",
-      "pSD",
-      "x"
+      "Via1 upper-landing containment (curated)",
+      "Via2 upper-landing containment (curated)",
+      "Via3 upper-landing containment (curated)",
+      "Via4 upper-landing containment (curated)",
+      "pSD"
     ],
     "unmodeled_rules": [
       "LU.a",
@@ -190,18 +220,23 @@
       "gatpoly.separation.activ.1",
       "gatpoly.space.1",
       "gatpoly.width.1",
+      "metal1.enclosing.cont.1",
       "metal1.enclosing.via1.1",
       "metal1.space.1",
       "metal1.width.1",
+      "metal2.enclosing.via1.1",
       "metal2.enclosing.via2.1",
       "metal2.space.1",
       "metal2.width.1",
+      "metal3.enclosing.via2.1",
       "metal3.enclosing.via3.1",
       "metal3.space.1",
       "metal3.width.1",
+      "metal4.enclosing.via3.1",
       "metal4.enclosing.via4.1",
       "metal4.space.1",
       "metal4.width.1",
+      "metal5.enclosing.via4.1",
       "metal5.space.1",
       "metal5.width.1",
       "nwell.enclosing.pactiv.1",
@@ -311,21 +346,22 @@
     "nothing_checked": false,
     "nothing_checked_reasons": []
   },
+  "top": "macro",
   "provenance": {
-    "klt_version": "0.9.3.dev234+g5ed4e55bffbd",
-    "klt_git_commit": "5ed4e55bffbd1ff909b9b3331d23d21c0a21894f",
-    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@5ed4e55bffbd1ff909b9b3331d23d21c0a21894f",
+    "klt_version": "0.9.3.dev5094+g36b2431d2ee1",
+    "klt_git_commit": "36b2431d2ee13c25a510ede540c7adaee29aff2d",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@36b2431d2ee13c25a510ede540c7adaee29aff2d",
     "klayout_version": "0.30.13",
     "pdk": null,
     "deck": {
       "name": "sg13g2",
-      "content_hash": "sha256:cf6dfeadf75bd95bf89beb0a64e06ed43b65f6ff782df10ae200ea200a73d8e9",
-      "released": true
+      "content_hash": "sha256:b2634caf6d96c00579ce3340e47a24b84d8671937d9886ff3aa92f7cdc539ea8",
+      "released": false
     },
     "input": {
-      "content_hash": "sha256:e0a06f5f06a6b84ee053e4f8f3a5996d2a54681a78494083cc06192677cfbff6",
+      "content_hash": "sha256:abf46bc3386b691810b88bfad498738dc9c260b2fec498512bdaf52f97bbcf00",
       "role": "layout"
     },
-    "klayout_version_mismatch": true
+    "klayout_version_mismatch": false
   }
 }

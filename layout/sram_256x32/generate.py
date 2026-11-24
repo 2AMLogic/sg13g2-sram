@@ -65,12 +65,12 @@ enough apart to hold the track band.
 What is NOT drawn (disclosed, not hidden)
 -----------------------------------------
 No signal routing between blocks and none to the pins (#95): the fan-out between blocks (4) and the pins (5). The ``VDD``/``VSS`` pin squares are not
-connected to the rails, and the supply D/S terminals of the devices are not joined to the ties. Every leaf-cell net is drawn. The array
+connected to the rails (#108). Every leaf-cell net and every periphery supply D/S terminal (#231) is drawn. The array
 interface (wordlines, bit lines) is routed; the macro is placed, tapped and supplied, not fully
 signal-connected. LVS (#30) and power delivery checks (#31) are the checks that must be run once routing exists.
 
-Supply rails (issues #92, #102)
--------------------------------
+Supply rails (issues #92, #102, #231)
+-------------------------------------
 The decoder-to-array gap holds the wordline Metal2 lanes and Metal3 tracks, so no rail uses
 Metal1-Metal3 or Via1-Via3 there; only Metal4 crosses it.
 
@@ -85,7 +85,11 @@ Metal1-Metal3 or Via1-Via3 there; only Metal4 crosses it.
   lane of its net inside the same floorplan region (lanes every ``RAIL_LANE_PITCH``, VDD/VSS
   interleaved); lanes reach the trunk through a Via4. Where the Metal2 around a tie is taken by the leaf-cell
   nets, the stub leaves on Metal3 from a Via2 on the tie's pad, or is maze-routed (``tie_maze``) to a Via3 on
-  the lane; ``tie_wiring`` records which. Nothing below Metal4 enters the wordline gap.
+  the lane; ``tie_wiring`` records which. Each placed periphery D/S terminal whose resolved flat net in
+  ``macro.spice`` is ``VDD`` or ``VSS`` (across repeated instances, independent of device polarity) is joined to
+  its own device's tie on Metal1 when that tie shares the same supply net and Metal1 is clear, or else landed on
+  Via1/Metal2 and routed to a lane of its supply; ``ds_wiring`` records which. Nothing below Metal4 enters the
+  wordline gap.
 """
 
 from __future__ import annotations
@@ -160,8 +164,10 @@ PIN = 0.5  # um, macro pin square on Metal2
 PIN_PITCH = 1.0  # um between left-edge pins
 
 # ---- inter-block routing (rule values from `klt deck rules --deck sg13g2`) ----
+M1_MIN_W = 0.16  # M1.a: minimum Metal1 width
+M1_SPACE = 0.18  # M1.b: minimum Metal1 space or notch
 V1 = 0.19  # V1.a: Via1 is a fixed 0.19 square
-# V1.b spacing (0.22) is not enforced by the generator (unlike V2_SPACE, which is); klt drc checks it
+V1_SPACE = 0.22  # V1.b: minimum Via1 spacing (enforced on fallback supply landings; klt drc checks everywhere)
 M1_ENC_V1 = 0.01  # V1.c: Metal1 enclosure of Via1
 M1_V1_PAD = V1 + 2 * M1_ENC_V1  # 0.21: Metal1 landing pad for a Via1 on a 0.20 wire
 M2_W = 0.20  # M2.a
@@ -1449,10 +1455,14 @@ class Gen:
         ports = self.nl[TOP].ports
         sl_w = 2 * dbu(bc.W_CELL)
         bs = self.bit_slice()
+        self.place_of[TOP] = {}
+        inst_by_ref = {i.ref: i.name for i in self.nl[TOP].insts if not i.name.startswith("XS[")}
         for inst in self.nl[TOP].insts:
             m = re.fullmatch(r"XS\[(\d+)\]", inst.name)
             if m:
-                self.place(top, bs, int(m.group(1)) * sl_w, 0)
+                dx = int(m.group(1)) * sl_w
+                self.place(top, bs, dx, 0)
+                self.place_of[TOP][inst.name] = (dx, 0)
         col_bottom = bs.bbox().bottom
         arr_w = SLICES * sl_w
 
@@ -1468,7 +1478,8 @@ class Gen:
             assert dx % GRID == 0 and dy % GRID == 0
             self.place(top, ch, dx, dy)
             regions.append(bb.moved(dx, dy))
-            self.place_of.setdefault(TOP, {})[ref] = (dx, dy)
+            self.place_of[TOP][ref] = (dx, dy)
+            self.place_of[TOP][inst_by_ref[ref]] = (dx, dy)
             by += bb.height() + dbu(BLOCK_GAP)
 
         # bottom block: data latch and output latch under the column path
@@ -1481,6 +1492,8 @@ class Gen:
             assert dx % GRID == 0 and dy % GRID == 0
             self.place(top, ch, dx, dy)
             regions.append(bb.moved(dx, dy))
+            self.place_of[TOP][ref] = (dx, dy)
+            self.place_of[TOP][inst_by_ref[ref]] = (dx, dy)
             y -= bb.height() + dbu(BLOCK_GAP)
         regions.append(kdb.Box(0, bs.bbox().bottom, arr_w, self.colpath_top))  # the 32 column paths
 
@@ -1507,12 +1520,12 @@ class Gen:
         top.shapes(self.li(bc.L_PRBOUNDARY)).insert(top.bbox())
         return top
 
-    # ---- supply rails (issue #92) -------------------------------------------
+    # ---- supply rails (issues #92, #231) ------------------------------------
     def ties(self, top: kdb.Cell) -> list[dict]:
         """Centre of every periphery tie (Metal1/Via1/Metal2 pad) under ``top``, by netlist bulk net."""
         found: list[dict] = []
         dev = {c.cell_index(): ("VDD" if "pmos" in c.name else "VSS", pts["B"]) for c, pts in self.devs.values()}
-        skip = {self.cells["bitcell"].cell_index(), self.cells["bl_pair"].cell_index()}
+        skip = {self.cells[k].cell_index() for k in ("bitcell", "bl_pair") if k in self.cells}
 
         def walk(cell: kdb.Cell, t: kdb.Trans) -> None:
             for inst in cell.each_inst():
@@ -1530,6 +1543,56 @@ class Gen:
         walk(top, kdb.Trans())
         return found
 
+    def supply_ds(self, top_name: str = TOP) -> list[dict]:
+        """Placed periphery D/S terminals whose resolved flat net in ``self.nl`` is ``VDD`` or ``VSS`` (issue #231).
+
+        Walks every placed instance path (including repeated subcircuits) and uses the resolved flat net at each D and S
+        terminal rather than device polarity. Also records each device's body-tie coordinate and resolved bulk net so
+        ``rails`` can join to that tie on Metal1 only when both share the same supply net.
+        """
+        flat = flat_nets(self.nl, top=top_name)
+        term_supply: dict[tuple[str, str, str], str] = {}
+        for entry in flat.values():
+            supplies = {a.rsplit("/", 1)[-1] for a in entry["aliases"]} & set(SUPPLY_NETS)
+            assert len(supplies) <= 1, f"netlist shorts supplies together: {entry['aliases'][:4]}"
+            if supplies:
+                snet = next(iter(supplies))
+                for t in entry["terminals"]:
+                    term_supply[t] = snet
+
+        out: list[dict] = []
+
+        def walk(sub: str, path: tuple[str, ...], ox: int, oy: int) -> None:
+            for inst in self.nl[sub].insts:
+                if inst.ref in ("bitcell", "bl_pair"):
+                    continue
+                if inst.ref in DEVICE_REFS:
+                    pts = self.dev_pts[sub][inst.name]
+                    p_str = "/".join(path)
+                    b_net = term_supply.get((p_str, inst.name, "B"))
+                    bx = round(pts["B"][0] + ox * DBU, 3)
+                    by = round(pts["B"][1] + oy * DBU, 3)
+                    for term in ("D", "S"):
+                        snet = term_supply.get((p_str, inst.name, term))
+                        if snet in SUPPLY_NETS:
+                            out.append({
+                                "net": snet,
+                                "path": p_str,
+                                "device": inst.name,
+                                "term": term,
+                                "x": round(pts[term][0] + ox * DBU, 3),
+                                "y": round(pts[term][1] + oy * DBU, 3),
+                                "bx": bx,
+                                "by": by,
+                                "b_net": b_net,
+                            })
+                else:
+                    dx, dy = self.place_of[sub][inst.name]
+                    walk(inst.ref, path + (inst.name,), ox + dx, oy + dy)
+
+        walk(top_name, (), 0, 0)
+        return out
+
     def signal_boxes(self, top: kdb.Cell, lp, skip: list[kdb.DBox]) -> list[kdb.DBox]:
         """Flat boxes of a routing layer already in ``top``, minus the supply pads in ``skip`` (centre match)."""
         out: list[kdb.DBox] = []
@@ -1543,7 +1606,7 @@ class Gen:
             it.next()
         return out
 
-    def rails(self, top: kdb.Cell, regions: list[kdb.Box], arr_w: int) -> None:
+    def rails(self, top: kdb.Cell, regions: list[kdb.Box], arr_w: int, top_name: str = TOP) -> None:
         """Supply rails. Metal4 lanes run in free tracks, Metal5 trunks sit right of the array; nothing but
         Metal4 crosses the wordline fan-out gap, whose Metal2/Metal3 lanes and tracks belong to the signals."""
         rc = self.layout.create_cell("rails")
@@ -1563,23 +1626,24 @@ class Gen:
         # array straps: the Metal2 strap of each row seam continues right of the array to its trunk
         # (even seams VSS, odd seams VDD)
         seam_pads: dict[str, list[float]] = {"VDD": [], "VSS": []}
-        for k in range(ROWS + 1):
-            net = "VSS" if k % 2 == 0 else "VDD"
-            y = round(k * bc.H_CELL, 3)
-            tx = trunk_x[net]
-            if k == 0:  # Via2/Metal3/Via3 on each column's pad, a Metal4 strap along the seam to the trunk
-                xs0 = [(c + 1) * bc.W_CELL - bc.xc("pad_c") if c % 2 else c * bc.W_CELL + bc.xc("pad_c")
-                       for c in range(COLS)]
-                for xc0 in xs0:
-                    via(None, L_VIA2, L_METAL3, xc0, y)
-                    via(None, L_VIA3, L_METAL4, xc0, y)
-                self.box(rc, L_METAL4, min(xs0) - hp, y - hp, tx + hp, y + hp)
-            else:
-                self.box(rc, L_METAL2, arr_um, y - hp, tx + hp, y + hp)
-                via(None, L_VIA2, L_METAL3, tx, y)
-                via(None, L_VIA3, L_METAL4, tx, y)
-            self.box(rc, L_VIA4, tx - VIA / 2, y - VIA / 2, tx + VIA / 2, y + VIA / 2)
-            seam_pads[net].append(y)
+        if "bitcell" in self.cells:
+            for k in range(ROWS + 1):
+                net = "VSS" if k % 2 == 0 else "VDD"
+                y = round(k * bc.H_CELL, 3)
+                tx = trunk_x[net]
+                if k == 0:  # Via2/Metal3/Via3 on each column's pad, a Metal4 strap along the seam to the trunk
+                    xs0 = [(c + 1) * bc.W_CELL - bc.xc("pad_c") if c % 2 else c * bc.W_CELL + bc.xc("pad_c")
+                           for c in range(COLS)]
+                    for xc0 in xs0:
+                        via(None, L_VIA2, L_METAL3, xc0, y)
+                        via(None, L_VIA3, L_METAL4, xc0, y)
+                    self.box(rc, L_METAL4, min(xs0) - hp, y - hp, tx + hp, y + hp)
+                else:
+                    self.box(rc, L_METAL2, arr_um, y - hp, tx + hp, y + hp)
+                    via(None, L_VIA2, L_METAL3, tx, y)
+                    via(None, L_VIA3, L_METAL4, tx, y)
+                self.box(rc, L_VIA4, tx - VIA / 2, y - VIA / 2, tx + VIA / 2, y + VIA / 2)
+                seam_pads[net].append(y)
 
         ties = self.ties(top)
         tie_pads = [kdb.DBox(t["x"] - hp, t["y"] - hp, t["x"] + hp, t["y"] + hp) for t in ties]
@@ -1596,6 +1660,7 @@ class Gen:
         # Metal4 lanes: per region, per net (see lane_positions)
         lanes = lane_positions(regions, trunk_x, seam_pads)
         self.tie_wiring: list[dict] = []
+        self.ds_wiring: list[dict] = []
         state = RailState(rc)
 
         def tie_candidates(net: str, ri: int, x: float, y: float):
@@ -1612,12 +1677,8 @@ class Gen:
                         continue
                     yield ly, xs, dx
 
-        for t in ties:
-            net, x, y = t["net"], t["x"], t["y"]
-            ri = next((i for i, rb in enumerate(regions) if rb.contains(kdb.Point(dbu(x), dbu(y)))), None)
-            assert ri is not None, (net, x, y, [str(r) for r in regions])
-            # candidates: nearest lanes first, vertical stub straight up/down from the pad, else jogged
-            # sideways at the tie's own height (Metal2 horizontal, then vertical)
+        def connect_pad_to_lane(net: str, x: float, y: float, ri: int, wiring_out: list[dict]) -> bool:
+            """Connect a Metal2 supply pad at ``(x, y)`` in region ``ri`` to a Metal4 lane of ``net``."""
             chosen = None
             hw = STUB_W / 2
             for ly, xs, dx in tie_candidates(net, ri, x, y):
@@ -1646,8 +1707,8 @@ class Gen:
                 if chosen:
                     break
             if chosen is None:
-                # the Metal2 around the tie is taken by cell routing (issue #104): leave on Metal3 instead, from a
-                # Via2 on the tie's own Metal2 pad to a Via3 on the lane
+                # the Metal2 around the pad is taken by cell routing (issue #104): leave on Metal3 instead, from a
+                # Via2 on the Metal2 pad to a Via3 on the lane
                 chosen3 = None
                 for ly, xs, dx in tie_candidates(net, ri, x, y):
                     lo, hi = min(y, ly), max(y, ly)
@@ -1671,13 +1732,11 @@ class Gen:
                     via(None, L_VIA3, L_METAL4, xs, ly)
                     state.via2_at.setdefault((ri, net, ly), []).append(xs)
                     state.used.setdefault((ri, net), set()).add(ly)
-                    self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
-                                            "stub": "Metal3"})
-                    continue
-                if self.tie_maze(net, x, y, ri, rb_x=(regions[ri].left * DBU, regions[ri].right * DBU), lanes=lanes[(ri, net)],
-                                 obs=obs, state=state):
-                    continue
-                raise AssertionError(f"no clear Metal2 stub for {net} tie at ({x}, {y}); lanes {sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]}, region {ri}")
+                    wiring_out.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
+                                       "stub": "Metal3"})
+                    return True
+                return self.tie_maze(net, x, y, ri, rb_x=(regions[ri].left * DBU, regions[ri].right * DBU),
+                                     lanes=lanes[(ri, net)], obs=obs, state=state, wiring_out=wiring_out)
             ly, xs, parts = chosen
             for pt in parts:
                 self.box(rc, L_METAL2, pt.left, pt.bottom, pt.right, pt.top)
@@ -1688,9 +1747,173 @@ class Gen:
             obs.add_m3(pad3)
             state.via2_at.setdefault((ri, net, ly), []).append(xs)
             state.used.setdefault((ri, net), set()).add(ly)
-            self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
-                                    "stub": "Metal2"})
-        # lanes that serve at least one tie run on Metal4 out to the trunk of their net
+            wiring_out.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": xs, "region": ri,
+                               "stub": "Metal2"})
+            return True
+
+        for t in ties:
+            net, x, y = t["net"], t["x"], t["y"]
+            ri = next((i for i, rb in enumerate(regions) if rb.contains(kdb.Point(dbu(x), dbu(y)))), None)
+            assert ri is not None, (net, x, y, [str(r) for r in regions])
+            if not connect_pad_to_lane(net, x, y, ri, self.tie_wiring):
+                raise AssertionError(
+                    f"no clear Metal2 stub for {net} tie at ({x}, {y}); "
+                    f"lanes {sorted(lanes[(ri, net)], key=lambda ly: abs(ly - y))[:8]}, region {ri}"
+                )
+
+        # Periphery supply D/S pads (issue #231): join to the device's own routed tie on Metal1 when both share the
+        # same resolved supply net and Metal1 is clear; otherwise land on Via1/Metal2 and connect to a lane of the
+        # assigned supply.
+        lm1 = self.li(bc.L_METAL1)
+        lv1 = self.li(L_VIA1)
+        hw1 = dbu(bc.M1_W / 2)
+        m1_margin = dbu(M1_SPACE) + 10
+        v1_margin = dbu(VIA / 2 + V1_SPACE) + 5
+        pb = self.pre_rail_bb
+        same_m1_drawn: dict[str, list[kdb.Box]] = {"VDD": [], "VSS": []}
+
+        def m1_at(cx: float, cy: float) -> set[kdb.Box]:
+            px, py = dbu(cx), dbu(cy)
+            q = kdb.Box(px - 5, py - 5, px + 5, py + 5)
+            found_boxes: set[kdb.Box] = set()
+            it = top.begin_shapes_rec_overlapping(lm1, q)
+            while not it.at_end():
+                found_boxes.add(it.shape().bbox().transformed(it.trans()))
+                it.next()
+            return found_boxes
+
+        def m1_parts_clear(net: str, parts: list[kdb.Box], allow: set[kdb.Box]) -> bool:
+            if any(in_wl_gap(pt.left * DBU, pt.right * DBU) for pt in parts):
+                return False
+            if any(pt.left < pb.left or pt.bottom < pb.bottom or pt.top > pb.top for pt in parts):
+                return False
+            ub = parts[0]
+            for pt in parts[1:]:
+                ub += pt
+            it = top.begin_shapes_rec_touching(lm1, ub.enlarged(m1_margin, m1_margin))
+            same_touching: list[kdb.Box] = []
+            while not it.at_end():
+                ob = it.shape().bbox().transformed(it.trans())
+                if ob in allow:
+                    it.next()
+                    continue
+                if ob in same_m1_drawn[net] and any(pt.touches(ob) for pt in parts):
+                    same_touching.append(ob)
+                    it.next()
+                    continue
+                if any(pt.enlarged(m1_margin, m1_margin).overlaps(ob) for pt in parts):
+                    return False
+                it.next()
+            loc = kdb.Region()
+            for bx in list(parts) + list(allow) + same_touching:
+                loc.insert(bx)
+            loc.merge()
+            if loc.count() != 1:
+                return False
+            return loc.width_check(dbu(M1_MIN_W)).is_empty() and loc.notch_check(dbu(M1_SPACE)).is_empty()
+
+        for d in self.supply_ds(top_name):
+            net, x, y = d["net"], d["x"], d["y"]
+            ri = next((i for i, rb in enumerate(regions) if rb.contains(kdb.Point(dbu(x), dbu(y)))), None)
+            assert ri is not None, (net, x, y, d)
+            src_boxes = m1_at(x, y)
+            assert src_boxes, ("missing Metal1 D/S pad", d)
+
+            routed_m1 = False
+            if d["b_net"] == net:
+                bx, by = d["bx"], d["by"]
+                dst_boxes = m1_at(bx, by)
+                allow = src_boxes | dst_boxes
+                candidates_m1: list[list[kdb.Box]] = []
+                if abs(y - by) < 1e-6:
+                    candidates_m1.append([kdb.Box(min(dbu(x), dbu(bx)), dbu(y) - hw1, max(dbu(x), dbu(bx)), dbu(y) + hw1)])
+                for dy in (-0.55, 0.55, -0.65, 0.65, -0.75, 0.75, -0.85, 0.85):
+                    yj = snap(y + dy)
+                    candidates_m1.append([
+                        kdb.Box(dbu(x) - hw1, min(dbu(y), dbu(yj)) - hw1, dbu(x) + hw1, max(dbu(y), dbu(yj)) + hw1),
+                        kdb.Box(min(dbu(x), dbu(bx)) - hw1, dbu(yj) - hw1, max(dbu(x), dbu(bx)) + hw1, dbu(yj) + hw1),
+                        kdb.Box(dbu(bx) - hw1, min(dbu(by), dbu(yj)) - hw1, dbu(bx) + hw1, max(dbu(by), dbu(yj)) + hw1),
+                    ])
+                for m1_parts in candidates_m1:
+                    if m1_parts_clear(net, m1_parts, allow):
+                        for pt in m1_parts:
+                            rc.shapes(lm1).insert(pt)
+                            same_m1_drawn[net].append(pt)
+                        self.ds_wiring.append({
+                            "net": net,
+                            "path": d["path"],
+                            "device": d["device"],
+                            "term": d["term"],
+                            "x": x,
+                            "y": y,
+                            "tie_x": bx,
+                            "tie_y": by,
+                            "region": ri,
+                            "stub": "Metal1_tie",
+                        })
+                        routed_m1 = True
+                        break
+            if routed_m1:
+                continue
+
+            # Fallback when the device's bulk tie is on the opposite rail or Metal1 to it is obstructed:
+            # place a clear Metal1/Via1/Metal2 landing from (x, y) and connect it to a Metal4 lane of ``net``.
+            offsets = [(0.0, 0.0)] + [
+                (round(0.25 * ix, 3), round(0.25 * iy, 3))
+                for dist in range(1, 9)
+                for ix in range(-dist, dist + 1)
+                for iy in range(-dist, dist + 1)
+                if max(abs(ix), abs(iy)) == dist
+            ]
+            landed = False
+            for dx1, dy1 in offsets:
+                lx, ly1 = snap(x + dx1), snap(y + dy1)
+                pad2 = kdb.DBox(lx - hp, ly1 - hp, lx + hp, ly1 + hp)
+                if in_wl_gap(pad2.left, pad2.right) or pad2.left < pb.left * DBU or not obs.clear(net, pad2):
+                    continue
+                v1_q = kdb.Box(dbu(lx) - v1_margin, dbu(ly1) - v1_margin, dbu(lx) + v1_margin, dbu(ly1) + v1_margin)
+                if not top.begin_shapes_rec_overlapping(lv1, v1_q).at_end():
+                    continue
+                pad1 = kdb.Box(dbu(lx - hp), dbu(ly1 - hp), dbu(lx + hp), dbu(ly1 + hp))
+                m1_parts = [pad1]
+                if dx1:
+                    m1_parts.append(kdb.Box(min(dbu(x), dbu(lx)) - hw1, dbu(y) - hw1, max(dbu(x), dbu(lx)) + hw1, dbu(y) + hw1))
+                if dy1:
+                    m1_parts.append(kdb.Box(dbu(lx) - hw1, min(dbu(y), dbu(ly1)) - hw1, dbu(lx) + hw1, max(dbu(y), dbu(ly1)) + hw1))
+                if not m1_parts_clear(net, m1_parts, src_boxes):
+                    continue
+                obs.add(net, pad2)
+                lane_rec: list[dict] = []
+                if not connect_pad_to_lane(net, lx, ly1, ri, lane_rec):
+                    # remove tentative pad2 from obs if no lane route existed from this landing
+                    for cell_key in Obstacles.cells_of(pad2):
+                        obs.m2[cell_key].remove((net, pad2))
+                    continue
+                for pt in m1_parts:
+                    rc.shapes(lm1).insert(pt)
+                    same_m1_drawn[net].append(pt)
+                self.box(rc, L_VIA1, lx - VIA / 2, ly1 - VIA / 2, lx + VIA / 2, ly1 + VIA / 2)
+                self.box(rc, L_METAL2, lx - hp, ly1 - hp, lx + hp, ly1 + hp)
+                self.ds_wiring.append({
+                    "net": net,
+                    "path": d["path"],
+                    "device": d["device"],
+                    "term": d["term"],
+                    "x": x,
+                    "y": y,
+                    "land_x": lx,
+                    "land_y": ly1,
+                    "lane_y": lane_rec[0]["lane_y"],
+                    "lane_x": lane_rec[0]["lane_x"],
+                    "region": ri,
+                    "stub": f"Via1+{lane_rec[0]['stub']}",
+                })
+                landed = True
+                break
+            if not landed:
+                raise AssertionError(f"no clear supply landing/route for {net} D/S pad at ({x}, {y}): {d}")
+
+        # lanes that serve at least one tie or fallback D/S pad run on Metal4 out to the trunk of their net
         for (ri, net), ys in sorted(state.used.items()):
             rb = regions[ri]
             tx = trunk_x[net]
@@ -1706,16 +1929,17 @@ class Gen:
             self.text(rc, L_METAL5_LBL, net, tx, min(ys))
 
     def tie_maze(self, net: str, x: float, y: float, ri: int, rb_x: tuple[float, float], lanes: list[float],
-                 obs: Obstacles, state: RailState, reach: int = 0) -> bool:
+                 obs: Obstacles, state: RailState, reach: int = 0, wiring_out: list[dict] | None = None) -> bool:
         """Last resort for a tie whose straight stubs are blocked (issue #104): maze-route it on Metal2/Metal3 from its
         Metal2 pad to a Via3 on one of its net's Metal4 lanes, around everything already drawn. The search window grows
         (``TIE_MAZE_REACH``) where the decoder's cell nets leave no way out of the first one (issue #105)."""
         rx, ry = TIE_MAZE_REACH[reach]
+        target = self.tie_wiring if wiring_out is None else wiring_out
 
         def retry() -> bool:
             if reach + 1 == len(TIE_MAZE_REACH):
                 return False
-            return self.tie_maze(net, x, y, ri, rb_x, lanes, obs, state, reach + 1)
+            return self.tie_maze(net, x, y, ri, rb_x, lanes, obs, state, reach + 1, wiring_out=target)
 
         pb = self.pre_rail_bb  # the rails may extend the macro to the right only
         win = kdb.DBox(max(x - rx, pb.left * DBU + 0.5), max(y - ry, pb.bottom * DBU + 0.5), x + rx, min(y + ry, pb.top * DBU - 0.5))
@@ -1788,7 +2012,7 @@ class Gen:
         obs.add_m3(pad3)
         state.via2_at.setdefault((ri, net, ly), []).append(round(gx, 3))
         state.used.setdefault((ri, net), set()).add(ly)
-        self.tie_wiring.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": round(gx, 3), "region": ri, "stub": "maze"})
+        target.append({"net": net, "x": x, "y": y, "lane_y": ly, "lane_x": round(gx, 3), "region": ri, "stub": "maze"})
         return True
 
     def pins(self, top: kdb.Cell, bb: kdb.Box, ports: list[str], arr_w: int) -> list[dict]:

@@ -719,3 +719,189 @@ def test_decoder_trace_has_teeth_via2():
 
     after = _hier_split("predec3", g.L_VIA2, pick)
     assert any(len(c) > 1 for c in after.values())
+
+
+# ---- periphery supply D/S terminal routing (issue #231) ---------------------------------
+def _periphery_rail_m1_shapes(rails_cell: kdb.Cell, lm1: int) -> list:
+    arr = kdb.DBox(0.0, 0.0, g.COLS * g.bc.W_CELL, g.ROWS * g.bc.H_CELL)
+    return [sh for sh in rails_cell.shapes(lm1).each() if not arr.contains(sh.dbox.center())]
+
+
+def test_every_supply_ds_pad_reaches_its_rail():
+    import rails_check
+
+    layout, gen, top = _built()
+    res = rails_check.analyse(layout, top, gen)
+    assert res["supply_ds_pads"]["VDD"] == {
+        "expected": 1038,
+        "on_own_rail": 1038,
+        "on_other_rail": 0,
+        "floating": 0,
+        "floating_samples": [],
+    }
+    assert res["supply_ds_pads"]["VSS"] == {
+        "expected": 620,
+        "on_own_rail": 620,
+        "on_other_rail": 0,
+        "floating": 0,
+        "floating_samples": [],
+    }
+    assert res["vdd_vss_short_polygons"] == 0
+    # Independent layout+netlist-only check (gen=None) reaches the identical verdict
+    indep = rails_check.analyse(layout, top)
+    assert indep["supply_ds_pads"] == res["supply_ds_pads"]
+    assert indep["ties_expected"] == indep["ties_on_own_rail"] == 2796
+    assert indep["ties_floating"] == 0 and indep["ties_on_other_rail"] == 0
+    assert indep["vdd_vss_short_polygons"] == 0
+
+
+def test_supply_ds_probe_detects_unrouted_ds_while_ties_pass():
+    """Removing the periphery D/S Metal1 bridges from ``rails`` reproduces the pre-#231 state on the identical
+    expected terminal set: all 2,796 body ties and 16,384 risers still pass, while all 1,038 VDD and 620 VSS
+    periphery D/S pads are detected as floating."""
+    import rails_check
+
+    routed_layout, _, _ = _built()
+    expected_routed = rails_check.supply_ds_terminals(routed_layout)
+
+    unrouted_layout, _, unrouted_top = _built()
+    rails = unrouted_layout.cell("rails")
+    lm1 = unrouted_layout.layer(*g.bc.L_METAL1)
+    straps = _periphery_rail_m1_shapes(rails, lm1)
+    assert len(straps) == 1038 + 620
+    for sh in straps:
+        rails.shapes(lm1).erase(sh)
+
+    expected_unrouted = rails_check.supply_ds_terminals(unrouted_layout)
+    assert expected_unrouted == expected_routed
+
+    res = rails_check.analyse(unrouted_layout, unrouted_top)
+    assert res["ties_expected"] == res["ties_on_own_rail"] == 2796
+    assert res["ties_floating"] == 0 and res["ties_on_other_rail"] == 0
+    assert res["bitcell_risers"]["VDD"]["on_rail"] == g.ROWS * g.COLS
+    assert res["bitcell_risers"]["VSS"]["on_rail"] == g.ROWS * g.COLS
+    assert res["vdd_vss_short_polygons"] == 0
+    assert res["supply_ds_pads"]["VDD"]["expected"] == 1038
+    assert res["supply_ds_pads"]["VDD"]["on_own_rail"] == 0
+    assert res["supply_ds_pads"]["VDD"]["on_other_rail"] == 0
+    assert res["supply_ds_pads"]["VDD"]["floating"] == 1038
+    assert res["supply_ds_pads"]["VSS"]["expected"] == 620
+    assert res["supply_ds_pads"]["VSS"]["on_own_rail"] == 0
+    assert res["supply_ds_pads"]["VSS"]["on_other_rail"] == 0
+    assert res["supply_ds_pads"]["VSS"]["floating"] == 620
+
+
+def test_removing_one_supply_ds_strap_floats_only_that_pad():
+    """Teeth: sever one VDD and one VSS D/S Metal1 bridge; each floats only that single pad while ties stay wired."""
+    import rails_check
+
+    layout, gen, top = _built()
+    rails = layout.cell("rails")
+    vdd_w = next(w for w in gen.ds_wiring if w["net"] == "VDD")
+    vss_w = next(w for w in gen.ds_wiring if w["net"] == "VSS")
+    for w in (vdd_w, vss_w):
+        mx = 0.5 * (w["x"] + w["tie_x"])
+        _erase_at(rails, g.bc.L_METAL1, mx, w["y"])
+    res = rails_check.analyse(layout, top, gen)
+    assert res["ties_floating"] == 0
+    assert res["supply_ds_pads"]["VDD"]["floating"] == 1
+    assert res["supply_ds_pads"]["VDD"]["on_own_rail"] == 1037
+    assert res["supply_ds_pads"]["VSS"]["floating"] == 1
+    assert res["supply_ds_pads"]["VSS"]["on_own_rail"] == 619
+    assert res["vdd_vss_short_polygons"] == 0
+
+
+def test_supply_ds_probe_catches_wrong_rail_and_vdd_vss_short():
+    """Teeth: wiring a VSS D/S pad to a VDD tie flags ``on_other_rail``; bridging the rails flags a short."""
+    import rails_check
+
+    layout, gen, top = _built()
+    rails = layout.cell("rails")
+    vss_w = next(w for w in gen.ds_wiring if w["net"] == "VSS")
+    vdd_tie = min(
+        (t for t in gen.tie_wiring if t["net"] == "VDD"),
+        key=lambda t: abs(t["x"] - vss_w["x"]) + abs(t["y"] - vss_w["y"]),
+    )
+    _erase_at(rails, g.bc.L_METAL1, 0.5 * (vss_w["x"] + vss_w["tie_x"]), vss_w["y"])
+    # Bridge the isolated VSS D/S pad directly to the VDD tie on Metal1 (isolated from VSS trunk, so no trunk short)
+    gen.seg(rails, g.bc.L_METAL1, g.bc.M1_W, vss_w["x"], vss_w["y"], vss_w["x"], vdd_tie["y"])
+    gen.seg(rails, g.bc.L_METAL1, g.bc.M1_W, vss_w["x"], vdd_tie["y"], vdd_tie["x"], vdd_tie["y"])
+    wrong = rails_check.analyse(layout, top, gen)
+    assert wrong["supply_ds_pads"]["VSS"]["on_other_rail"] == 1
+    assert wrong["supply_ds_pads"]["VSS"]["floating"] == 1
+    assert wrong["vdd_vss_short_polygons"] == 0
+
+    # Bridging the Metal5 trunks directly flags vdd_vss_short_polygons
+    gen.seg(rails, g.L_METAL5, g.TRUNK_W, gen.trunk_x["VSS"], 10.0, gen.trunk_x["VDD"], 10.0)
+    shorted = rails_check.analyse(layout, top, gen)
+    assert shorted["vdd_vss_short_polygons"] > 0
+
+
+def test_supply_ds_routing_uses_resolved_net_not_polarity_and_handles_repeated_instances():
+    """A repeated subcircuit whose port is tied to VDD in one instance and to a signal in another, plus cross-polarity
+    D terminals (NMOS D on VDD while B is VSS; PMOS D on VSS while B is VDD), must route exactly the supply-resolved
+    D/S pads to their assigned rails and leave the signal instance untouched."""
+    import rails_check
+
+    gen = g.Gen()
+    gen.nl = {
+        "rep_cell": g.Subckt(
+            "rep_cell",
+            ["P", "G", "OUT", "VDD", "VSS"],
+            [
+                # NMOS with D on port P (VDD in X0, SIG in X1), S on OUT, B on VSS (cross-polarity when P=VDD!)
+                g.Inst("XMN", ["P", "G", "OUT", "VSS"], "sg13_lv_nmos", {"w": "0.5u", "l": "0.13u"}),
+                # PMOS with D on VSS (cross-polarity to B=VDD!), S on VDD (same-polarity), B on VDD
+                g.Inst("XMP", ["VSS", "G", "VDD", "VDD"], "sg13_lv_pmos", {"w": "0.5u", "l": "0.13u"}),
+            ],
+        ),
+        "mini": g.Subckt(
+            "mini",
+            ["SIG", "G", "O0", "O1", "VDD", "VSS"],
+            [
+                g.Inst("X0", ["VDD", "G", "O0", "VDD", "VSS"], "rep_cell", {}),
+                g.Inst("X1", ["SIG", "G", "O1", "VDD", "VSS"], "rep_cell", {}),
+            ],
+        ),
+    }
+    top = gen.layout.create_cell("mini")
+    gen.cells["mini"] = top
+    gen.place_of["mini"] = {}
+    ch = gen.subckt("rep_cell")
+    bb = ch.bbox()
+    regions = []
+    for k, iname in enumerate(("X0", "X1")):
+        dx = k * (bb.width() + g.dbu(4.0)) - bb.left
+        dy = -bb.bottom
+        gen.place(top, ch, dx, dy)
+        gen.place_of["mini"][iname] = (dx, dy)
+        regions.append(bb.moved(dx, dy).enlarged(g.dbu(2.0), g.dbu(2.0)))
+    gen.pre_rail_bb = top.bbox().enlarged(g.dbu(3.0), g.dbu(3.0))
+    gen.rails(top, regions, top.bbox().right, top_name="mini")
+
+    res = rails_check.analyse(gen.layout, top, gen)
+    # Expected supply D/S pads:
+    # VDD: X0/XMN.D (1) + X0/XMP.S (1) + X1/XMP.S (1) = 3
+    # VSS: X0/XMP.D (1) + X1/XMP.D (1) = 2
+    assert res["supply_ds_pads"]["VDD"]["expected"] == 3
+    assert res["supply_ds_pads"]["VDD"]["on_own_rail"] == 3
+    assert res["supply_ds_pads"]["VDD"]["on_other_rail"] == 0
+    assert res["supply_ds_pads"]["VDD"]["floating"] == 0
+    assert res["supply_ds_pads"]["VSS"]["expected"] == 2
+    assert res["supply_ds_pads"]["VSS"]["on_own_rail"] == 2
+    assert res["supply_ds_pads"]["VSS"]["on_other_rail"] == 0
+    assert res["supply_ds_pads"]["VSS"]["floating"] == 0
+    assert res["ties_expected"] == res["ties_on_own_rail"] == 4
+    assert res["vdd_vss_short_polygons"] == 0
+
+    # And X1/XMN.D (wired to SIG, not VDD) must NOT reach either supply trunk
+    x1_dx, x1_dy = gen.place_of["mini"]["X1"]
+    sig_x = gen.dev_pts["rep_cell"]["XMN"]["D"][0] + x1_dx * g.DBU
+    sig_y = gen.dev_pts["rep_cell"]["XMN"]["D"][1] + x1_dy * g.DBU
+    # Check trunk connectivity specifically via rails_check._grow
+    regs = {k: kdb.Region(top.begin_shapes_rec(gen.li(lp))).merged() for k, lp in rails_check._LAYERS.items()}
+    trunk_pts = rails_check._trunks_from_layout(gen.layout)
+    for net in ("VDD", "VSS"):
+        grown = rails_check._grow(regs, kdb.Region(rails_check._box(trunk_pts[net][0], trunk_pts[net][1], 0.01)))
+        assert (kdb.Region(rails_check._box(sig_x, sig_y, 0.01)) & grown["m1"]).is_empty()
+
