@@ -133,7 +133,7 @@ python3 -I - "$WORK" "$OUT" "$TABLE" <<'CHEOF'
 import hashlib, json, sys
 
 work, out, table_raw = sys.argv[1:4]
-t = dict(line.split("=", 1) for line in table_raw.splitlines() if line.strip())
+t = dict(line.split("=", 1) for line in table_raw.splitlines() if line.strip() and not line.lstrip().startswith("#"))
 load = lambda n: json.load(open(f"{work}/{n}.json"))
 rec = json.load(open(out))
 inv = {i["name"]: i for i in rec["invocations"]}
@@ -237,7 +237,7 @@ python3 -I - "$WORK" "$KLT_PIN" "$TABLE" <<'PYEOF' > "$WORK/record.json"
 import hashlib, json, sys
 
 work, pin, table_raw = sys.argv[1:4]
-t = dict(line.split("=", 1) for line in table_raw.splitlines() if line.strip())
+t = dict(line.split("=", 1) for line in table_raw.splitlines() if line.strip() and not line.lstrip().startswith("#"))
 macro, tile = t["macro"], t["tile"]
 sha = lambda p: "sha256:" + hashlib.sha256(open(p, "rb").read()).hexdigest()
 load = lambda n: json.load(open(f"{work}/{n}.json"))
