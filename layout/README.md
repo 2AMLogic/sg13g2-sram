@@ -265,7 +265,9 @@ lists LU.* and Pad.*). Periphery devices use bitcell-derived rule constants.
 
 `klt array-check` on the committed `layout/sram_256x32/macro.gds` (8192 bitcells, 128 rows x 64
 columns) -> `layout/reports/array-check-macro.json`, minted by
-`layout/reports/generate-array-check.sh` and re-run by `./layout/verify.sh` step 10.
+`layout/reports/generate-array-check.sh`; `./layout/verify.sh` step 10 re-runs the same
+invocations through that script's `--check` mode (issue #247), which asserts the abutment and
+symmetry expectations in both modes, so the mint and the check cannot drift apart.
 
 The check is run with **released `klayout-tools==0.9.1` through `uvx`**, not the host klt and not
 the `klayout-tools==0.9.2` this repo pins for signoff. The repo deliberately carries two klt pins
