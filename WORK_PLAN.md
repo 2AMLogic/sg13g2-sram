@@ -6,10 +6,10 @@ refreshes this file. Date the snapshot with `git log -1 -- WORK_PLAN.md`.
 Only the region between the markers is machine-generated.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-24T14:40:00Z (snapshot; compare against live labels)_
+_Generated: 2026-11-27T16:36:29Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
-Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
+Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — a human merge decision, or the prerequisite shown, is missing.
 
 _None._
 
@@ -33,13 +33,19 @@ _None._
 
 ## Ready
 
-Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
+Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues with an open linked PR (native admission `OPEN_PR`; listed under Issues with Open PRs).
 
-- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7
-- **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module
-- **#72**: spec: internal inconsistencies in sram.md text
-- **#74**: spec: no area target, min-clock-pulse, power or retention rows
-- **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface
+_None._
+
+## Issues with Open PRs (Not Dispatchable)
+
+`loom:issue` issues an open linked PR already holds — native admission would refuse them (`OPEN_PR`); listed with the PR and its stage, not counted above.
+
+- **#37**: Post-hoc two-key ratification review of spec/sram.md as merged in #7 — open PR #77 (held)
+- **#56**: Consolidate duplicated helpers across sim/*_post.py into one shared module — open PR #64 (held)
+- **#72**: spec: internal inconsistencies in sram.md text — open PR #78 (held)
+- **#74**: spec: no area target, min-clock-pulse, power or retention rows — open PR #80 (held)
+- **#126**: netlist: scalar WEN vs the origin's per-bit WEN[31:0]; Views row ratified by #79 assumes the per-bit interface — open PR #130 (held)
 
 ## In Progress
 
@@ -60,7 +66,7 @@ PRs waiting on Judge (`loom:review-requested`).
 
 ## Approved (Awaiting Merge)
 
-PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
+PRs that passed review (`loom:pr`); unmarked PRs are queued for Champion auto-merge, PRs marked `*(held …)*` are not (the hold decides).
 
 _None._
 
@@ -96,8 +102,9 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 7 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 5 |
+| Ready (`loom:issue`, net of holds/building/open-linked-PRs) | 0 |
 | In Progress (`loom:building`) | 3 |
+| Held, no other bucket | 3 |
 | PRs awaiting review | 4 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 12 |
