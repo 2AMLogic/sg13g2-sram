@@ -7,6 +7,7 @@
 #   export PDK=ihp-sg13g2
 #   sim/tools/build-osdi.sh                 # fetch compiler + compile models
 #   sim/tools/build-osdi.sh --check         # verify only: models present + loadable
+#   sim/tools/build-osdi.sh --print-pins    # print the toolchain pins as JSON (no PDK, no network)
 #
 # WHAT THIS DOES AND WHY
 #
@@ -34,36 +35,73 @@
 set -euo pipefail
 
 # --------------------------------------------------------------------------
-# Pins. These are the single source of truth; sim/pdk.json's
-# "osdi_toolchain" block restates them as a greppable fact sheet (that file
-# is documentation, not consumed by tooling). Keep the two in sync.
-# --------------------------------------------------------------------------
-OPENVAF_REPO="OpenVAF/OpenVAF-Reloaded"
-OPENVAF_TAG="v24.0.1mob"
-OPENVAF_BASE_URL="https://github.com/${OPENVAF_REPO}/releases/download/${OPENVAF_TAG}"
-
-# asset name -> sha256, as published by GitHub's release API for ${OPENVAF_TAG}
+# Pins. The JSON block below is the single statement of every pin this script
+# uses; the build reads its values from it (pin <key>), and
+# `build-osdi.sh --print-pins` prints it verbatim for consumers to read
+# instead of restating the values. Format contract (so plain sed can read it,
+# no jq/python3 needed -- neither is guaranteed on stock macOS): one
+# `"key": "value"` per line, flat, values free of quotes and backslashes.
+#
+# asset sha256s: as published by GitHub's release API for the tag
 # (`gh api repos/OpenVAF/OpenVAF-Reloaded/releases --jq '.[0].assets[]|{name,digest}'`,
-# re-checked 2026-08-21). Only the macos-aarch64 entry has been executed and
-# used to produce evidence in this repo so far -- see sim/README.md.
-OPENVAF_ASSET_macos_aarch64="openvaf-r-${OPENVAF_TAG}-macos-aarch64.tar.gz"
-OPENVAF_SHA_macos_aarch64="b59a6d7ffba0cdc2e3d3d27edb62d686cde72e7fbe9931f7bed6a4538c15e85e"
-OPENVAF_ASSET_macos_x86_64="openvaf-r-${OPENVAF_TAG}-macos-x86_64.tar.gz"
-OPENVAF_SHA_macos_x86_64="1635e728a81830326c06d4f81e96f2a8943e661b906d4046084c35ff7595f41e"
-OPENVAF_ASSET_linux_x86_64="openvaf-r-${OPENVAF_TAG}-linux-x86_64.tar.gz"
-OPENVAF_SHA_linux_x86_64="3297e32f68becf5e0d4709d7f731d7d26f87f88dc136041334677d3ab36279e3"
-
-# Linux/x86_64 only (issue #31): the pinned openvaf-r release above ships
-# lib/libLLVM.so.21.1 as a *dangling symlink* to
+# re-checked 2026-08-21). Only the macos-aarch64 entry had been executed to
+# produce evidence in this repo at that time -- see sim/README.md.
+#
+# libllvm21_deb_* (Linux/x86_64 only, issue #31): the pinned openvaf-r
+# release ships lib/libLLVM.so.21.1 as a *dangling symlink* to
 # ../../x86_64-linux-gnu/libLLVM.so.21.1 -- it assumes the host already has a
 # system-installed LLVM 21, which no current Ubuntu LTS ships (24.04/noble
 # tops out at libllvm20). Fetch the real .so from the official LLVM apt
 # repo's .deb (dpkg-deb -x, no root needed) and point LD_LIBRARY_PATH at it
 # for our own openvaf-r invocations. Pin re-checked 2026-08-21; see
 # https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-21/ for updates.
-LIBLLVM21_DEB_URL="https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-21/libllvm21_21.1.8~++20251221032922+2078da43e25a-1~exp1~20251221153059.70_amd64.deb"
-LIBLLVM21_DEB_SHA256="f1f058fff19f9d711c32b9efe5cd473dd2f0e7d5338d082fa5a25858322048cd"
-LIBLLVM21_DEB_CODENAME="noble"
+# --------------------------------------------------------------------------
+: <<'PINS_JSON'
+{
+  "openvaf_repo": "OpenVAF/OpenVAF-Reloaded",
+  "openvaf_tag": "v24.0.1mob",
+  "openvaf_asset_macos_aarch64": "openvaf-r-v24.0.1mob-macos-aarch64.tar.gz",
+  "openvaf_sha256_macos_aarch64": "b59a6d7ffba0cdc2e3d3d27edb62d686cde72e7fbe9931f7bed6a4538c15e85e",
+  "openvaf_asset_macos_x86_64": "openvaf-r-v24.0.1mob-macos-x86_64.tar.gz",
+  "openvaf_sha256_macos_x86_64": "1635e728a81830326c06d4f81e96f2a8943e661b906d4046084c35ff7595f41e",
+  "openvaf_asset_linux_x86_64": "openvaf-r-v24.0.1mob-linux-x86_64.tar.gz",
+  "openvaf_sha256_linux_x86_64": "3297e32f68becf5e0d4709d7f731d7d26f87f88dc136041334677d3ab36279e3",
+  "libllvm21_deb_url": "https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-21/libllvm21_21.1.8~++20251221032922+2078da43e25a-1~exp1~20251221153059.70_amd64.deb",
+  "libllvm21_deb_sha256": "f1f058fff19f9d711c32b9efe5cd473dd2f0e7d5338d082fa5a25858322048cd",
+  "libllvm21_deb_codename": "noble"
+}
+PINS_JSON
+
+# print_pins: the JSON block above, verbatim (no network, no PDK).
+print_pins() {
+  sed -n "/^: <<'PINS_JSON'\$/,/^PINS_JSON\$/p" "${BASH_SOURCE[0]}" | sed '1d;$d'
+}
+
+# pin <key>: value of one pin, read from the same block print_pins prints.
+pin() {
+  local v
+  v="$(print_pins | sed -n "s/^ *\"$1\": *\"\(.*\)\",\{0,1\}\$/\1/p")"
+  if [[ -z "${v}" ]]; then
+    echo "build-osdi.sh: internal error: pin '$1' missing from the embedded pins block." >&2
+    exit 3
+  fi
+  printf '%s\n' "${v}"
+}
+
+OPENVAF_REPO="$(pin openvaf_repo)"
+OPENVAF_TAG="$(pin openvaf_tag)"
+OPENVAF_BASE_URL="https://github.com/${OPENVAF_REPO}/releases/download/${OPENVAF_TAG}"
+
+OPENVAF_ASSET_macos_aarch64="$(pin openvaf_asset_macos_aarch64)"
+OPENVAF_SHA_macos_aarch64="$(pin openvaf_sha256_macos_aarch64)"
+OPENVAF_ASSET_macos_x86_64="$(pin openvaf_asset_macos_x86_64)"
+OPENVAF_SHA_macos_x86_64="$(pin openvaf_sha256_macos_x86_64)"
+OPENVAF_ASSET_linux_x86_64="$(pin openvaf_asset_linux_x86_64)"
+OPENVAF_SHA_linux_x86_64="$(pin openvaf_sha256_linux_x86_64)"
+
+LIBLLVM21_DEB_URL="$(pin libllvm21_deb_url)"
+LIBLLVM21_DEB_SHA256="$(pin libllvm21_deb_sha256)"
+LIBLLVM21_DEB_CODENAME="$(pin libllvm21_deb_codename)"
 LIBLLVM21_DEB_ASSET="libllvm21_21.1.8-${LIBLLVM21_DEB_CODENAME}_amd64.deb"
 
 # model basename -> subdirectory under libs.tech/verilog-a, mirroring the
@@ -79,7 +117,8 @@ for arg in "$@"; do
   case "${arg}" in
     --check) CHECK_ONLY=1 ;;
     --force) FORCE=1 ;;
-    -h|--help) sed -n '2,40p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    --print-pins) print_pins; exit 0 ;;
+    -h|--help) sed -n '2,/^set -euo pipefail/{/^set -euo/!p}' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) echo "build-osdi.sh: unknown argument '${arg}'" >&2; exit 2 ;;
   esac
 done
