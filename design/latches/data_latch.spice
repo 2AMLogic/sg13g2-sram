@@ -2,9 +2,15 @@
 
 * write-data input latch, transparent while CLK is low, holds while CLK is high
 
-.subckt data_latch CLK D[31] D[30] D[29] D[28] D[27] D[26] D[25] D[24] D[23] D[22] D[21] D[20] D[19] D[18] D[17] D[16] D[15]
-+ D[14] D[13] D[12] D[11] D[10] D[9] D[8] D[7] D[6] D[5] D[4] D[3] D[2] D[1] D[0] Q[31] Q[30] Q[29] Q[28] Q[27] Q[26] Q[25] Q[24] Q[23]
-+ Q[22] Q[21] Q[20] Q[19] Q[18] Q[17] Q[16] Q[15] Q[14] Q[13] Q[12] Q[11] Q[10] Q[9] Q[8] Q[7] Q[6] Q[5] Q[4] Q[3] Q[2] Q[1] Q[0] VDD VSS
+.subckt data_latch CLK D[31] D[30] D[29] D[28] D[27] D[26] D[25] D[24] D[23] D[22] D[21] D[20]
++ D[19] D[18] D[17] D[16] D[15] D[14] D[13] D[12] D[11] D[10] D[9] D[8] D[7] D[6] D[5] D[4] D[3] D[2] D[1]
++ D[0] WEN[31] WEN[30] WEN[29] WEN[28] WEN[27] WEN[26] WEN[25] WEN[24] WEN[23] WEN[22] WEN[21] WEN[20]
++ WEN[19] WEN[18] WEN[17] WEN[16] WEN[15] WEN[14] WEN[13] WEN[12] WEN[11] WEN[10] WEN[9] WEN[8] WEN[7] WEN[6]
++ WEN[5] WEN[4] WEN[3] WEN[2] WEN[1] WEN[0] Q[31] Q[30] Q[29] Q[28] Q[27] Q[26] Q[25] Q[24] Q[23] Q[22]
++ Q[21] Q[20] Q[19] Q[18] Q[17] Q[16] Q[15] Q[14] Q[13] Q[12] Q[11] Q[10] Q[9] Q[8] Q[7] Q[6] Q[5] Q[4]
++ Q[3] Q[2] Q[1] Q[0] WENL[31] WENL[30] WENL[29] WENL[28] WENL[27] WENL[26] WENL[25] WENL[24] WENL[23]
++ WENL[22] WENL[21] WENL[20] WENL[19] WENL[18] WENL[17] WENL[16] WENL[15] WENL[14] WENL[13] WENL[12] WENL[11]
++ WENL[10] WENL[9] WENL[8] WENL[7] WENL[6] WENL[5] WENL[4] WENL[3] WENL[2] WENL[1] WENL[0] VDD VSS
 *.ipin CLK
 *.ipin D[31]
 *.ipin D[30]
@@ -38,6 +44,38 @@
 *.ipin D[2]
 *.ipin D[1]
 *.ipin D[0]
+*.ipin WEN[31]
+*.ipin WEN[30]
+*.ipin WEN[29]
+*.ipin WEN[28]
+*.ipin WEN[27]
+*.ipin WEN[26]
+*.ipin WEN[25]
+*.ipin WEN[24]
+*.ipin WEN[23]
+*.ipin WEN[22]
+*.ipin WEN[21]
+*.ipin WEN[20]
+*.ipin WEN[19]
+*.ipin WEN[18]
+*.ipin WEN[17]
+*.ipin WEN[16]
+*.ipin WEN[15]
+*.ipin WEN[14]
+*.ipin WEN[13]
+*.ipin WEN[12]
+*.ipin WEN[11]
+*.ipin WEN[10]
+*.ipin WEN[9]
+*.ipin WEN[8]
+*.ipin WEN[7]
+*.ipin WEN[6]
+*.ipin WEN[5]
+*.ipin WEN[4]
+*.ipin WEN[3]
+*.ipin WEN[2]
+*.ipin WEN[1]
+*.ipin WEN[0]
 *.opin Q[31]
 *.opin Q[30]
 *.opin Q[29]
@@ -70,6 +108,38 @@
 *.opin Q[2]
 *.opin Q[1]
 *.opin Q[0]
+*.opin WENL[31]
+*.opin WENL[30]
+*.opin WENL[29]
+*.opin WENL[28]
+*.opin WENL[27]
+*.opin WENL[26]
+*.opin WENL[25]
+*.opin WENL[24]
+*.opin WENL[23]
+*.opin WENL[22]
+*.opin WENL[21]
+*.opin WENL[20]
+*.opin WENL[19]
+*.opin WENL[18]
+*.opin WENL[17]
+*.opin WENL[16]
+*.opin WENL[15]
+*.opin WENL[14]
+*.opin WENL[13]
+*.opin WENL[12]
+*.opin WENL[11]
+*.opin WENL[10]
+*.opin WENL[9]
+*.opin WENL[8]
+*.opin WENL[7]
+*.opin WENL[6]
+*.opin WENL[5]
+*.opin WENL[4]
+*.opin WENL[3]
+*.opin WENL[2]
+*.opin WENL[1]
+*.opin WENL[0]
 *.iopin VDD
 *.iopin VSS
 XCB CLK CLKB VDD VSS inv
@@ -105,6 +175,38 @@ XL[3] D[3] CLKB CLK Q[3] VDD VSS dlatch
 XL[2] D[2] CLKB CLK Q[2] VDD VSS dlatch
 XL[1] D[1] CLKB CLK Q[1] VDD VSS dlatch
 XL[0] D[0] CLKB CLK Q[0] VDD VSS dlatch
+XM[31] WEN[31] CLKB CLK WENL[31] VDD VSS dlatch
+XM[30] WEN[30] CLKB CLK WENL[30] VDD VSS dlatch
+XM[29] WEN[29] CLKB CLK WENL[29] VDD VSS dlatch
+XM[28] WEN[28] CLKB CLK WENL[28] VDD VSS dlatch
+XM[27] WEN[27] CLKB CLK WENL[27] VDD VSS dlatch
+XM[26] WEN[26] CLKB CLK WENL[26] VDD VSS dlatch
+XM[25] WEN[25] CLKB CLK WENL[25] VDD VSS dlatch
+XM[24] WEN[24] CLKB CLK WENL[24] VDD VSS dlatch
+XM[23] WEN[23] CLKB CLK WENL[23] VDD VSS dlatch
+XM[22] WEN[22] CLKB CLK WENL[22] VDD VSS dlatch
+XM[21] WEN[21] CLKB CLK WENL[21] VDD VSS dlatch
+XM[20] WEN[20] CLKB CLK WENL[20] VDD VSS dlatch
+XM[19] WEN[19] CLKB CLK WENL[19] VDD VSS dlatch
+XM[18] WEN[18] CLKB CLK WENL[18] VDD VSS dlatch
+XM[17] WEN[17] CLKB CLK WENL[17] VDD VSS dlatch
+XM[16] WEN[16] CLKB CLK WENL[16] VDD VSS dlatch
+XM[15] WEN[15] CLKB CLK WENL[15] VDD VSS dlatch
+XM[14] WEN[14] CLKB CLK WENL[14] VDD VSS dlatch
+XM[13] WEN[13] CLKB CLK WENL[13] VDD VSS dlatch
+XM[12] WEN[12] CLKB CLK WENL[12] VDD VSS dlatch
+XM[11] WEN[11] CLKB CLK WENL[11] VDD VSS dlatch
+XM[10] WEN[10] CLKB CLK WENL[10] VDD VSS dlatch
+XM[9] WEN[9] CLKB CLK WENL[9] VDD VSS dlatch
+XM[8] WEN[8] CLKB CLK WENL[8] VDD VSS dlatch
+XM[7] WEN[7] CLKB CLK WENL[7] VDD VSS dlatch
+XM[6] WEN[6] CLKB CLK WENL[6] VDD VSS dlatch
+XM[5] WEN[5] CLKB CLK WENL[5] VDD VSS dlatch
+XM[4] WEN[4] CLKB CLK WENL[4] VDD VSS dlatch
+XM[3] WEN[3] CLKB CLK WENL[3] VDD VSS dlatch
+XM[2] WEN[2] CLKB CLK WENL[2] VDD VSS dlatch
+XM[1] WEN[1] CLKB CLK WENL[1] VDD VSS dlatch
+XM[0] WEN[0] CLKB CLK WENL[0] VDD VSS dlatch
 .ends
 
 * expanding   symbol:  gates/inv.sym # of pins=4

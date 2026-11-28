@@ -65,7 +65,7 @@ def test_write_slower_than_pulse_fails():
 
 
 def access_meas(**over) -> dict:
-    m = {"vdd_check": 1.2, "tclk_read1b": 44.05e-9, "tclk_read0": 28.05e-9, "tclk_write1": 4.05e-9, "tclk_write0": 20.05e-9,
+    m = {"vdd_check": 1.2, "tclk_read1b": 44.05e-9, "cell_after_write0m": 1.2, "qend_read1m": 1.2, "tclk_read0": 28.05e-9, "tclk_write1": 4.05e-9, "tclk_write0": 20.05e-9,
          "tq_read1b": 45.2e-9, "tq_read0": 29.3e-9, "qend_read1": 1.2, "qend_read0": 0.0, "qend_read1b": 1.2,
          "tflip_write1": 5.0e-9, "tflip_write0": 21.0e-9, "twl_rise_write1": 4.5e-9, "twl_rise_write0": 20.5e-9,
          "cell_after_write1": 1.2, "cell_after_write0": -1.2}
@@ -90,6 +90,15 @@ def test_access_failing_cases_are_counted():
     v = ap.verdict_access(access_meas(qend_read0=0.5))                    # Q settles mid-rail
     assert not v["checks"]["read0_valid"]
     assert not ap.verdict_access({"vdd_check": 1.2})["pass"]              # missing measurements
+
+
+def test_access_mask_negative_control_fails():
+    # a macro that ignores WEN[0] writes the 0 into the masked bit: the cell flips and the read returns 0
+    assert ap.verdict_access(access_meas())["checks"]["masked_write_leaves_bit"]
+    v = ap.verdict_access(access_meas(cell_after_write0m=-1.2, qend_read1m=0.0))
+    assert not v["pass"] and not v["checks"]["masked_write_leaves_bit"]
+    assert not ap.verdict_access(access_meas(cell_after_write0m=-1.2))["checks"]["masked_write_leaves_bit"]
+    assert not ap.verdict_access(access_meas(qend_read1m=0.0))["checks"]["masked_write_leaves_bit"]
 
 
 def test_access_timeline_is_consistent():

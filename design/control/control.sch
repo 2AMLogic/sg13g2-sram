@@ -76,12 +76,7 @@ C {devices/lab_pin.sym} 360.0 610.0 0 0 {name=l54 lab=E3}
 C {devices/lab_pin.sym} 360.0 630.0 0 0 {name=l55 lab=E4}
 C {devices/lab_pin.sym} 360.0 650.0 0 0 {name=l56 lab=VDD}
 C {devices/lab_pin.sym} 360.0 670.0 0 0 {name=l57 lab=VSS}
-C {gates/nor2.sym} 800 640 0 0 {name=XWR}
-C {devices/lab_pin.sym} 760.0 600.0 0 0 {name=l58 lab=GWENL}
-C {devices/lab_pin.sym} 760.0 620.0 0 0 {name=l59 lab=WENL}
-C {devices/lab_pin.sym} 760.0 640.0 0 0 {name=l60 lab=WRITE}
-C {devices/lab_pin.sym} 760.0 660.0 0 0 {name=l61 lab=VDD}
-C {devices/lab_pin.sym} 760.0 680.0 0 0 {name=l62 lab=VSS}
+C {gates/inv.sym} 800 640 0 0 {name=XWR}
 C {gates/inv.sym} 1200 640 0 0 {name=XWRB}
 C {devices/lab_pin.sym} 1160.0 610.0 0 0 {name=l63 lab=WRITE}
 C {devices/lab_pin.sym} 1160.0 630.0 0 0 {name=l64 lab=WRITEB}
@@ -140,21 +135,24 @@ C {devices/lab_pin.sym} 360.0 1270.0 0 0 {name=l106 lab=SEL1}
 C {devices/lab_pin.sym} 360.0 1290.0 0 0 {name=l107 lab=SEL1B}
 C {devices/lab_pin.sym} 360.0 1310.0 0 0 {name=l108 lab=VDD}
 C {devices/lab_pin.sym} 360.0 1330.0 0 0 {name=l109 lab=VSS}
-C {devices/ipin.sym} -900 -300 0 0 {name=p110 lab=CLK}
-C {devices/ipin.sym} -900 -260 0 0 {name=p111 lab=CENL}
-C {devices/ipin.sym} -900 -220 0 0 {name=p112 lab=GWENL}
-C {devices/ipin.sym} -900 -180 0 0 {name=p113 lab=WENL}
-C {devices/ipin.sym} -900 -140 0 0 {name=p114 lab=A0L}
-C {devices/opin.sym} -900 -100 0 0 {name=p115 lab=PRE_B}
-C {devices/opin.sym} -900 -60 0 0 {name=p116 lab=WLEN}
-C {devices/opin.sym} -900 -20 0 0 {name=p117 lab=SAE}
-C {devices/opin.sym} -900 20 0 0 {name=p118 lab=WE}
-C {devices/opin.sym} -900 60 0 0 {name=p119 lab=SEL0}
-C {devices/opin.sym} -900 100 0 0 {name=p120 lab=SEL0B}
-C {devices/opin.sym} -900 140 0 0 {name=p121 lab=SEL1}
-C {devices/opin.sym} -900 180 0 0 {name=p122 lab=SEL1B}
-C {devices/iopin.sym} -900 220 0 0 {name=p123 lab=VDD}
-C {devices/iopin.sym} -900 260 0 0 {name=p124 lab=VSS}
+C {devices/ipin.sym} -900 -300 0 0 {name=pw28 lab=CLK}
+C {devices/ipin.sym} -900 -260 0 0 {name=pw29 lab=CENL}
+C {devices/ipin.sym} -900 -220 0 0 {name=pw30 lab=GWENL}
+C {devices/ipin.sym} -900 -180 0 0 {name=pw31 lab=A0L}
+C {devices/opin.sym} -900 -140 0 0 {name=pw32 lab=PRE_B}
+C {devices/opin.sym} -900 -100 0 0 {name=pw33 lab=WLEN}
+C {devices/opin.sym} -900 -60 0 0 {name=pw34 lab=SAE}
+C {devices/opin.sym} -900 -20 0 0 {name=pw35 lab=WE}
+C {devices/opin.sym} -900 20 0 0 {name=pw36 lab=SEL0}
+C {devices/opin.sym} -900 60 0 0 {name=pw37 lab=SEL0B}
+C {devices/opin.sym} -900 100 0 0 {name=pw38 lab=SEL1}
+C {devices/opin.sym} -900 140 0 0 {name=pw39 lab=SEL1B}
+C {devices/iopin.sym} -900 180 0 0 {name=pw40 lab=VDD}
+C {devices/iopin.sym} -900 220 0 0 {name=pw41 lab=VSS}
+C {devices/lab_pin.sym} 760 610 0 0 {name=lw42 lab=GWENL}
+C {devices/lab_pin.sym} 760 630 0 0 {name=lw43 lab=WRITE}
+C {devices/lab_pin.sym} 760 650 0 0 {name=lw44 lab=VDD}
+C {devices/lab_pin.sym} 760 670 0 0 {name=lw45 lab=VSS}
 C {devices/code_shown.sym} -900 0 0 0 {name=NOTE only_toplevel=false
 place=header
 value="* timing: ACT = CLK & ~CENL; PRE_B follows ACT; WLEN = ACT & delayed ACT; SAE = WLEN & delayed WLEN & read; WE = WLEN & write; SEL* from A0L"}

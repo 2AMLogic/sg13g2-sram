@@ -1,0 +1,17 @@
+klt sim: warning: batch job bound 81120s (options.timeout_s 1800s x 45 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. Set request.remote.hosts to at least 45 to run one job per shard of at most 1 units, each within the ceiling
+klt: batch job klt-sim-68bbff8957b3 submitting to s3://<bucket>/jobs/klt-sim-68bbff8957b3
+klt sim: batch job klt-sim-68bbff8957b3: submitted
+klt sim: batch job klt-sim-68bbff8957b3 launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-68bbff8957b3`
+klt sim: batch job klt-sim-68bbff8957b3 state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-68bbff8957b3: running
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=32s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=339s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=646s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=954s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=1261s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=1569s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=1876s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=2183s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=2491s
+klt sim: batch job klt-sim-68bbff8957b3 state=running elapsed=2798s
+klt sim: batch job klt-sim-68bbff8957b3: done
